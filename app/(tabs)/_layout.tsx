@@ -1,8 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
@@ -27,34 +23,34 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home/home"
+        name="home/index"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
+            <MaterialIcons size={28} name="home" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="recherche/recherche"
+        name="search/index"
         options={{
           title: "Recherche",
           tabBarIcon: ({ color }) => (
-            <AntDesign size={28} name="search1" color={color} />
+            <MaterialIcons size={28} name="search" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="recommande/recommande"
+        name="recommended/index"
         options={{
           title: "Recommande",
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 size={28} name="heart" color={color} />
+            <MaterialIcons size={28} name="favorite" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="swipe/swipe"
+        name="swipe/index"
         options={{
           title: "Swipe",
           tabBarIcon: ({ color }) => (
@@ -63,11 +59,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profil/profil"
+        name="profile/index"
         options={{
           title: "Profil",
           tabBarIcon: ({ color }) => (
-            <Octicons size={28} name="person" color={color} />
+            <MaterialIcons size={28} name="person" color={color} />
           ),
         }}
       />

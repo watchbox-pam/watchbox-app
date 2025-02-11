@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Recommande() {
+export default function Index() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Recommande() {
         alignItems: "center",
       }}
     >
-      <Text>Recommande</Text>
+      <Text>Swipe</Text>
     </View>
   );
 }

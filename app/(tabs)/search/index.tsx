@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Swipe() {
+export default function Index() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Swipe() {
         alignItems: "center",
       }}
     >
-      <Text>Swipe</Text>
+      <Text>Recherche</Text>
     </View>
   );
 }

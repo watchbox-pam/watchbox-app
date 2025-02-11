@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Profil() {
+export default function Index() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Profil() {
         alignItems: "center",
       }}
     >
-      <Text>Profil</Text>
+      <Text>Home</Text>
     </View>
   );
 }
