@@ -41,7 +41,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="recommended/index"
+        name="recommendation/index"
         options={{
           title: "Recommande",
           tabBarIcon: ({ color }) => (
