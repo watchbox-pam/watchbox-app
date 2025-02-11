@@ -7,9 +7,10 @@ export default function Index() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "#0A1E38"
       }}
     >
-      <Text>Home</Text>
+      <Text>Recommande</Text>
     </View>
   );
 }
