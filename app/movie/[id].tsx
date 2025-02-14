@@ -7,6 +7,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Button, Image, ScrollView, StyleSheet, View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Index() {
   const { id } = useLocalSearchParams();
@@ -127,6 +128,11 @@ export default function Index() {
       overScrollMode="never"
     >
       <View style={styles.imageBannerContainer}>
+        <LinearGradient
+          // Background Linear Gradient
+          colors={["#0A1E38", "transparent"]}
+          style={styles.shadowBottom}
+        />
         <Image
           source={{ uri: "https://image.tmdb.org/t/p/original" + media.banner }}
           style={styles.imageBanner}
@@ -221,13 +227,16 @@ const styles = StyleSheet.create({
   },
   imageBannerContainer: {
     width: "100%",
+    aspectRatio: 16 / 9,
   },
   imageBanner: {
-    aspectRatio: 16 / 9,
+    width: "100%",
+    height: "100%",
   },
   imagePosterContainer: {
     width: "30%",
     marginRight: 20,
+    zIndex: 1,
   },
   imagePoster: {
     aspectRatio: 2 / 3,
@@ -294,5 +303,14 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingLeft: 20,
     marginTop: 30,
+  },
+  shadowBottom: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "60%",
+    transform: [{ rotate: "180deg" }],
+    zIndex: 1,
   },
 });
