@@ -1,5 +1,6 @@
 import React from "react";
 import { FlatList, StyleSheet, View, Image } from "react-native";
+import { Link } from "expo-router";
 
 export default function CarouselPoster({ providers }: { providers: any }) {
   return (
@@ -10,13 +11,19 @@ export default function CarouselPoster({ providers }: { providers: any }) {
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.imageContainer}>
+          <Link
+            style={styles.imageContainer}
+            href={{
+              pathname: "/movie/[id]",
+              params: { id: "1" },
+            }}
+          >
             <Image
               source={{ uri: `https://image.tmdb.org/t/p/w500${item}` }} // 🛠️ Correction URL
               style={styles.image}
               resizeMode="cover"
             />
-          </View>
+          </Link>
         )}
       />
     </View>
@@ -31,7 +38,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginRight: 10,
-    width: 120, // Largeur fixe pour chaque poster
+    width: 100, // Largeur fixe pour chaque poster
+    margin: 10,
   },
   container: {
     height: 200, // Ajuste selon le design
