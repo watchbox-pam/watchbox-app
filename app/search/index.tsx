@@ -13,6 +13,14 @@ export default function Index() {
     >
       <Text>Recherche</Text>
       <Link
+        style={{
+          width: "50%",
+          height: 50,
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          marginTop: 10,
+          justifyContent: "center",
+        }}
         href={{
           pathname: "/movie/[id]",
           params: { id: "1" },
