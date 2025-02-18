@@ -19,7 +19,7 @@ export default function CarouselPoster({ providers }: { providers: any }) {
             }}
           >
             <Image
-              source={{ uri: `https://image.tmdb.org/t/p/w500${item}` }} // 🛠️ Correction URL
+              source={{ uri: `https://image.tmdb.org/t/p/w500${item}` }}
               style={styles.image}
               resizeMode="cover"
             />
@@ -32,17 +32,16 @@ export default function CarouselPoster({ providers }: { providers: any }) {
 
 const styles = StyleSheet.create({
   image: {
-    width: "100%", // 🛠️ Corrigé pour afficher l'image
-    aspectRatio: 2 / 3, // Format poster 2:3
+    width: 100, // 🔥 Correction ici : largeur fixe au lieu de "100%"
+    height: 150, // 🔥 Ajustement pour garder un ratio 2:3
     borderRadius: 10,
   },
   imageContainer: {
     marginRight: 10,
-    width: 100, // Largeur fixe pour chaque poster
-    margin: 10,
+    alignItems: "center", // ✅ Centrer l'image dans son conteneur
   },
   container: {
-    height: 200, // Ajuste selon le design
+    height: 160, // ✅ Ajuste pour éviter tout dépassement
     paddingLeft: 10,
   },
 });

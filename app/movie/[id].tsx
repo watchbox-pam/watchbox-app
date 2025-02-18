@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import { Button, Image, ScrollView, StyleSheet, View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { LinearGradient } from "expo-linear-gradient";
+import BackButton from "@/components/BackButton";
+import React from "react";
+import LogoButton from "@/components/Logo";
 
 export default function Index() {
   const { id } = useLocalSearchParams();
@@ -127,6 +130,10 @@ export default function Index() {
       contentContainerStyle={styles.contentContainer}
       overScrollMode="never"
     >
+      <View style={styles.headers}>
+        <BackButton />
+      </View>
+
       <View style={styles.imageBannerContainer}>
         <LinearGradient
           // Background Linear Gradient
@@ -216,6 +223,14 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  headers: {
+    position: "absolute",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 25,
+    zIndex: 100,
+  },
   container: {
     backgroundColor: "#0A1E38",
     height: "100%",
