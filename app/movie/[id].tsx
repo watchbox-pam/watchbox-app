@@ -4,13 +4,12 @@ import StyledText from "@/components/StyledText";
 import Tag from "@/components/Tag";
 import TagList from "@/components/TagList";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { Button, Image, ScrollView, StyleSheet, View } from "react-native";
+import { useEffect, useState  } from "react";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { LinearGradient } from "expo-linear-gradient";
 import BackButton from "@/components/BackButton";
 import React from "react";
-import LogoButton from "@/components/Logo";
 
 export default function Index() {
   const { id } = useLocalSearchParams();
