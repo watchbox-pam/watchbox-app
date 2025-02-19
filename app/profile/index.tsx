@@ -7,6 +7,7 @@ import StyledText from "@/components/StyledText";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import DropDownButton from "@/components/DropDownButton";
+import TraitGradiant from "@/components/TraitGradiant";
 
 export default function Index() {
   const providers = [
@@ -73,22 +74,31 @@ export default function Index() {
         </StyledText>
       </View>
 
+      <TraitGradiant />
+
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>WatchList Film</Text>
         <CarouselPoster providers={providers} />
       </View>
+
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>Historique Film</Text>
         <CarouselPoster providers={providers} />
       </View>
+
+      <TraitGradiant />
+
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>WatchList Séries</Text>
         <CarouselPoster providers={providers} />
       </View>
+
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>Historique Séries</Text>
         <CarouselPoster providers={providers} />
       </View>
+
+      <TraitGradiant />
     </ScrollView>
   );
 }
@@ -103,6 +113,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#0A1E38",
+    margin: 0,
+    padding: 0,
   },
   contentContainer: {
     alignItems: "center",
@@ -133,7 +145,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: "#ffffff",
     paddingTop: 10,
-    paddingLeft: 5,
+    paddingLeft: 10,
+    marginTop: 15,
   },
   text: {
     fontSize: 15,
@@ -147,6 +160,10 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     marginBottom: 20,
     zIndex: -1,
+  },
+  Trait: {
+    marginTop: 20,
+    marginBottom: 20,
   },
   infoContainer: {
     flexDirection: "row",
@@ -175,6 +192,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    marginLeft: 10,
   },
   shadowBottom: {
     position: "absolute",

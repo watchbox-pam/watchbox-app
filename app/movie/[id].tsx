@@ -4,7 +4,7 @@ import StyledText from "@/components/StyledText";
 import Tag from "@/components/Tag";
 import TagList from "@/components/TagList";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState  } from "react";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { LinearGradient } from "expo-linear-gradient";
@@ -235,6 +235,8 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     fontFamily: "wght",
+    margin: 0,
+    padding: 0,
   },
   contentContainer: {
     alignItems: "center",
