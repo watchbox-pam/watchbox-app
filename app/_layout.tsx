@@ -78,6 +78,18 @@ export default function TabLayout() {
             href: null,
           }}
         />
+        {/* <Tabs.Screen
+          name="commentary"
+          options={{
+            href: null,
+          }}
+        /> */}
+        <Tabs.Screen
+          name="watchList"
+          options={{
+            href: null,
+          }}
+        />
         <Tabs.Screen
           name="index"
           options={{

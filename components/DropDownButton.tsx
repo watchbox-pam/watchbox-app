@@ -11,7 +11,7 @@ const DropDownButton = () => {
   const closeMenu = () => setVisible(false);
 
   const handleNavigate = (screen: string) => {
-    //navigation.navigate(screen);
+    navigation.navigate(screen as never);
     closeMenu();
   };
 
@@ -30,7 +30,7 @@ const DropDownButton = () => {
             style={styles.menu}
           >
             <Menu.Item
-              onPress={() => handleNavigate("Commentaire")}
+              onPress={() => handleNavigate("Commentary")}
               title="Commentaires"
               leadingIcon="comment"
             />

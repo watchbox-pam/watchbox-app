@@ -1,6 +1,3 @@
-import CarouselPoster from "@/components/CarouselPoster";
-// import BackButton from "@/components/BackButton";
-// import LogoButton from "@/components/Logo";
 import React, { useEffect } from "react";
 import { ScrollView, View, Text, StyleSheet, Image } from "react-native";
 import StyledText from "@/components/StyledText";
@@ -8,6 +5,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import DropDownButton from "@/components/DropDownButton";
 import TraitGradiant from "@/components/TraitGradiant";
+import StatsScreen from "@/components/Stats";
+import CarouselWatchList from "@/components/CarouselWatchList";
 
 export default function Index() {
   const providers = [
@@ -78,27 +77,29 @@ export default function Index() {
 
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>WatchList Film</Text>
-        <CarouselPoster providers={providers} />
+        <CarouselWatchList providers={providers} />
       </View>
 
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>Historique Film</Text>
-        <CarouselPoster providers={providers} />
+        <CarouselWatchList providers={providers} />
       </View>
 
       <TraitGradiant />
 
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>WatchList Séries</Text>
-        <CarouselPoster providers={providers} />
+        <CarouselWatchList providers={providers} />
       </View>
 
       <View style={styles.WatchList}>
         <Text style={styles.TitleWatchList}>Historique Séries</Text>
-        <CarouselPoster providers={providers} />
+        <CarouselWatchList providers={providers} />
       </View>
 
       <TraitGradiant />
+
+      <StatsScreen />
     </ScrollView>
   );
 }
