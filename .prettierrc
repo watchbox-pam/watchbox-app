@@ -6,5 +6,6 @@
   "bracketSpacing": true,
   "semi": true,
   "jsxSingleQuote": false,
-  "bracketSameLine": true
+  "bracketSameLine": true,
+  "endOfLine": "lf"
 }
