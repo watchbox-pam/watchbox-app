@@ -10,7 +10,7 @@ export default function StyledText({
   style?: any;
 }) {
   const [fontsLoaded] = useFonts({
-    Oswald: require("@/assets/fonts/Oswald-VariableFont_wght.ttf"),
+    Oswald: require("@/src/assets/fonts/Oswald-VariableFont_wght.ttf"),
   });
 
   if (!fontsLoaded) {
