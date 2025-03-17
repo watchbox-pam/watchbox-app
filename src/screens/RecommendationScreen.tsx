@@ -1,7 +1,15 @@
 import { Text, View } from "react-native";
-import React from "react";
+import { useState } from "react";
+import EmotionCircle from "../components/EmotionCircle";
+import Popular from "../components/Popular";
 
 export default function RecommendationScreen() {
+	const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
+
+	const handleBackToEmotions = () => {
+		setSelectedEmotion(null);
+	};
+
 	return (
 		<View
 			style={{
@@ -10,7 +18,14 @@ export default function RecommendationScreen() {
 				alignItems: "center",
 				backgroundColor: "#0A1E38"
 			}}>
-			<Text>Recommande</Text>
+			{!selectedEmotion ? (
+				<EmotionCircle onEmotionSelect={setSelectedEmotion} />
+			) : (
+				<Popular
+					emotion={selectedEmotion}
+					onBackToEmotions={handleBackToEmotions}
+				/>
+			)}
 		</View>
 	);
 }
