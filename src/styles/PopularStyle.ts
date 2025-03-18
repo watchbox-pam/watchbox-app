@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
 const PopularStyle = StyleSheet.create({
 	container: {
@@ -60,20 +60,20 @@ const PopularStyle = StyleSheet.create({
 		paddingRight: 10
 	},
 	movieItemContainer: {
-		width: 150,
+		width: 112.5,
 		marginRight: 15,
 		marginVertical: 10
 	},
 	posterImage: {
-		width: 150,
-		height: 220,
+		width: 112.5,
+		height: 165,
 		borderRadius: 5,
 		marginBottom: 8,
 		backgroundColor: "#143B6F"
 	},
 	noPosterContainer: {
-		width: 150,
-		height: 220,
+		width: 112.5,
+		height: 165,
 		backgroundColor: "#143B6F",
 		borderRadius: 5,
 		marginBottom: 8,
@@ -89,6 +89,50 @@ const PopularStyle = StyleSheet.create({
 		fontWeight: "bold",
 		marginBottom: 2,
 		textAlign: "center"
+	},
+	tabContainer: {
+		flexDirection: "row",
+		marginBottom: 15,
+		borderRadius: 20,
+		backgroundColor: "rgba(30, 60, 90, 0.5)",
+		overflow: "hidden"
+	},
+	tab: {
+		paddingVertical: 8,
+		paddingHorizontal: 20,
+		alignItems: "center",
+		justifyContent: "center"
+	},
+	activeTab: {
+		backgroundColor: "#143B6F"
+	},
+	tabText: {
+		color: "#CCCCCC",
+		fontSize: 14,
+		fontWeight: "500"
+	},
+	activeTabText: {
+		color: "#FFFFFF",
+		fontWeight: "700"
+	},
+	scrollViewContent: {
+		paddingBottom: 20
+	},
+	sectionContainer: {
+		marginBottom: 20
+	},
+	sectionTitle: {
+		fontSize: 18,
+		fontWeight: "700",
+		color: "#FFFFFF",
+		marginLeft: 10,
+		marginBottom: 10
+	},
+	mainTitle: {
+		fontSize: 22,
+		fontWeight: "700",
+		color: "#FFFFFF",
+		marginBottom: 5
 	}
 });
 
