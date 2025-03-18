@@ -1,4 +1,3 @@
-import React = require("react");
 import { View, Text, StyleSheet } from "react-native";
 
 interface CommentSectionProps {
@@ -12,7 +11,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ isMyComments }) => {
 				"Commentaire de mon ami 1",
 				"Super film !",
 				"Je n'ai pas aimé ce film"
-		  ];
+			];
 
 	return (
 		<View style={styles.commentContainer}>

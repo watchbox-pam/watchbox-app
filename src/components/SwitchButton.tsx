@@ -1,4 +1,3 @@
-import React = require("react");
 import { Pressable, Text, View, StyleSheet } from "react-native";
 
 interface SwitchButtonProps {

@@ -1,15 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/types"; // Assurez-vous d'importer le type
 
-const ResultatScreen = () => {
-	const route = useRoute();
-	const { emotion } = route.params as { emotion: string };
+// Typage de la route
+type ResultatScreenRouteProp = RouteProp<RootStackParamList, "ResultatScreen">;
+
+const ResultatScreen = ({ route }: { route: ResultatScreenRouteProp }) => {
+	const { emotion } = route.params; // Utilisation de 'emotion' typé
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>Vous avez choisi :</Text>
-			<Text style={styles.emotion}>{emotion}</Text>
+			<Text style={styles.title}>Émotion Sélectionnée</Text>
+			<Text style={styles.emotionText}>{emotion}</Text>
 		</View>
 	);
 };
@@ -18,17 +21,18 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		backgroundColor: "#fff"
 	},
 	title: {
 		fontSize: 24,
-		fontWeight: "bold"
+		fontWeight: "bold",
+		marginBottom: 20
 	},
-	emotion: {
+	emotionText: {
 		fontSize: 30,
 		fontWeight: "bold",
-		color: "#FF6347",
-		marginTop: 10
+		color: "#333"
 	}
 });
 
