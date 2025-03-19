@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import PieChartComponent from "../components/PieChartComponent";
+import EmotionsPieChart from "../components/EmotionsPieChart";
 import { RootStackParamList } from "../navigation/types"; // Importer les types
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -13,14 +13,14 @@ type RecommendationScreenNavigationProp = StackNavigationProp<
 >;
 
 const emotions = [
-	{ key: 1, label: "Joie", color: "#FFD700" },
-	{ key: 2, label: "Tristesse", color: "#1E90FF" },
-	{ key: 3, label: "Colère", color: "#FF4500" },
-	{ key: 4, label: "Peur", color: "#800080" },
-	{ key: 5, label: "Surprise", color: "#00FF00" },
-	{ key: 6, label: "Dégoût", color: "#8B4513" },
-	{ key: 7, label: "Amour", color: "#FF69B4" },
-	{ key: 8, label: "Excitation", color: "#FF6347" }
+	{ key: 1, label: "Emerveillement", color: "#00FF00" },
+	{ key: 2, label: "Energique", color: "#FF6347" },
+	{ key: 3, label: "Frisson", color: "#FF4500" },
+	{ key: 4, label: "Rire", color: "#FFD700" },
+	{ key: 5, label: "Romantique", color: "#FF69B4" },
+	{ key: 6, label: "Melancolie", color: "#1E90FF" },
+	{ key: 7, label: "Nostalgie", color: "#858585" },
+	{ key: 8, label: "MindFuck", color: "#000000" }
 ];
 
 const RecommendationScreen = () => {
@@ -37,15 +37,10 @@ const RecommendationScreen = () => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Choisissez une émotion :</Text>
-			<PieChartComponent
+			<EmotionsPieChart
 				emotions={emotions}
 				onEmotionSelect={handleEmotionSelect}
 			/>
-			{selectedEmotion && (
-				<Text style={styles.selectedText}>
-					Émotion sélectionnée : {selectedEmotion}
-				</Text>
-			)}
 		</View>
 	);
 };
@@ -53,19 +48,22 @@ const RecommendationScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: "#0A1E38",
+		margin: 0,
+		padding: 0,
 		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#fff"
+		alignItems: "center"
 	},
 	title: {
 		fontSize: 20,
 		fontWeight: "bold",
-		marginBottom: 20
+		marginBottom: 20,
+		color: "#fff"
 	},
 	selectedText: {
 		fontSize: 18,
 		marginTop: 20,
-		color: "#333"
+		color: "#fff"
 	}
 });
 

@@ -90,7 +90,7 @@ export default function TabLayout() {
 						)
 					}}
 				/>
-				<Tabs.Screen
+				{/* <Tabs.Screen
 					name="commentary"
 					options={{
 						title: "Commentary",
@@ -141,7 +141,7 @@ export default function TabLayout() {
 							/>
 						)
 					}}
-				/>
+				/>*/}
 			</Tabs>
 		</View>
 	);
