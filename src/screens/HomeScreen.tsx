@@ -1,8 +1,6 @@
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
-import TraitGradiant from "../components/TraitGradiant";
-import React from "react";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { Text, View, StyleSheet, ScrollView, Platform } from "react-native";
 
 export default function HomeScreen() {
 	const providers = [
@@ -27,77 +25,6 @@ export default function HomeScreen() {
 				<Text style={styles.TitleWatchList}>WatchList Film</Text>
 				<CarouselPoster providers={providers} />
 			</View>
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Film</Text>
-				<CarouselPoster providers={providers} />
-			</View>
 		</ScrollView>
 	);
 }
@@ -117,7 +44,8 @@ const styles = StyleSheet.create({
 		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		paddingHorizontal: 25
+		paddingHorizontal: 25,
+		marginTop: Platform.OS === "ios" ? "30" : "0"
 	},
 	TitleHeader: {
 		color: "#ffffff",
