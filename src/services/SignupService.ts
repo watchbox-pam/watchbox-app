@@ -49,8 +49,10 @@ export async function registerUser(user: UserSignup) {
 			};
 		}
 
-		const { hashedPassword, salt } = await Encryption.encryptPassword(
-			user.password
+		const firstHash = await Encryption.encryptPassword(user.password);
+		const salt = await Encryption.randomString(32);
+		const hashedPassword = await Encryption.encryptPassword(
+			firstHash + salt
 		);
 		const result = await ApiHelper.post("/users", {
 			id: "",
