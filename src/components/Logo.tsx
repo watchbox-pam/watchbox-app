@@ -12,7 +12,7 @@ const LogoButton = () => {
 			// 	navigation.navigate("../screens/HomeScreen.tsx")}
 			>
 				<Image
-					source={require("@/src/assets/images/Logo-removebg-preview.png")} // Assurez-vous que le chemin est correct
+					source={require("@/src/assets/images/watchbox-logo.png")} // Assurez-vous que le chemin est correct
 					style={{ width: 50, height: 50 }}
 					resizeMode="contain"
 				/>

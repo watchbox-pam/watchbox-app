@@ -1,0 +1,53 @@
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import styles from "@/src/styles/SignupStyle";
+import BackButton from "@/src/components/BackButton";
+import Logo from "@/src/components/Logo";
+import StyledText from "@/src/components/StyledText";
+import { useState } from "react";
+import { loginUser } from "@/src/services/LoginService";
+import { router } from "expo-router";
+import useSessionStore from "@/src/zustand/sessionStore";
+
+export default function LoginScreen() {
+	const [identifier, setIdentifier] = useState<string>("");
+	const [password, setPassword] = useState<string>("");
+
+	const signIn = useSessionStore((state) => state.signIn);
+
+	const handleSubmit = async () => {
+		const result = await loginUser({ identifier, password });
+		if (result.success) {
+			signIn(result.message, identifier);
+			router.replace("/");
+			return;
+		} else {
+			alert(result.message);
+		}
+	};
+
+	return (
+		<View style={styles.container}>
+			<View style={styles.topBar}>
+				<BackButton />
+				<Logo />
+			</View>
+			<StyledText style={styles.title}>Connexion</StyledText>
+			<TextInput
+				style={styles.input}
+				placeholder="Adresse mail ou Pseudo"
+				placeholderTextColor="#fff"
+				onChangeText={setIdentifier}
+			/>
+			<TextInput
+				style={styles.input}
+				placeholder="Mot de passe"
+				placeholderTextColor="#fff"
+				secureTextEntry
+				onChangeText={setPassword}
+			/>
+			<TouchableOpacity style={styles.button} onPress={handleSubmit}>
+				<Text style={styles.buttonText}>Connexion</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
