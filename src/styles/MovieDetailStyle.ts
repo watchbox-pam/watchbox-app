@@ -44,13 +44,13 @@ const styles = StyleSheet.create({
 		fontSize: 40
 	},
 	text: {
-		fontSize: 15
+		fontSize: 14
 	},
 	textBold: {
 		fontWeight: "bold"
 	},
 	description: {
-		fontSize: 20,
+		fontSize: 14,
 		paddingRight: 20,
 		paddingLeft: 20
 	},
