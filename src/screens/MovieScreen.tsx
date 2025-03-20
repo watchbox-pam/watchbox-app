@@ -125,7 +125,7 @@ export default function MovieScreen() {
 
 			<View>
 				<StyledText style={styles.description}>
-					{media?.description}
+					{media?.overview}
 				</StyledText>
 			</View>
 
@@ -173,7 +173,7 @@ export type MovieProps = {
 	release_date: number;
 	genres: string[];
 	providers: string[];
-	description: string;
+	overview: string;
 	casting: {
 		adult: boolean;
 		gender: number;
