@@ -1,11 +1,19 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { View } from "react-native";
+import useSessionStore from "@/src/zustand/sessionStore";
 
 export default function TabLayout() {
+	const isLoggedIn = useSessionStore((state) => state.isLoggedIn);
+
+	if (!isLoggedIn) {
+		return <Redirect href="/base" />;
+	}
+
 	return (
 		<View style={{ flex: 1, backgroundColor: "#0A1E38" }}>
 			<Tabs
+				backBehavior={"history"}
 				screenOptions={{
 					tabBarActiveTintColor: "#AC2821",
 					tabBarInactiveTintColor: "#F5EFF7",

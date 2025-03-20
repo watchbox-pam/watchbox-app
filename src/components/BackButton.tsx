@@ -1,16 +1,14 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const BackButton = () => {
-	const navigation = useNavigation();
-
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
 				style={styles.button}
-				onPress={() => navigation.goBack()}>
+				onPress={() => router.back()}>
 				<Ionicons name="arrow-back" size={24} color="white" />
 			</TouchableOpacity>
 		</View>
@@ -25,7 +23,7 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		alignItems: "center",
-		backgroundColor: "#313131",
+		backgroundColor: "#13396A",
 		padding: 10,
 		borderRadius: 50
 	}

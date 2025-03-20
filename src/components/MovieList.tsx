@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "expo-router";
 import {
 	StyleSheet,
 	View,
@@ -44,9 +45,12 @@ const MovieList: React.FC<MovieListProps> = ({
 	onBack
 }) => {
 	const renderMovieItem = ({ item }: { item: Movie }) => (
-		<TouchableOpacity
-			style={styles.movieCard}
-			onPress={() => console.log("Selected movie:", item)}>
+		<Link
+			href={{
+				pathname: "/movie/[id]",
+				params: { id: item.id }
+			}}
+			style={styles.movieCard}>
 			{item.poster_path ? (
 				<Image
 					source={{
@@ -62,7 +66,7 @@ const MovieList: React.FC<MovieListProps> = ({
 			<Text style={styles.movieTitle} numberOfLines={2}>
 				{item.title}
 			</Text>
-		</TouchableOpacity>
+		</Link>
 	);
 
 	return (
