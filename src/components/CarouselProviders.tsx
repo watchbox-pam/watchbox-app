@@ -18,7 +18,8 @@ export default function CarouselProviders({
 						<Image
 							source={{
 								uri:
-									"https://image.tmdb.org/t/p/original" + item
+									"https://image.tmdb.org/t/p/original" +
+									item.logo_path
 							}}
 							style={styles.image}
 						/>

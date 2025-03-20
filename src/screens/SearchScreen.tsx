@@ -23,7 +23,7 @@ export default function SearchScreen() {
 				}}
 				href={{
 					pathname: "/movie/[id]",
-					params: { id: "1" }
+					params: { id: "920" }
 				}}>
 				View second user details
 			</Link>

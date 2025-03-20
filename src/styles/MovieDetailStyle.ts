@@ -15,6 +15,12 @@ const styles = StyleSheet.create({
 		width: "100%",
 		fontFamily: "wght"
 	},
+	loading: {
+		backgroundColor: "#0A1E38",
+		height: "100%",
+		width: "100%",
+		justifyContent: "center"
+	},
 	contentContainer: {
 		alignItems: "center"
 	},
