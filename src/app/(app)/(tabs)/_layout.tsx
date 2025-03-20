@@ -13,6 +13,7 @@ export default function TabLayout() {
 	return (
 		<View style={{ flex: 1, backgroundColor: "#0A1E38" }}>
 			<Tabs
+				backBehavior={"history"}
 				screenOptions={{
 					tabBarActiveTintColor: "#AC2821",
 					tabBarInactiveTintColor: "#F5EFF7",
