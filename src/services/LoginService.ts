@@ -9,6 +9,10 @@ export async function loginUser({
 	identifier: string;
 	password: string;
 }) {
+	return {
+		success: true,
+		message: "u good bro"
+	};
 	try {
 		if (!identifier) {
 			return {

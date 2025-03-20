@@ -1,29 +1,25 @@
+import React from "react";
 import { FlatList, StyleSheet, View, Image } from "react-native";
 import { Link } from "expo-router";
 
-export default function CarouselPoster({ data }: any) {
-	// Vérifier si les données sont disponibles
-	if (!data || data.length === 0) {
-		return <View style={styles.container} />;
-	}
-
+export default function CarouselWatchList({ providers }: { providers: any }) {
 	return (
 		<View style={styles.container}>
 			<FlatList
-				data={data}
+				data={providers}
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				keyExtractor={(item) => item.id.toString()}
-				renderItem={({ item }) => (
+				keyExtractor={(item, index) => index.toString()}
+				renderItem={({ item, index }) => (
 					<Link
-						style={styles.imageContainer}
 						href={{
-							pathname: "/movie/[id]",
-							params: { id: item.id.toString() }
-						}}>
+							pathname: "/watchList/[id]",
+							params: { id: index.toString() } // 🔥 Utilisation de l'index comme ID temporaire
+						}}
+						style={styles.imageContainer}>
 						<Image
 							source={{
-								uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`
+								uri: `https://image.tmdb.org/t/p/w500${item}`
 							}}
 							style={styles.image}
 							resizeMode="cover"
@@ -39,10 +35,11 @@ const styles = StyleSheet.create({
 	image: {
 		width: 100,
 		height: 150,
-		borderRadius: 5
+		borderRadius: 10
 	},
 	imageContainer: {
-		marginRight: 5,
+		marginRight: 10,
+		height: 160,
 		alignItems: "center"
 	},
 	container: {
