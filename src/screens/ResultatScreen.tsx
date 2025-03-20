@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/types"; // Assurez-vous d'importer le type
 
 // Typage de la route
 type ResultatScreenRouteProp = RouteProp<RootStackParamList, "ResultatScreen">;
