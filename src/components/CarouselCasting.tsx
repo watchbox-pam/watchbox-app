@@ -1,8 +1,9 @@
-import React from "react";
 import { FlatList, Image, StyleSheet, View } from "react-native";
 import StyledText from "./StyledText";
 
 export default function CarouselCasting({ cast }: any) {
+	if (!cast || cast.length === 0 || cast.every((item: any) => item === null))
+		return null;
 	return (
 		<View>
 			<FlatList
@@ -15,14 +16,16 @@ export default function CarouselCasting({ cast }: any) {
 						<Image
 							style={styles.image}
 							source={{
-								uri: `https://image.tmdb.org/t/p/original${item.picture}`
+								uri: `https://image.tmdb.org/t/p/original${item.profile_path}`
 							}}
 							onMagicTap={() => {}}
 						/>
 						<StyledText style={styles.name}>{item.name}</StyledText>
-						<StyledText style={styles.character}>
-							{item.character}
-						</StyledText>
+						{item.character && (
+							<StyledText style={styles.character}>
+								{item.character}
+							</StyledText>
+						)}
 					</View>
 				)}
 			/>
