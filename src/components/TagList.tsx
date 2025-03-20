@@ -19,7 +19,9 @@ export default function TagList({
 				renderItem={({ item }) => (
 					<View style={styles.tagContainer}>
 						<Tag style={tagStyle}>
-							<StyledText style={styles.tag}>{item}</StyledText>
+							<StyledText style={styles.tag}>
+								{item.name}
+							</StyledText>
 						</Tag>
 					</View>
 				)}
