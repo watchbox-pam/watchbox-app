@@ -15,9 +15,9 @@ const CommentaryScreen = () => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<BackButton />
+				{/*<BackButton />*/}
 				<Text style={styles.CommentTitle}>Commentaires</Text>
-				<Logo />
+				{/*<Logo />*/}
 			</View>
 			<SwitchButton isOn={isMyComments} onToggle={handleSwitch} />
 			<CommentSection isMyComments={isMyComments} />

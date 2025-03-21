@@ -15,7 +15,7 @@ const SwitchButton: React.FC<SwitchButtonProps> = ({ isOn, onToggle }) => {
 					isOn ? styles.active : styles.inactive
 				]}>
 				<Text style={[styles.toggleText, isOn && styles.activeText]}>
-					Mes Commentaires
+					Tous les commentaires
 				</Text>
 			</Pressable>
 			<Pressable

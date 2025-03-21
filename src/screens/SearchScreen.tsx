@@ -1,9 +1,18 @@
-import { Button, Image, ScrollView, Text, TextInput, View } from "react-native";
+import {
+	Button,
+	Image,
+	ScrollView,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
+} from "react-native";
 import React, { useState } from "react";
 import { searchInfos } from "@/src/services/SearchService";
 import styles from "@/src/styles/SearchStyle";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import Movie from "@/src/models/Movie";
+import StyledText from "../components/StyledText";
 
 export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
@@ -11,8 +20,10 @@ export default function SearchScreen() {
 	const [category, setCategory] = useState("all");
 
 	const search = async () => {
-		const searchResults = await searchInfos(searchTerm);
-		setResults(searchResults);
+		if (searchTerm.trim()) {
+			const searchResults = await searchInfos(searchTerm);
+			setResults(searchResults);
+		}
 	};
 
 	return (
@@ -27,17 +38,15 @@ export default function SearchScreen() {
 				<Text style={styles.filter}>Acteurs</Text>
 			</View>
 			<ScrollView contentContainerStyle={styles.resultsContainer}>
-				{results !== null &&
-					results?.length > 0 &&
+				{results !== null && results?.length > 0 ? (
 					results.map((result) => {
 						return (
 							<View style={styles.resContainer} key={result.id}>
-								<Link
-									style={styles.link}
-									href={{
-										pathname: "/movie/[id]",
-										params: { id: result.id }
-									}}>
+								<TouchableOpacity
+									onPress={() =>
+										router.push(`/movie/${result.id}`)
+									}
+									style={styles.link}>
 									<Image
 										source={{
 											uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
@@ -59,11 +68,14 @@ export default function SearchScreen() {
 											}
 										</Text>
 									</View>
-								</Link>
+								</TouchableOpacity>
 								<View style={styles.separator}></View>
 							</View>
 						);
-					})}
+					})
+				) : (
+					<StyledText>Aucun résultat</StyledText>
+				)}
 			</ScrollView>
 		</View>
 	);

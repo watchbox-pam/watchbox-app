@@ -98,9 +98,10 @@ export default function TabLayout() {
 						)
 					}}
 				/>
-				{/* <Tabs.Screen
+				<Tabs.Screen
 					name="commentary"
 					options={{
+						href: null,
 						title: "Commentary",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
@@ -114,6 +115,7 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="friends"
 					options={{
+						href: null,
 						title: "Friends",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
@@ -127,6 +129,7 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="notifs"
 					options={{
+						href: null,
 						title: "Notifs",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
@@ -140,6 +143,7 @@ export default function TabLayout() {
 				<Tabs.Screen
 					name="param"
 					options={{
+						href: null,
 						title: "Params",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
@@ -149,7 +153,7 @@ export default function TabLayout() {
 							/>
 						)
 					}}
-				/>*/}
+				/>
 			</Tabs>
 		</View>
 	);
