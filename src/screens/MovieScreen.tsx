@@ -12,118 +12,45 @@ import CarouselProviders from "@/src/components/CarouselProviders";
 import CarouselCasting from "@/src/components/CarouselCasting";
 
 import styles from "@/src/styles/MovieDetailStyle";
+import { ApiHelper } from "../utils/axios";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function MovieScreen() {
+	const [loading, setLoading] = useState(true);
 	const { id } = useLocalSearchParams();
 
-	const [media, setMedia] = useState({
-		banner: "",
-		poster: "",
-		title: "",
-		ageRestriction: null as string | null,
-		duration: "",
-		date: null as null | number,
-		director: "",
-		genres: [] as string[],
-		providers: [] as string[],
-		description: "",
-		casts: [] as any[],
-		directors: [] as any[],
-		composer: [] as any[],
-		writers: [] as any[],
-		video: ""
-	});
+	const [media, setMedia] = useState<undefined | MovieProps>();
 
 	useEffect(() => {
-		console.log(id);
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				const response = await ApiHelper.get(`/movies/${id}`);
+				setMedia(response);
+				console.log(response);
+				setLoading(false);
+			} catch (e) {
+				console.error(e);
+			}
+		};
 
-		fetch(`nothing`);
-		/* .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-            setMedia(data);
-          }); */
-
-		setMedia({
-			banner: "/vgnoBSVzWAV9sNQUORaDGvDp7wx.jpg",
-			poster: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-			title: "Interstellar",
-			ageRestriction: "12 ans",
-			duration: "2h49min",
-			date: 2014,
-			director: "Christopher Nolan",
-			genres: ["Aventure", "Drame", "Science-fiction"],
-			providers: [
-				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-				"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-				"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-				"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-				"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-				"/pvske1MyAoymrs5bguRfVqYiM9a.jpg"
-			],
-			description: `Dans un futur proche, face à une Terre qui se meurt, un groupe
-          d’explorateurs utilise un vaisseau interstellaire pour franchir un
-          trou de ver permettant de parcourir des distances jusque‐là
-          infranchissables. Leur but : trouver un nouveau foyer pour l’humanité.`,
-			casts: [
-				{
-					id: 1,
-					name: "Matthew McConaughey",
-					character: "Cooper",
-					picture: "/lCySuYjhXix3FzQdS4oceDDrXKI.jpg"
-				},
-				{
-					id: 2,
-					name: "Anne Hathaway",
-					character: "Brand",
-					picture: "/s6tflSD20MGz04ZR2R1lZvhmC4Y.jpg"
-				},
-				{
-					id: 3,
-					name: "Anne Hathaway",
-					character: "Brand",
-					picture: "/s6tflSD20MGz04ZR2R1lZvhmC4Y.jpg"
-				},
-				{
-					id: 4,
-					name: "Anne Hathaway",
-					character: "Brand",
-					picture: "/s6tflSD20MGz04ZR2R1lZvhmC4Y.jpg"
-				}
-			],
-			directors: [
-				{
-					id: 1,
-					name: "Christopher Nolan",
-					character: "",
-					picture: "/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg"
-				}
-			],
-			composer: [
-				{
-					id: 1,
-					name: "Hans Zimmer",
-					character: "",
-					picture: "/tpQnDeHY15szIXvpnhlprufz4d.jpg"
-				}
-			],
-			writers: [
-				{
-					id: 1,
-					name: "Christopher Nolan"
-				},
-				{
-					id: 2,
-					name: "Jonathan Nolan"
-				}
-			],
-			video: "VaOijhK3CRU"
-		});
+		fetchData();
+		setLoading(true);
 	}, [id]);
+
+	const convertMinutesToHours = (minutes: number) => {
+		const hours = Math.floor(minutes / 60);
+		const remainingMinutes = minutes % 60;
+		return `${hours}h ${remainingMinutes}min`;
+	};
+
+	if (loading) {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator size="large" color="#fff" />
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView
@@ -143,7 +70,8 @@ export default function MovieScreen() {
 				<Image
 					source={{
 						uri:
-							"https://image.tmdb.org/t/p/original" + media.banner
+							"https://image.tmdb.org/t/p/original" +
+							media?.backdrop_path
 					}}
 					style={styles.imageBanner}
 				/>
@@ -155,46 +83,49 @@ export default function MovieScreen() {
 						source={{
 							uri:
 								"https://image.tmdb.org/t/p/original" +
-								media.poster
+								media?.poster_path
 						}}
 						style={styles.imagePoster}
 					/>
 				</View>
 				<View style={styles.infoDiv}>
-					<Tag style={styles.tagContainer}>
-						<StyledText style={styles.textTag}>
-							{media.ageRestriction}
-						</StyledText>
-					</Tag>
-					<StyledText style={styles.title}>{media.title}</StyledText>
+					{media?.age_restriction && (
+						<Tag style={styles.tagContainer}>
+							<StyledText style={styles.textTag}>
+								{media?.age_restriction}
+							</StyledText>
+						</Tag>
+					)}
+
+					<StyledText style={styles.title}>{media?.title}</StyledText>
 
 					<StyledText style={styles.text}>
-						<StyledText>{media.date}</StyledText> •{" "}
-						<StyledText>{media.duration}</StyledText>
+						<StyledText>{media?.release_date}</StyledText> •{" "}
+						<StyledText>
+							{convertMinutesToHours(Number(media?.runtime) ?? 0)}
+						</StyledText>
 					</StyledText>
 					<StyledText style={styles.text}>
 						par{" "}
-						<StyledText style={styles.textBold}>
-							{media.director}
-						</StyledText>
+						{media?.director?.name && (
+							<StyledText style={styles.textBold}>
+								{media?.director.name}
+							</StyledText>
+						)}
 					</StyledText>
 
-					<TagList tags={media.genres} />
+					<TagList tags={media?.genres || []} />
 				</View>
 			</View>
 
 			<View style={styles.providersContainer}>
 				<StyledText>ou regarder ?</StyledText>
-				<CarouselProviders providers={media.providers} />
+				<CarouselProviders providers={media?.providers} />
 			</View>
 
 			<View>
 				<StyledText style={styles.description}>
-					Dans un futur proche, face à une Terre qui se meurt, un
-					groupe d’explorateurs utilise un vaisseau interstellaire
-					pour franchir un trou de ver permettant de parcourir des
-					distances jusque‐là infranchissables. Leur but : trouver un
-					nouveau foyer pour l’humanité.
+					{media?.overview}
 				</StyledText>
 			</View>
 
@@ -205,37 +136,84 @@ export default function MovieScreen() {
 				<YoutubePlayer
 					height={275}
 					play={false}
-					videoId="VaOijhK3CRU"
+					videoId={media?.video_key}
 				/>
 			</View>
 
 			<View style={styles.castingContainer}>
 				<StyledText style={styles.textCasting}>Casting</StyledText>
-				<CarouselCasting cast={media.casts} />
+				<CarouselCasting cast={media?.casting} />
 
 				<View style={styles.directorContainer}>
 					<View>
 						<StyledText style={styles.textCasting}>
 							Réalisateur
 						</StyledText>
-						<CarouselCasting cast={media.directors} />
+						<CarouselCasting cast={[media?.director]} />
 					</View>
 
 					<View>
 						<StyledText style={styles.textCasting}>
 							Compositeur
 						</StyledText>
-						<CarouselCasting cast={media.composer} />
+						<CarouselCasting cast={[media?.composer]} />
 					</View>
-				</View>
-
-				<StyledText style={styles.textCasting}>Scénaristes</StyledText>
-				<View>
-					{media.writers.map((writer) => (
-						<StyledText key={writer.id}>{writer.name}</StyledText>
-					))}
 				</View>
 			</View>
 		</ScrollView>
 	);
 }
+
+export type MovieProps = {
+	backdrop_path: string;
+	poster_path: string;
+	title: string;
+	age_restriction: string;
+	runtime: string;
+	release_date: number;
+	genres: string[];
+	providers: string[];
+	overview: string;
+	casting: {
+		adult: boolean;
+		gender: number;
+		id: number;
+		known_for_department: string;
+		name: string;
+		original_name: string;
+		popularity: number;
+		profile_path: string;
+		cast_id: number;
+		character: string;
+		credit_id: string;
+		order: number;
+	}[];
+	director: {
+		adult: boolean;
+		gender: number;
+		id: number;
+		known_for_department: string;
+		name: string;
+		original_name: string;
+		popularity: number;
+		profile_path: string;
+		credit_id: string;
+		department: number;
+		job: string;
+	};
+	composer: {
+		adult: boolean;
+		gender: number;
+		id: number;
+		known_for_department: string;
+		name: string;
+		original_name: string;
+		popularity: number;
+		profile_path: string;
+		credit_id: string;
+		department: number;
+		job: string;
+	};
+	video: string;
+	video_key: string;
+};

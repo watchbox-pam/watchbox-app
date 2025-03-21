@@ -29,7 +29,7 @@ const DropDownButton = () => {
 						anchor={{ x: 50, y: 50 }} // Position fixe en haut
 						style={styles.menu}>
 						<Menu.Item
-							onPress={() => handleNavigate("Commentaire")}
+							onPress={() => handleNavigate("Commentary")}
 							title="Commentaires"
 							leadingIcon="comment"
 						/>
