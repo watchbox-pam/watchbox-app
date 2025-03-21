@@ -14,6 +14,7 @@ import CarouselCasting from "@/src/components/CarouselCasting";
 import styles from "@/src/styles/MovieDetailStyle";
 import { ApiHelper } from "../utils/axios";
 import { ActivityIndicator } from "react-native-paper";
+import CommentaryScreen from "@/src/screens/CommentaryScreen";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -27,7 +28,6 @@ export default function MovieScreen() {
 			try {
 				const response = await ApiHelper.get(`/movies/${id}`);
 				setMedia(response);
-				console.log(response);
 				setLoading(false);
 			} catch (e) {
 				console.error(e);
@@ -160,6 +160,7 @@ export default function MovieScreen() {
 					</View>
 				</View>
 			</View>
+			<CommentaryScreen />
 		</ScrollView>
 	);
 }

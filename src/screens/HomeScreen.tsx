@@ -62,7 +62,7 @@ export default function HomeScreen() {
 			<View style={styles.WatchList}>
 				<View style={styles.TitleWatchList}>
 					<StyledText style={styles.MainTitleWatchList}>
-						Popular this day{" "}
+						Populaires aujourd'hui{" "}
 						<StyledText style={styles.SubTitleWatchList}>
 							films
 						</StyledText>
@@ -73,7 +73,7 @@ export default function HomeScreen() {
 			<View style={styles.WatchList}>
 				<View style={styles.TitleWatchList}>
 					<StyledText style={styles.MainTitleWatchList}>
-						Popular this week{" "}
+						Populaires cette semaine{" "}
 						<StyledText style={styles.SubTitleWatchList}>
 							films
 						</StyledText>

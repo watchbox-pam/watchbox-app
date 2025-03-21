@@ -1,10 +1,7 @@
 import React from "react";
 import { Image, TouchableOpacity, View, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 const LogoButton = () => {
-	const navigation = useNavigation(); // Assurez-vous que le chemin est correcte (chemin complet vers HomeScreen)
-
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
