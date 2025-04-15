@@ -41,50 +41,40 @@ const styles = StyleSheet.create({
 		fontSize: 16
 	},
 	resultsContainer: {
+		flex: 1
+	},
+	contInfo: {
+		flex: 1,
 		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "space-evenly",
-		gap: 15
-	},
-	image: {
-		width: 100,
-		height: 150,
-		aspectRatio: 2 / 3,
-		borderRadius: 10,
-		backgroundColor: "#313131",
-		marginRight: 15
-	},
-	resContainer: {
-		height: 160,
-		paddingLeft: 10,
 		width: "100%"
 	},
-	link: {
-		flexDirection: "row",
-		alignItems: "flex-start",
-		justifyContent: "space-between",
-		marginBottom: 20
+	image: {
+		width: "25%",
+		height: 150,
+		borderRadius: 10,
+		backgroundColor: "#313131"
 	},
 	resultInfo: {
-		marginLeft: 15,
-		flexDirection: "column",
-		justifyContent: "flex-start",
-		height: "100%"
+		width: "70%",
+		marginLeft: "5%"
 	},
 	resultTitle: {
 		color: "#EBDDFF",
 		fontWeight: "bold",
-		fontSize: 24,
-		textOverflow: "ellipsis",
-		flexWrap: "wrap"
+		fontSize: 20
 	},
 	resultYear: {
+		color: "#fff",
+		fontSize: 14
+	},
+	avis: {
 		color: "#fff"
 	},
 	separator: {
 		width: "100%",
 		height: 1,
-		backgroundColor: "#EBDDFF"
+		backgroundColor: "#EBDDFF",
+		marginVertical: 10
 	}
 });
 

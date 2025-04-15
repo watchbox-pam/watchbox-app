@@ -31,33 +31,41 @@ export default function SearchScreen() {
 					results?.length > 0 &&
 					results.map((result) => {
 						return (
-							<View style={styles.resContainer} key={result.id}>
+							<View key={result.id}>
 								<Link
-									style={styles.link}
 									href={{
 										pathname: "/movie/[id]",
 										params: { id: result.id }
 									}}>
-									<Image
-										source={{
-											uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
-										}}
-										style={styles.image}
-										resizeMode="cover"
-									/>
-									<View style={styles.resultInfo}>
-										<Text
-											style={styles.resultTitle}
-											numberOfLines={2}>
-											{result.title}
-										</Text>
-										<Text style={styles.resultYear}>
-											{
-												result.release_date
-													.toString()
-													.split("-")[0]
-											}
-										</Text>
+									<View style={styles.contInfo}>
+										<Image
+											source={{
+												uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
+											}}
+											style={styles.image}
+											resizeMode="cover"
+										/>
+										<View style={styles.resultInfo}>
+											<View>
+												<Text
+													style={styles.resultTitle}
+													numberOfLines={2}>
+													{result.title}
+												</Text>
+												<Text style={styles.resultYear}>
+													{
+														result.release_date
+															.toString()
+															.split("-")[0]
+													}
+												</Text>
+											</View>
+											<View>
+												<Text style={styles.avis}>
+													{result.status}
+												</Text>
+											</View>
+										</View>
 									</View>
 								</Link>
 								<View style={styles.separator}></View>

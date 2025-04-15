@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
 	StyleSheet,
 	View,
@@ -6,6 +6,7 @@ import {
 	TouchableWithoutFeedback,
 	Animated
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Emotion {
 	id: number;
@@ -31,6 +32,7 @@ const EmotionsPieChart: React.FC<EmotionsPieChartProps> = ({
 	size,
 	wheelOpacity
 }) => {
+	const [hoveredEmotion, setHoveredEmotion] = useState<Emotion | null>(null);
 	const radius = size / 2;
 	const darkBlue = "#0a1a2a";
 
@@ -98,6 +100,82 @@ const EmotionsPieChart: React.FC<EmotionsPieChartProps> = ({
 		}
 	};
 
+	// Fonction pour détecter le secteur survolé
+	const handleTouchMove = (event: any) => {
+		if (selectedEmotion) return;
+
+		const { locationX, locationY } = event.nativeEvent;
+
+		const x = locationX - radius;
+		const y = locationY - radius;
+
+		const distanceFromCenter = Math.sqrt(x * x + y * y);
+
+		// Si le doigt est en dehors du cercle, on annule le survol
+		if (distanceFromCenter > radius) {
+			setHoveredEmotion(null);
+			return;
+		}
+
+		let angle = Math.atan2(y, x) * (180 / Math.PI);
+
+		if (angle < 0) {
+			angle += 360;
+		}
+
+		let foundEmotion = null;
+
+		for (const emotion of emotions) {
+			let startAngle = emotion.startAngle;
+			let endAngle = emotion.endAngle;
+
+			if (startAngle < 0) startAngle += 360;
+			if (endAngle < 0) endAngle += 360;
+
+			if (startAngle > endAngle) {
+				if (angle >= startAngle || angle < endAngle) {
+					foundEmotion = emotion;
+					break;
+				}
+			} else {
+				if (angle >= startAngle && angle < endAngle) {
+					foundEmotion = emotion;
+					break;
+				}
+			}
+		}
+
+		setHoveredEmotion(foundEmotion);
+	};
+
+	// Annuler le survol quand on quitte le composant
+	const handleTouchEnd = () => {
+		setHoveredEmotion(null);
+	};
+
+	// Calculer les positions pour le gradient du contour
+	const getGradientPositions = (emotion: Emotion | null) => {
+		if (!emotion) return { start: { x: 0, y: 0 }, end: { x: 0, y: 1 } };
+
+		const centerAngle = (emotion.startAngle + emotion.endAngle) / 2;
+		const angleRad = (centerAngle * Math.PI) / 180;
+
+		// Direction opposée au secteur survolé pour le gradient
+		const endX = 0.5 + 0.5 * Math.cos(angleRad);
+		const endY = 0.5 + 0.5 * Math.sin(angleRad);
+
+		// Position de départ à l'opposé
+		const startX = 0.5 - 0.5 * Math.cos(angleRad);
+		const startY = 0.5 - 0.5 * Math.sin(angleRad);
+
+		return {
+			start: { x: startX, y: startY },
+			end: { x: endX, y: endY }
+		};
+	};
+
+	const gradientPositions = getGradientPositions(hoveredEmotion);
+
 	return (
 		<Animated.View
 			style={[
@@ -106,99 +184,172 @@ const EmotionsPieChart: React.FC<EmotionsPieChartProps> = ({
 					opacity: wheelOpacity
 				}
 			]}>
-			<TouchableWithoutFeedback onPress={handlePiePress}>
+			<TouchableWithoutFeedback
+				onPress={handlePiePress}
+				onPressIn={handleTouchMove}
+				onPressOut={handleTouchEnd}
+				delayPressIn={0}>
 				<View
 					style={[
-						styles.circle,
+						styles.circleWrapper,
 						{
-							width: size,
-							height: size,
-							backgroundColor: darkBlue,
-							borderWidth: 2,
-							borderColor: "white"
+							width: size + 6, // Pour l'effet de bordure
+							height: size + 6,
+							borderRadius: (size + 6) / 2
 						}
-					]}>
-					{emotions.map((emotion) => (
-						<View
-							key={`line-${emotion.id}`}
+					]}
+					onTouchMove={handleTouchMove}
+					onTouchEnd={handleTouchEnd}
+					onTouchCancel={handleTouchEnd}>
+					{/* Bordure avec gradient */}
+					{hoveredEmotion ? (
+						<LinearGradient
+							colors={[
+								"rgba(255, 255, 255, 0.2)",
+								"rgba(255, 255, 255, 0.2)",
+								"rgba(255, 255, 255,1)"
+							]}
+							start={gradientPositions.start}
+							end={gradientPositions.end}
 							style={[
-								styles.divider,
+								styles.borderGradient,
 								{
-									width: radius,
-									height: 1,
-									left: radius,
-									top: radius,
-									transform: [
-										{ rotate: `${emotion.startAngle}deg` }
-									]
+									width: size + 6,
+									height: size + 6,
+									borderRadius: (size + 6) / 2
 								}
 							]}
 						/>
-					))}
-
-					{selectedEmotion && (
+					) : (
 						<View
 							style={[
-								styles.selectedSector,
+								styles.staticBorder,
 								{
-									width: size,
-									height: size,
-									backgroundColor: selectedEmotion.color,
-									clipPath: `path('${createSectorPath(selectedEmotion)}')`
+									width: size + 6,
+									height: size + 6,
+									borderRadius: (size + 6) / 2
 								}
 							]}
 						/>
 					)}
 
-					{emotions.map((emotion) => {
-						const centerAngle =
-							(emotion.startAngle + emotion.endAngle) / 2;
-						const angleRad = (centerAngle * Math.PI) / 180;
-						const textRadius = radius * 0.6;
-						const x = radius + textRadius * Math.cos(angleRad);
-						const y = radius + textRadius * Math.sin(angleRad);
-						let textRotation = centerAngle;
+					{/* Cercle principal */}
+					<View
+						style={[
+							styles.circle,
+							{
+								width: size,
+								height: size,
+								backgroundColor: darkBlue
+							}
+						]}>
+						{emotions.map((emotion) => (
+							<View
+								key={`line-${emotion.id}`}
+								style={[
+									styles.divider,
+									{
+										width: radius,
+										height: 1,
+										left: radius,
+										top: radius,
+										transform: [
+											{
+												rotate: `${emotion.startAngle}deg`
+											}
+										]
+									}
+								]}
+							/>
+						))}
 
-						if (textRotation > 90 && textRotation < 270) {
-							textRotation += 180;
-						}
+						{/* Secteur sélectionné */}
+						{selectedEmotion && (
+							<View
+								style={[
+									styles.selectedSector,
+									{
+										width: size,
+										height: size,
+										backgroundColor: selectedEmotion.color,
+										clipPath: `path('${createSectorPath(selectedEmotion)}')`
+									}
+								]}
+							/>
+						)}
 
-						return (
-							<TouchableWithoutFeedback
-								key={`text-touch-${emotion.id}`}
-								onPress={() =>
-									!selectedEmotion && onSelectEmotion(emotion)
-								}>
-								<View
-									style={[
-										styles.textContainer,
-										{
-											left: x,
-											top: y,
-											transform: [
-												{ translateX: -50 },
-												{ translateY: -10 },
-												{ rotate: `${textRotation}deg` }
-											]
-										}
-									]}>
-									<Text
+						{/* Secteur survolé */}
+						{hoveredEmotion && !selectedEmotion && (
+							<View
+								style={[
+									styles.hoveredSector,
+									{
+										width: size,
+										height: size,
+										backgroundColor: hoveredEmotion.color,
+										clipPath: `path('${createSectorPath(hoveredEmotion)}')`
+									}
+								]}
+							/>
+						)}
+
+						{emotions.map((emotion) => {
+							const centerAngle =
+								(emotion.startAngle + emotion.endAngle) / 2;
+							const angleRad = (centerAngle * Math.PI) / 180;
+							const textRadius = radius * 0.6;
+							const x = radius + textRadius * Math.cos(angleRad);
+							const y = radius + textRadius * Math.sin(angleRad);
+							let textRotation = centerAngle;
+
+							if (textRotation > 90 && textRotation < 270) {
+								textRotation += 180;
+							}
+
+							return (
+								<TouchableWithoutFeedback
+									key={`text-touch-${emotion.id}`}
+									onPress={() =>
+										!selectedEmotion &&
+										onSelectEmotion(emotion)
+									}>
+									<View
 										style={[
-											styles.text,
-											selectedEmotion &&
-											selectedEmotion.id === emotion.id
-												? {
-														color: selectedEmotion.color,
-														fontWeight: "900"
+											styles.textContainer,
+											{
+												left: x,
+												top: y,
+												transform: [
+													{ translateX: -50 },
+													{ translateY: -10 },
+													{
+														rotate: `${textRotation}deg`
 													}
-												: {}
+												]
+											}
 										]}>
-										{emotion.label}
-									</Text>
-								</View>
-							</TouchableWithoutFeedback>
-						);
-					})}
+										<Text
+											style={[
+												styles.text,
+												(selectedEmotion &&
+													selectedEmotion.id ===
+														emotion.id) ||
+												(hoveredEmotion &&
+													hoveredEmotion.id ===
+														emotion.id)
+													? {
+															color: emotion.color,
+															fontWeight: "900"
+														}
+													: {}
+											]}>
+											{emotion.label}
+										</Text>
+									</View>
+								</TouchableWithoutFeedback>
+							);
+						})}
+					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		</Animated.View>
@@ -211,6 +362,21 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		zIndex: 1
+	},
+	circleWrapper: {
+		position: "relative",
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	borderGradient: {
+		position: "absolute",
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	staticBorder: {
+		position: "absolute",
+		borderWidth: 3,
+		borderColor: "rgba(255, 255, 255, 0.5)"
 	},
 	circle: {
 		borderRadius: 150,
@@ -225,6 +391,10 @@ const styles = StyleSheet.create({
 	selectedSector: {
 		position: "absolute",
 		opacity: 0.6
+	},
+	hoveredSector: {
+		position: "absolute",
+		opacity: 0.7
 	},
 	textContainer: {
 		position: "absolute",
