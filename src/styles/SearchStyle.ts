@@ -13,33 +13,85 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		height: 40,
-		marginBottom: 20
+		marginBottom: 20,
+		backgroundColor: "#fff",
+		borderWidth: 1,
+		borderRadius: 8
 	},
 	input: {
 		height: 40,
-		borderWidth: 1,
-		borderRadius: 4,
-		borderColor: "#6B737A",
-		marginBottom: 15,
-		color: "#fff",
-		padding: 5,
+		color: "#000",
+		paddingVertical: "auto",
+		paddingLeft: 20,
 		flex: 1,
-		marginRight: 5
+		marginRight: 5,
+		width: "65%"
 	},
+	BtnSearch: {
+		height: 40,
+		width: "35%"
+	},
+	TextSearch: {
+		color: "#000",
+		margin: "auto"
+	},
+
 	listFilters: {
+		marginVertical: 10,
 		flexDirection: "row",
-		gap: 20,
-		justifyContent: "center",
-		marginBottom: 20
+		marginBottom: 20,
+		height: 30
+	},
+	filterContainer: {
+		borderWidth: 0.5,
+		//borderWidth: 1,
+		borderColor: "#AC2821",
+		padding: 5,
+		margin: "auto",
+		borderRadius: 5,
+		fontSize: 16,
+		marginRight: 10,
+		paddingHorizontal: 15
+	},
+	selectedFilterContainer: {
+		backgroundColor: "#fff", // Couleur blanc quand sélectionné
+		borderWidth: 0.5,
+		//borderWidth: 1,
+		borderColor: "#000"
 	},
 	filter: {
 		color: "#fff",
-		borderWidth: 1,
-		borderColor: "#AC2821",
-		padding: 5,
-		borderRadius: 5,
+		margin: "auto",
 		fontSize: 16
 	},
+	selectedFilter: {
+		color: "#000" // Texte noir quand sélectionné
+	},
+
+	// listFilters: {
+	// 	flexDirection: "row",
+	// 	marginBottom: 20,
+	// 	height: 30
+	// },
+	// selectedFilterContainer: {
+	// 	backgroundColor: "#143c6f", // Couleur bleue quand sélectionné
+	// 	width: "100%"
+	// },
+	// filter: {
+	// 	color: "#fff",
+	// 	borderWidth: 0.5,
+	// 	//borderWidth: 1,
+	// 	borderColor: "#AC2821",
+	// 	padding: 5,
+	// 	margin: "auto",
+	// 	borderRadius: 5,
+	// 	fontSize: 16,
+	// 	marginRight: 10,
+	// 	paddingHorizontal: 15
+	// },
+	// selectedFilter: {
+	// 	color: "white" // Texte blanc quand sélectionné
+	// },
 	resultsContainer: {
 		flex: 1
 	},
@@ -75,6 +127,12 @@ const styles = StyleSheet.create({
 		height: 1,
 		backgroundColor: "#EBDDFF",
 		marginVertical: 10
+	},
+	NoResult: {
+		margin: "auto",
+		marginTop: 200,
+		height: "100%",
+		fontSize: 30
 	}
 });
 

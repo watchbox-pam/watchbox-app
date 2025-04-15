@@ -1,77 +1,114 @@
-import { Button, Image, ScrollView, Text, TextInput, View } from "react-native";
+import {
+	Button,
+	FlatList,
+	Image,
+	ScrollView,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
+} from "react-native";
 import React, { useState } from "react";
 import { searchInfos } from "@/src/services/SearchService";
 import styles from "@/src/styles/SearchStyle";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import Movie from "@/src/models/Movie";
+import StyledText from "../components/StyledText";
 
 export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [results, setResults] = useState<Movie[]>([]);
 	const [category, setCategory] = useState("all");
+	const [selectedFilter, setSelectedFilter] = useState("films"); // État pour suivre l'élément sélectionné
+
+	const filters = [
+		{ key: "films", label: "Films" },
+		{ key: "series", label: "Séries" },
+		{ key: "actors", label: "Acteurs" },
+		{ key: "users", label: "Utilisateurs" },
+		{ key: "years", label: "Année" }
+	];
 
 	const search = async () => {
-		const searchResults = await searchInfos(searchTerm);
-		setResults(searchResults);
+		if (searchTerm.trim()) {
+			const searchResults = await searchInfos(searchTerm);
+			setResults(searchResults);
+		}
 	};
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.topSection}>
 				<TextInput style={styles.input} onChangeText={setSearchTerm} />
-				<Button title={"Rechercher"} onPress={search} />
+				<TouchableOpacity onPress={search} style={styles.BtnSearch}>
+					<Text style={styles.TextSearch}>Rechercher</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.listFilters}>
-				<Text style={styles.filter}>Films</Text>
-				<Text style={styles.filter}>Séries</Text>
-				<Text style={styles.filter}>Acteurs</Text>
-			</View>
+			<FlatList
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				style={styles.listFilters}
+				data={filters}
+				renderItem={({ item }) => (
+					<TouchableOpacity
+						onPress={() => setSelectedFilter(item.key)}
+						style={[
+							styles.filterContainer,
+							selectedFilter === item.key &&
+								styles.selectedFilterContainer
+						]}>
+						<Text
+							style={[
+								styles.filter,
+								selectedFilter === item.key &&
+									styles.selectedFilter
+							]}>
+							{item.label}
+						</Text>
+					</TouchableOpacity>
+				)}
+				keyExtractor={(item) => item.key}
+			/>
 			<ScrollView contentContainerStyle={styles.resultsContainer}>
-				{results !== null &&
-					results?.length > 0 &&
+				{results !== null && results?.length > 0 ? (
 					results.map((result) => {
 						return (
 							<View key={result.id}>
-								<Link
-									href={{
-										pathname: "/movie/[id]",
-										params: { id: result.id }
-									}}>
-									<View style={styles.contInfo}>
-										<Image
-											source={{
-												uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
-											}}
-											style={styles.image}
-											resizeMode="cover"
-										/>
-										<View style={styles.resultInfo}>
-											<View>
-												<Text
-													style={styles.resultTitle}
-													numberOfLines={2}>
-													{result.title}
-												</Text>
-												<Text style={styles.resultYear}>
-													{
-														result.release_date
-															.toString()
-															.split("-")[0]
-													}
-												</Text>
-											</View>
-											<View>
-												<Text style={styles.avis}>
-													{result.status}
-												</Text>
-											</View>
-										</View>
+								<TouchableOpacity
+									onPress={() =>
+										router.push(`/movie/${result.id}`)
+									}>
+									<Image
+										source={{
+											uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
+										}}
+										style={styles.image}
+										resizeMode="cover"
+									/>
+									<View style={styles.resultInfo}>
+										<Text
+											style={styles.resultTitle}
+											numberOfLines={2}>
+											{result.title}
+										</Text>
+										<Text style={styles.resultYear}>
+											{
+												result.release_date
+													.toString()
+													.split("-")[0]
+											}
+										</Text>
 									</View>
-								</Link>
+								</TouchableOpacity>
 								<View style={styles.separator}></View>
 							</View>
 						);
-					})}
+					})
+				) : (
+					<StyledText style={styles.NoResult}>
+						Aucun résultat
+					</StyledText>
+				)}
 			</ScrollView>
 		</View>
 	);

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
 
 const DropDownButton = () => {
 	const [visible, setVisible] = useState(false);
-	const navigation = useNavigation();
 
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
