@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
 	StyleSheet,
-	View,
 	Animated,
 	StatusBar,
 	SafeAreaView,
 	Dimensions
 } from "react-native";
 import axios from "axios";
-import EmotionsPieChart from "../components/EmotionsPieChart";
+//import EmotionsPieChart from "../components/EmotionsPieChart";
 import MovieList from "../components/MovieList";
+import EmotionsList from "../components/EmotionsList";
 import CarouselSelection from "../components/CarouselSelection";
 
 interface Movie {
@@ -25,6 +25,7 @@ interface Emotion {
 	startAngle: number;
 	endAngle: number;
 	color: string;
+	emoji: string;
 }
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_BASE_API_URL;
@@ -36,7 +37,8 @@ const emotions: Emotion[] = [
 		value: "romantisme",
 		startAngle: -22.5,
 		endAngle: 22.5,
-		color: "#FF9AAA"
+		color: "#FF9AAA",
+		emoji: "🩷"
 	},
 	{
 		id: 2,
@@ -44,7 +46,8 @@ const emotions: Emotion[] = [
 		value: "emerveillement",
 		startAngle: 22.5,
 		endAngle: 67.5,
-		color: "#4CAF50"
+		color: "#4CAF50",
+		emoji: "😯"
 	},
 	{
 		id: 3,
@@ -52,7 +55,8 @@ const emotions: Emotion[] = [
 		value: "excitation",
 		startAngle: 67.5,
 		endAngle: 112.5,
-		color: "#FF9800"
+		color: "#FF9800",
+		emoji: "🫨"
 	},
 	{
 		id: 4,
@@ -60,7 +64,8 @@ const emotions: Emotion[] = [
 		value: "frisson",
 		startAngle: 112.5,
 		endAngle: 157.5,
-		color: "#D32F2F"
+		color: "#D32F2F",
+		emoji: "😨"
 	},
 	{
 		id: 5,
@@ -68,7 +73,8 @@ const emotions: Emotion[] = [
 		value: "nostalgie",
 		startAngle: 157.5,
 		endAngle: 202.5,
-		color: "#9E9E9E"
+		color: "#9E9E9E",
+		emoji: "😌"
 	},
 	{
 		id: 6,
@@ -76,7 +82,8 @@ const emotions: Emotion[] = [
 		value: "reflexion",
 		startAngle: 202.5,
 		endAngle: 247.5,
-		color: "#212121"
+		color: "#212121",
+		emoji: "🤓"
 	},
 	{
 		id: 7,
@@ -84,7 +91,8 @@ const emotions: Emotion[] = [
 		value: "melancolie",
 		startAngle: 247.5,
 		endAngle: 292.5,
-		color: "#2196F3"
+		color: "#2196F3",
+		emoji: "🥲"
 	},
 	{
 		id: 8,
@@ -92,11 +100,12 @@ const emotions: Emotion[] = [
 		value: "rire",
 		startAngle: 292.5,
 		endAngle: 337.5,
-		color: "#FFEB3B"
+		color: "#ffd53b",
+		emoji: "😂"
 	}
 ];
 
-const RecommendationScreen: React.FC = () => {
+export default function RecommendationScreen() {
 	const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(
 		null
 	);
@@ -184,20 +193,12 @@ const RecommendationScreen: React.FC = () => {
 		<SafeAreaView style={styles.container}>
 			<StatusBar barStyle="light-content" />
 
-			<Animated.View
-				style={[
-					styles.centeredContainer,
-					{ height: windowHeight, opacity: wheelOpacity }
-				]}
-				pointerEvents={selectedEmotion ? "none" : "auto"}>
-				{/* <EmotionsPieChart
-					emotions={emotions}
-					selectedEmotion={selectedEmotion}
-					onSelectEmotion={handleSelectEmotion}
-					size={size}
-					wheelOpacity={wheelOpacity}
-				/> */}
-			</Animated.View>
+			<EmotionsList
+				emotions={emotions}
+				selectedEmotion={selectedEmotion}
+				onSelectEmotion={handleSelectEmotion}
+				wheelOpacity={wheelOpacity}
+			/>
 
 			<Animated.View
 				style={[styles.moviesContainer, { opacity: resultsOpacity }]}
@@ -214,7 +215,7 @@ const RecommendationScreen: React.FC = () => {
 			<CarouselSelection />
 		</SafeAreaView>
 	);
-};
+}
 
 const styles = StyleSheet.create({
 	container: {
@@ -239,5 +240,3 @@ const styles = StyleSheet.create({
 		zIndex: 2
 	}
 });
-
-export default RecommendationScreen;
