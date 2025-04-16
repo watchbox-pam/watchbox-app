@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import EmotionsPieChart from "../components/EmotionsPieChart";
 import MovieList from "../components/MovieList";
+import CarouselSelection from "../components/CarouselSelection";
 
 interface Movie {
 	id: number;
@@ -189,13 +190,13 @@ const RecommendationScreen: React.FC = () => {
 					{ height: windowHeight, opacity: wheelOpacity }
 				]}
 				pointerEvents={selectedEmotion ? "none" : "auto"}>
-				<EmotionsPieChart
+				{/* <EmotionsPieChart
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}
 					onSelectEmotion={handleSelectEmotion}
 					size={size}
 					wheelOpacity={wheelOpacity}
-				/>
+				/> */}
 			</Animated.View>
 
 			<Animated.View
@@ -210,6 +211,7 @@ const RecommendationScreen: React.FC = () => {
 					onBack={resetAnimation}
 				/>
 			</Animated.View>
+			<CarouselSelection />
 		</SafeAreaView>
 	);
 };

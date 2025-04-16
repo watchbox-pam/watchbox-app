@@ -127,9 +127,11 @@ export default function SignupScreen() {
 					maximumDate={new Date(Date.now())}
 				/>
 			)}
-			<TouchableOpacity style={styles.button} onPress={signupUser}>
-				<Text style={styles.buttonText}>Créez votre compte</Text>
-			</TouchableOpacity>
+			<View style={styles.btnSignUp}>
+				<TouchableOpacity style={styles.button} onPress={signupUser}>
+					<Text style={styles.buttonText}>Créez votre compte</Text>
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }
