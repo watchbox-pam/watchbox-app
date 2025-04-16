@@ -1,6 +1,7 @@
 import { ApiHelper } from "@/src/utils/axios";
 import { Encryption } from "@/src/utils/encryption";
 import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 export async function loginUser({
 	identifier,
@@ -31,10 +32,17 @@ export async function loginUser({
 			password: hashedPassword
 		});
 		if (result.success) {
-			await SecureStore.setItemAsync(
-				"currentUser",
-				JSON.stringify(result.data.token)
-			);
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			} else {
+				localStorage.setItem(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			}
 			return {
 				success: true,
 				message: result.data
