@@ -2,11 +2,17 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		margin: 15
+		margin: 15,
+		marginHorizontal: "auto",
+		padding: 0,
+		width: "95%"
 	},
 	topBar: {
 		flexDirection: "row",
 		justifyContent: "space-between"
+	},
+	formContainer: {
+		width: "100%"
 	},
 	title: {
 		fontSize: 40,
@@ -31,13 +37,18 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		padding: 5
 	},
+	btnForm: {
+		width: "100%",
+		marginTop: 15
+	},
 	button: {
 		backgroundColor: "#AC2128",
 		width: "75%",
 		borderRadius: 12,
 		padding: 10,
 		alignItems: "center",
-		margin: 8
+		justifyContent: "center",
+		margin: "auto"
 	},
 	buttonText: {
 		color: "#fff",
