@@ -3,21 +3,29 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
 		alignItems: "center"
+	},
+	Logo: {
+		alignItems: "center",
+		width: "100%",
+		height: "auto",
+		marginTop: 100
+	},
+	btns: {
+		marginTop: 100,
+		width: "75%"
 	},
 	button: {
 		backgroundColor: "#AC2128",
-		width: "75%",
 		borderRadius: 12,
 		padding: 10,
 		alignItems: "center",
-		margin: 8
+		marginVertical: 12
 	},
 	buttonText: {
 		color: "#fff",
 		fontWeight: "bold",
-		fontSize: 17
+		fontSize: 18
 	}
 });
 

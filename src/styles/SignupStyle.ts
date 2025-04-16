@@ -31,6 +31,10 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		padding: 5
 	},
+	btnSignUp: {
+		width: "100%",
+		alignItems: "center"
+	},
 	button: {
 		backgroundColor: "#AC2128",
 		width: "75%",

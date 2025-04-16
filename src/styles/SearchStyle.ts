@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		height: 40,
-		marginBottom: 20,
+		marginVertical: 10,
 		backgroundColor: "#fff",
 		borderWidth: 1,
 		borderRadius: 8
@@ -35,28 +35,24 @@ const styles = StyleSheet.create({
 		color: "#000",
 		margin: "auto"
 	},
-
 	listFilters: {
 		marginVertical: 10,
 		flexDirection: "row",
-		marginBottom: 20,
-		height: 30
+		marginBottom: 20
 	},
 	filterContainer: {
 		borderWidth: 0.5,
-		//borderWidth: 1,
 		borderColor: "#AC2821",
 		padding: 5,
-		margin: "auto",
 		borderRadius: 5,
 		fontSize: 16,
 		marginRight: 10,
-		paddingHorizontal: 15
+		paddingHorizontal: 15,
+		height: 30
 	},
 	selectedFilterContainer: {
-		backgroundColor: "#fff", // Couleur blanc quand sélectionné
+		backgroundColor: "#fff",
 		borderWidth: 0.5,
-		//borderWidth: 1,
 		borderColor: "#000"
 	},
 	filter: {
@@ -65,33 +61,8 @@ const styles = StyleSheet.create({
 		fontSize: 16
 	},
 	selectedFilter: {
-		color: "#000" // Texte noir quand sélectionné
+		color: "#000"
 	},
-
-	// listFilters: {
-	// 	flexDirection: "row",
-	// 	marginBottom: 20,
-	// 	height: 30
-	// },
-	// selectedFilterContainer: {
-	// 	backgroundColor: "#143c6f", // Couleur bleue quand sélectionné
-	// 	width: "100%"
-	// },
-	// filter: {
-	// 	color: "#fff",
-	// 	borderWidth: 0.5,
-	// 	//borderWidth: 1,
-	// 	borderColor: "#AC2821",
-	// 	padding: 5,
-	// 	margin: "auto",
-	// 	borderRadius: 5,
-	// 	fontSize: 16,
-	// 	marginRight: 10,
-	// 	paddingHorizontal: 15
-	// },
-	// selectedFilter: {
-	// 	color: "white" // Texte blanc quand sélectionné
-	// },
 	resultsContainer: {
 		flex: 1
 	},
@@ -130,7 +101,6 @@ const styles = StyleSheet.create({
 	},
 	NoResult: {
 		margin: "auto",
-		marginTop: 200,
 		height: "100%",
 		fontSize: 30
 	}

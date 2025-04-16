@@ -1,5 +1,4 @@
 import {
-	Button,
 	FlatList,
 	Image,
 	ScrollView,
@@ -19,14 +18,17 @@ export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [results, setResults] = useState<Movie[]>([]);
 	const [category, setCategory] = useState("all");
-	const [selectedFilter, setSelectedFilter] = useState("films"); // État pour suivre l'élément sélectionné
+	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
 
 	const filters = [
+		{ key: "all", label: "Tous" },
 		{ key: "films", label: "Films" },
 		{ key: "series", label: "Séries" },
 		{ key: "actors", label: "Acteurs" },
 		{ key: "users", label: "Utilisateurs" },
-		{ key: "years", label: "Année" }
+		{ key: "years", label: "Année" },
+		{ key: "score+", label: "Mieux noté" },
+		{ key: "score-", label: "Mal noté" }
 	];
 
 	const search = async () => {
