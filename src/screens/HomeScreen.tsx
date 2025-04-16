@@ -2,49 +2,28 @@ import { useEffect, useState } from "react";
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
 import { Text, View, StyleSheet, ScrollView, Platform } from "react-native";
-import { ApiHelper } from "../utils/axios";
 
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
+import { fetchPopular } from "@/src/services/HomePageService";
 
 export default function HomeScreen() {
 	const [popularDay, setPopularDay] = useState();
 	const [popularWeek, setPopularWeek] = useState();
 
-	useEffect(() => {
-		const fetchPopularDay = async () => {
-			try {
-				const time_window = "day";
-				const data = await ApiHelper.get(
-					`movies/popular/${time_window}?page=1`
-				);
-				setPopularDay(data);
-			} catch (error) {
-				console.error(
-					"Erreur lors de la récupération des films populaires:",
-					error
-				);
-			}
-		};
-		fetchPopularDay();
-	}, []);
+	const fetchPopularMovies = async () => {
+		const popularDay = await fetchPopular("day");
+		if (popularDay.success) {
+			setPopularDay(popularDay.data);
+		}
+		const popularWeek = await fetchPopular("week");
+		if (popularWeek.success) {
+			setPopularWeek(popularWeek.data);
+		}
+	};
 
 	useEffect(() => {
-		const fetchPopularWeek = async () => {
-			try {
-				const time_window = "week";
-				const data = await ApiHelper.get(
-					`movies/popular/${time_window}?page=1`
-				);
-				setPopularWeek(data);
-			} catch (error) {
-				console.error(
-					"Erreur lors de la récupération des films populaires:",
-					error
-				);
-			}
-		};
-		fetchPopularWeek();
+		fetchPopularMovies();
 	}, []);
 
 	return (

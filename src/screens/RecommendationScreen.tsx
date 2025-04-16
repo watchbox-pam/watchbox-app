@@ -7,9 +7,9 @@ import {
 	SafeAreaView,
 	Dimensions
 } from "react-native";
-import axios from "axios";
 import EmotionsPieChart from "../components/EmotionsPieChart";
 import MovieList from "../components/MovieList";
+import { fetchRecommendations } from "@/src/services/RecommendationService";
 
 interface Movie {
 	id: number;
@@ -25,8 +25,6 @@ interface Emotion {
 	endAngle: number;
 	color: string;
 }
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_BASE_API_URL;
 
 const emotions: Emotion[] = [
 	{
@@ -156,19 +154,14 @@ const RecommendationScreen: React.FC = () => {
 		setLoading(true);
 		setError(null);
 
-		const apiUrl = `${API_BASE_URL}recommendations/emotion/${selectedEmotion.value}?limit=10`;
-
 		try {
-			const response = await axios.get<Movie[]>(apiUrl, {
-				timeout: 10000,
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json"
-				}
-			});
-			setMovies(response.data);
+			const response = await fetchRecommendations(selectedEmotion.value);
+			if (response.success) {
+				setMovies(response.data);
+			} else {
+				setError("Impossible de charger les recommandations.");
+			}
 		} catch (err) {
-			console.error("Erreur lors du chargement des films:", err);
 			setError("Impossible de charger les recommandations.");
 		} finally {
 			setLoading(false);

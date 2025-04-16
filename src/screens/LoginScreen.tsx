@@ -12,6 +12,7 @@ export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 
+	// @ts-ignore
 	const signIn = useSessionStore((state) => state.signIn);
 
 	const handleSubmit = async () => {
