@@ -10,7 +10,6 @@ import axios from "axios";
 //import EmotionsPieChart from "../components/EmotionsPieChart";
 import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
-import CarouselSelection from "../components/CarouselSelection";
 
 interface Movie {
 	id: number;
@@ -212,7 +211,6 @@ export default function RecommendationScreen() {
 					onBack={resetAnimation}
 				/>
 			</Animated.View>
-			<CarouselSelection />
 		</SafeAreaView>
 	);
 }
