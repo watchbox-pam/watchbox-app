@@ -1,5 +1,5 @@
 import {
-	Button,
+	FlatList,
 	Image,
 	ScrollView,
 	Text,
@@ -18,6 +18,18 @@ export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [results, setResults] = useState<Movie[]>([]);
 	const [category, setCategory] = useState("all");
+	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
+
+	const filters = [
+		{ key: "all", label: "Tous" },
+		{ key: "films", label: "Films" },
+		{ key: "series", label: "Séries" },
+		{ key: "actors", label: "Acteurs" },
+		{ key: "users", label: "Utilisateurs" },
+		{ key: "years", label: "Année" },
+		{ key: "score+", label: "Mieux noté" },
+		{ key: "score-", label: "Mal noté" }
+	];
 
 	const search = async () => {
 		if (searchTerm.trim()) {
@@ -30,23 +42,44 @@ export default function SearchScreen() {
 		<View style={styles.container}>
 			<View style={styles.topSection}>
 				<TextInput style={styles.input} onChangeText={setSearchTerm} />
-				<Button title={"Rechercher"} onPress={search} />
+				<TouchableOpacity onPress={search} style={styles.BtnSearch}>
+					<Text style={styles.TextSearch}>Rechercher</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.listFilters}>
-				<Text style={styles.filter}>Films</Text>
-				<Text style={styles.filter}>Séries</Text>
-				<Text style={styles.filter}>Acteurs</Text>
-			</View>
+			<FlatList
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				style={styles.listFilters}
+				data={filters}
+				renderItem={({ item }) => (
+					<TouchableOpacity
+						onPress={() => setSelectedFilter(item.key)}
+						style={[
+							styles.filterContainer,
+							selectedFilter === item.key &&
+								styles.selectedFilterContainer
+						]}>
+						<Text
+							style={[
+								styles.filter,
+								selectedFilter === item.key &&
+									styles.selectedFilter
+							]}>
+							{item.label}
+						</Text>
+					</TouchableOpacity>
+				)}
+				keyExtractor={(item) => item.key}
+			/>
 			<ScrollView contentContainerStyle={styles.resultsContainer}>
 				{results !== null && results?.length > 0 ? (
 					results.map((result) => {
 						return (
-							<View style={styles.resContainer} key={result.id}>
+							<View key={result.id}>
 								<TouchableOpacity
 									onPress={() =>
 										router.push(`/movie/${result.id}`)
-									}
-									style={styles.link}>
+									}>
 									<Image
 										source={{
 											uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
@@ -74,7 +107,9 @@ export default function SearchScreen() {
 						);
 					})
 				) : (
-					<StyledText>Aucun résultat</StyledText>
+					<StyledText style={styles.NoResult}>
+						Aucun résultat
+					</StyledText>
 				)}
 			</ScrollView>
 		</View>

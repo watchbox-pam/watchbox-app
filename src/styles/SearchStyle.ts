@@ -13,78 +13,96 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		height: 40,
-		marginBottom: 20
+		marginVertical: 10,
+		backgroundColor: "#fff",
+		borderWidth: 1,
+		borderRadius: 8
 	},
 	input: {
 		height: 40,
-		borderWidth: 1,
-		borderRadius: 4,
-		borderColor: "#6B737A",
-		marginBottom: 15,
-		color: "#fff",
-		padding: 5,
+		color: "#000",
+		paddingVertical: "auto",
+		paddingLeft: 20,
 		flex: 1,
-		marginRight: 5
+		marginRight: 5,
+		width: "65%"
+	},
+	BtnSearch: {
+		height: 40,
+		width: "35%"
+	},
+	TextSearch: {
+		color: "#000",
+		margin: "auto"
 	},
 	listFilters: {
+		marginVertical: 10,
 		flexDirection: "row",
-		gap: 20,
-		justifyContent: "center",
 		marginBottom: 20
 	},
-	filter: {
-		color: "#fff",
-		borderWidth: 1,
+	filterContainer: {
+		borderWidth: 0.5,
 		borderColor: "#AC2821",
 		padding: 5,
 		borderRadius: 5,
+		fontSize: 16,
+		marginRight: 10,
+		paddingHorizontal: 15,
+		height: 30
+	},
+	selectedFilterContainer: {
+		backgroundColor: "#fff",
+		borderWidth: 0.5,
+		borderColor: "#000"
+	},
+	filter: {
+		color: "#fff",
+		margin: "auto",
 		fontSize: 16
 	},
+	selectedFilter: {
+		color: "#000"
+	},
 	resultsContainer: {
+		flex: 1
+	},
+	contInfo: {
+		flex: 1,
 		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "space-evenly",
-		gap: 15
-	},
-	image: {
-		width: 100,
-		height: 150,
-		aspectRatio: 2 / 3,
-		borderRadius: 10,
-		backgroundColor: "#313131",
-		marginRight: 15
-	},
-	resContainer: {
-		height: 160,
-		paddingLeft: 10,
 		width: "100%"
 	},
-	link: {
-		flexDirection: "row",
-		alignItems: "flex-start",
-		justifyContent: "space-between",
-		marginBottom: 20
+	image: {
+		width: "25%",
+		height: 150,
+		borderRadius: 10,
+		backgroundColor: "#313131"
 	},
 	resultInfo: {
-		marginLeft: 15,
-		flexDirection: "column",
-		justifyContent: "flex-start",
-		height: "100%"
+		width: "70%",
+		marginLeft: "5%"
 	},
 	resultTitle: {
 		color: "#EBDDFF",
 		fontWeight: "bold",
-		fontSize: 24,
-		textOverflow: "ellipsis",
-		flexWrap: "wrap"
+		fontSize: 20
 	},
 	resultYear: {
+		color: "#fff",
+		fontSize: 14
+	},
+	avis: {
 		color: "#fff"
 	},
 	separator: {
 		width: "100%",
 		height: 1,
-		backgroundColor: "#EBDDFF"
+		backgroundColor: "#EBDDFF",
+		marginVertical: 10
+	},
+	NoResult: {
+		margin: "auto",
+		height: "100%",
+		fontSize: 30
 	}
 });
 
