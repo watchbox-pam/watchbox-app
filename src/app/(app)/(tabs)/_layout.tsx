@@ -99,62 +99,6 @@ export default function TabLayout() {
 						)
 					}}
 				/>
-				<Tabs.Screen
-					name="commentary"
-					options={{
-						href: null,
-						title: "Commentary",
-						tabBarIcon: ({ color }) => (
-							<MaterialIcons
-								size={28}
-								name="person"
-								color={color}
-							/>
-						)
-					}}
-				/>
-				<Tabs.Screen
-					name="friends"
-					options={{
-						href: null,
-						title: "Friends",
-						tabBarIcon: ({ color }) => (
-							<MaterialIcons
-								size={28}
-								name="person"
-								color={color}
-							/>
-						)
-					}}
-				/>
-				<Tabs.Screen
-					name="notifs"
-					options={{
-						href: null,
-						title: "Notifs",
-						tabBarIcon: ({ color }) => (
-							<MaterialIcons
-								size={28}
-								name="person"
-								color={color}
-							/>
-						)
-					}}
-				/>
-				<Tabs.Screen
-					name="param"
-					options={{
-						href: null,
-						title: "Params",
-						tabBarIcon: ({ color }) => (
-							<MaterialIcons
-								size={28}
-								name="person"
-								color={color}
-							/>
-						)
-					}}
-				/>
 			</Tabs>
 		</View>
 	);

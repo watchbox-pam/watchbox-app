@@ -11,7 +11,8 @@
 		"test": "jest --watchAll",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"prepare": "husky"
+		"prepare": "husky",
+		"routes": "expo-router-cli routes"
 	},
 	"jest": {
 		"preset": "jest-expo"
