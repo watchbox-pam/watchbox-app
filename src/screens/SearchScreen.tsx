@@ -34,7 +34,9 @@ export default function SearchScreen() {
 	const search = async () => {
 		if (searchTerm.trim()) {
 			const searchResults = await searchInfos(searchTerm);
-			setResults(searchResults);
+			if (searchResults.success) {
+				setResults(searchResults.data);
+			}
 		}
 	};
 

@@ -12,9 +12,9 @@ import CarouselProviders from "@/src/components/CarouselProviders";
 import CarouselCasting from "@/src/components/CarouselCasting";
 
 import styles from "@/src/styles/MovieDetailStyle";
-import { ApiHelper } from "../utils/axios";
 import { ActivityIndicator } from "react-native-paper";
 import CommentaryScreen from "@/src/screens/CommentaryScreen";
+import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -22,20 +22,22 @@ export default function MovieScreen() {
 
 	const [media, setMedia] = useState<undefined | MovieProps>();
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			try {
-				const response = await ApiHelper.get(`/movies/${id}`);
-				setMedia(response);
-				setLoading(false);
-			} catch (e) {
-				console.error(e);
-			}
-		};
-
-		fetchData();
+	const fetchData = async () => {
 		setLoading(true);
+		try {
+			const response = await fetchMovieDetails(+id);
+			if (response.success) {
+				setMedia(response.data);
+			}
+			setLoading(false);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		fetchData();
 	}, [id]);
 
 	const convertMinutesToHours = (minutes: number) => {
