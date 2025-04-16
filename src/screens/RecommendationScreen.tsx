@@ -192,12 +192,19 @@ export default function RecommendationScreen() {
 		<SafeAreaView style={styles.container}>
 			<StatusBar barStyle="light-content" />
 
-			<EmotionsList
-				emotions={emotions}
-				selectedEmotion={selectedEmotion}
-				onSelectEmotion={handleSelectEmotion}
-				wheelOpacity={wheelOpacity}
-			/>
+			<Animated.View
+				style={[
+					styles.centeredContainer,
+					{ height: windowHeight, opacity: wheelOpacity }
+				]}
+				pointerEvents={selectedEmotion ? "none" : "auto"}>
+				<EmotionsList
+					emotions={emotions}
+					selectedEmotion={selectedEmotion}
+					onSelectEmotion={handleSelectEmotion}
+					wheelOpacity={wheelOpacity}
+				/>
+			</Animated.View>
 
 			<Animated.View
 				style={[styles.moviesContainer, { opacity: resultsOpacity }]}
