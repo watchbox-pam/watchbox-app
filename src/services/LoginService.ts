@@ -45,7 +45,7 @@ export async function loginUser({
 			}
 			return {
 				success: true,
-				message: result.data
+				message: result.data.user_id
 			};
 		} else {
 			return {
