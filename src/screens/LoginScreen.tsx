@@ -19,7 +19,7 @@ export default function LoginScreen() {
 		const result = await loginUser({ identifier, password });
 		if (result.success) {
 			signIn(result.message, identifier);
-			router.replace("/index");
+			router.replace("/");
 			return;
 		} else {
 			alert(result.message);

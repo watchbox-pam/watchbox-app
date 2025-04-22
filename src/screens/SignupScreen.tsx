@@ -24,7 +24,7 @@ export default function SignupScreen() {
 	const [dtPickerVisible, setDtPickerVisible] = useState<boolean>(false);
 	const [birthdate, setBirthdate] = useState<Date | null>(null);
 
-	const signIn = useSessionStore((state) => state.signIn);
+	const signIn = useSessionStore((state: any) => state.signIn);
 
 	const getCountries = async () => {
 		const countriesResult = await getAllCountries();
