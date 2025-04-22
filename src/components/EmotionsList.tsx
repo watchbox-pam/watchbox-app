@@ -1,28 +1,18 @@
 import { View, StyleSheet, ScrollView, Animated } from "react-native";
 import EmotionCard from "./EmotionsCard";
 
-interface Emotion {
-	id: number;
-	label: string;
-	value: string;
-	startAngle: number;
-	endAngle: number;
-	color: string;
-	emoji: string;
-}
+import Emotion from "@/src/models/Emotion";
 
 interface EmotionsListProps {
 	emotions: Emotion[];
 	selectedEmotion: Emotion | null;
 	onSelectEmotion: (emotion: Emotion) => void;
-	wheelOpacity: Animated.Value;
 }
 
 export default function EmotionList({
 	emotions,
 	selectedEmotion,
-	onSelectEmotion,
-	wheelOpacity
+	onSelectEmotion
 }: EmotionsListProps) {
 	return (
 		<View style={styles.container}>

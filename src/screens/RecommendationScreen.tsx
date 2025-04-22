@@ -100,10 +100,10 @@ export default function RecommendationScreen() {
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [wheelOpacity] = useState(new Animated.Value(1));
+	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
 
-	const size = 300;
+	//const size = 300;
 	const windowHeight = Dimensions.get("window").height;
 
 	useEffect(() => {
@@ -113,9 +113,15 @@ export default function RecommendationScreen() {
 		}
 	}, [selectedEmotion]);
 
+	/**
+	 * 	Fonction d'animation pour la transition entre la roue des émotions et les résultats
+	 */
 	const animateTransition = () => {
+		/**
+		 *  Éxécution en simultané des 2 animations
+		 */
 		Animated.parallel([
-			Animated.timing(wheelOpacity, {
+			Animated.timing(emotionsOpacity, {
 				toValue: 0,
 				duration: 500,
 				useNativeDriver: true
@@ -130,8 +136,11 @@ export default function RecommendationScreen() {
 	};
 
 	const resetAnimation = () => {
+		/**
+		 *  Éxécution en simultané des 2 animations
+		 */
 		Animated.parallel([
-			Animated.timing(wheelOpacity, {
+			Animated.timing(emotionsOpacity, {
 				toValue: 1,
 				duration: 500,
 				useNativeDriver: true
@@ -142,12 +151,16 @@ export default function RecommendationScreen() {
 				useNativeDriver: true
 			})
 		]).start(() => {
+			// Réinitialise les états
 			setSelectedEmotion(null);
 			setMovies([]);
 			setError(null);
 		});
 	};
 
+	/**
+	 * Fonction asynchrone pour récupérer les films basés sur l'émotion sélectionnée
+	 */
 	const fetchMoviesByEmotion = async (): Promise<void> => {
 		if (!selectedEmotion) return;
 
@@ -179,14 +192,13 @@ export default function RecommendationScreen() {
 			<Animated.View
 				style={[
 					styles.centeredContainer,
-					{ height: windowHeight, opacity: wheelOpacity }
+					{ height: windowHeight, opacity: emotionsOpacity }
 				]}
 				pointerEvents={selectedEmotion ? "none" : "auto"}>
 				<EmotionsList
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}
 					onSelectEmotion={handleSelectEmotion}
-					wheelOpacity={wheelOpacity}
 				/>
 			</Animated.View>
 
