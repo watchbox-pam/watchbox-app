@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -9,6 +9,9 @@ import {
 	TouchableOpacity,
 	Dimensions
 } from "react-native";
+import { fetchMovies } from "../services/SwipeService";
+import { useLocalSearchParams } from "expo-router";
+import { MovieProps } from "./MovieScreen";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 120;
@@ -42,6 +45,27 @@ export default function App() {
 			image: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
 		}
 	]);
+
+	const [loading, setLoading] = useState(true);
+	const { id } = useLocalSearchParams();
+
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const response = await fetchMovies(+id);
+			if (response.success) {
+				setMovies(response.data);
+			}
+			setLoading(false);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		fetchData();
+	}, [id]);
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [likedMovies, setLikedMovies] = useState([]);
@@ -247,8 +271,6 @@ export default function App() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.header}>Film Swiper</Text>
-
 			<View style={styles.cardContainer}>{renderCards()}</View>
 
 			<View style={styles.buttonsContainer}>
@@ -271,14 +293,8 @@ export default function App() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#f5f5f5",
+		backgroundColor: "#0A1E38",
 		paddingTop: 50
-	},
-	header: {
-		fontSize: 24,
-		fontWeight: "bold",
-		textAlign: "center",
-		marginBottom: 20
 	},
 	cardContainer: {
 		flex: 1,
@@ -290,7 +306,7 @@ const styles = StyleSheet.create({
 		width: SCREEN_WIDTH * 0.9,
 		height: SCREEN_WIDTH * 1.5,
 		borderRadius: 20,
-		backgroundColor: "white",
+		backgroundColor: "#143b71",
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.3,
@@ -308,7 +324,8 @@ const styles = StyleSheet.create({
 	movieTitle: {
 		fontSize: 20,
 		fontWeight: "bold",
-		marginTop: 15
+		marginTop: 15,
+		color: "#fff"
 	},
 	buttonsContainer: {
 		flexDirection: "row",
@@ -381,20 +398,23 @@ const styles = StyleSheet.create({
 	},
 	endContainer: {
 		alignItems: "center",
-		justifyContent: "center"
+		justifyContent: "center",
+		color: "white"
 	},
 	endText: {
 		fontSize: 22,
 		fontWeight: "bold",
-		marginBottom: 20
+		marginBottom: 20,
+		color: "#fff"
 	},
 	endSubText: {
 		fontSize: 18,
-		marginBottom: 5
+		marginBottom: 5,
+		color: "#fff"
 	},
 	resetButton: {
 		marginTop: 30,
-		backgroundColor: "#2196f3",
+		backgroundColor: "#143b71",
 		paddingVertical: 12,
 		paddingHorizontal: 30,
 		borderRadius: 8
