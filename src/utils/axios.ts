@@ -1,4 +1,6 @@
+import * as SecureStore from "expo-secure-store";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { Platform } from "react-native";
 
 const baseURL = process.env.EXPO_PUBLIC_BASE_API_URL;
 
@@ -14,24 +16,58 @@ export abstract class ApiHelper {
 
 	public static async get(url: string, options?: AxiosRequestConfig) {
 		try {
-			const response = await this.instance.get(url, options);
-			return response.data;
-		} catch (error) {
-			console.error(error);
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("currentUser");
+			} else {
+				userToken = localStorage.getItem("currentUser");
+			}
+			const response = await this.instance.get(url, {
+				...options,
+				...{
+					headers: {
+						Authorization: `Bearer ${userToken}`
+					}
+				}
+			});
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.message
+			};
 		}
 	}
 
 	static async post(url: string, data: any, options?: AxiosRequestConfig) {
 		try {
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("currentUser");
+			} else {
+				userToken = localStorage.getItem("currentUser");
+			}
 			const jsonData: string = JSON.stringify(data);
-			const response = await ApiHelper.instance.post(
-				url,
-				jsonData,
-				options
-			);
-			return response.data;
-		} catch (error) {
-			console.error(error);
+			const response = await ApiHelper.instance.post(url, jsonData, {
+				...options,
+				...{
+					headers: {
+						Authorization: `Bearer ${userToken}`
+					}
+				}
+			});
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.response.data.detail
+			};
 		}
 	}
 
@@ -41,20 +77,58 @@ export abstract class ApiHelper {
 		options?: AxiosRequestConfig
 	) {
 		try {
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("currentUser");
+			} else {
+				userToken = localStorage.getItem("currentUser");
+			}
 			const jsonData: string = JSON.stringify(data);
-			const response = await this.instance.put(url, jsonData, options);
-			return response.data;
-		} catch (error) {
-			console.error(error);
+			const response = await this.instance.put(url, jsonData, {
+				...options,
+				...{
+					headers: {
+						Authorization: `Bearer ${userToken}`
+					}
+				}
+			});
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.message
+			};
 		}
 	}
 
 	public static async delete(url: string, options?: AxiosRequestConfig) {
 		try {
-			const response = await this.instance.delete(url, options);
-			return response.data;
-		} catch (error) {
-			console.error(error);
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("currentUser");
+			} else {
+				userToken = localStorage.getItem("currentUser");
+			}
+			const response = await this.instance.delete(url, {
+				...options,
+				...{
+					headers: {
+						Authorization: `Bearer ${userToken}`
+					}
+				}
+			});
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.message
+			};
 		}
 	}
 }

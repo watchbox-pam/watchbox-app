@@ -4,6 +4,7 @@ import { View } from "react-native";
 import useSessionStore from "@/src/zustand/sessionStore";
 
 export default function TabLayout() {
+	// @ts-ignore
 	const isLoggedIn = useSessionStore((state) => state.isLoggedIn);
 
 	if (!isLoggedIn) {

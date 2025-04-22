@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 		marginTop: 10
 	},
 	WatchList: {
-		width: 350,
+		width: "99%",
 		marginBottom: 10
 	},
 	TitleWatchList: {
@@ -36,11 +36,11 @@ const styles = StyleSheet.create({
 	},
 	MainTitleWatchList: {
 		color: "#ffffff",
-		fontSize: 35
+		fontSize: 28
 	},
 	SubTitleWatchList: {
 		color: "#ffffff",
-		fontSize: 20
+		fontSize: 18
 	}
 });
 

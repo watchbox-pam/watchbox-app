@@ -7,7 +7,7 @@ import { ActivityIndicator } from "react-native-paper";
 import StyledText from "../components/StyledText";
 import ReadMore from "../components/ReadMore";
 import PersonMediaList from "../components/PersonMediaList";
-import { fetchPerson } from "../services/personService";
+import { fetchPerson } from "@/src/services/PersonService";
 
 export default function PersonScreen() {
 	const [loading, setLoading] = useState(true);
@@ -34,7 +34,9 @@ export default function PersonScreen() {
 			setLoading(true);
 			let response = await fetchPerson(id);
 
-			if (response === undefined) {
+			console.log("response", response);
+
+			if (!response) {
 				setLoading(false);
 				return;
 			}

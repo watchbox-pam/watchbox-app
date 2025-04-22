@@ -1,6 +1,7 @@
 import { ApiHelper } from "@/src/utils/axios";
 import { Encryption } from "@/src/utils/encryption";
-import { validate as isUUID } from "uuid";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 export async function loginUser({
 	identifier,
@@ -9,10 +10,6 @@ export async function loginUser({
 	identifier: string;
 	password: string;
 }) {
-	return {
-		success: true,
-		message: "u good bro"
-	};
 	try {
 		if (!identifier) {
 			return {
@@ -34,20 +31,32 @@ export async function loginUser({
 			identifier: identifier,
 			password: hashedPassword
 		});
-		if (isUUID(result)) {
+		if (result.success) {
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			} else {
+				localStorage.setItem(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			}
 			return {
 				success: true,
-				message: result
+				message: result.data.user_id
 			};
 		} else {
 			return {
 				success: false,
-				message: result
+				message: result.data
 			};
 		}
 	} catch (error) {
 		return {
 			success: false,
+			// @ts-ignore
 			message: error.message
 		};
 	}

@@ -2,7 +2,8 @@ import UserSignup from "@/src/models/UserSignup";
 import { ApiHelper } from "@/src/utils/axios";
 import { Encryption } from "@/src/utils/encryption";
 import Country from "@/src/models/Country";
-import { validate as isUUID } from "uuid";
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export async function registerUser(user: UserSignup) {
 	try {
@@ -54,7 +55,7 @@ export async function registerUser(user: UserSignup) {
 		const hashedPassword = await Encryption.encryptPassword(
 			firstHash + salt
 		);
-		const result = await ApiHelper.post("/users", {
+		const result = await ApiHelper.post("/users/signup", {
 			id: "",
 			username: user.username,
 			email: user.email,
@@ -63,32 +64,49 @@ export async function registerUser(user: UserSignup) {
 			country: user.country,
 			birthdate: new Date(user.birthdate).toISOString().split("T")[0]
 		});
-		if (isUUID(result)) {
+		if (result.success) {
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			} else {
+				localStorage.setItem(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			}
 			return {
 				success: true,
-				message: result
+				message: result.data.user_id
 			};
 		} else {
 			return {
 				success: false,
-				message: result
+				message: result.data
 			};
 		}
 	} catch (error) {
 		return {
 			success: false,
-			message: error.message
+			// @ts-ignore
+			message: error.detail
 		};
 	}
 }
 
 export async function getAllCountries() {
 	try {
-		let countries: Country[] = await ApiHelper.get("/countries");
-		countries = countries.sort((country) =>
-			country.name.localeCompare(country.name)
-		);
-		return countries;
+		let data = await ApiHelper.get("/countries");
+		if (data.success) {
+			let countries: Country[] = data.data;
+			countries = countries.sort((country) =>
+				country.name.localeCompare(country.name)
+			);
+			return countries;
+		} else {
+			return [];
+		}
 	} catch (error) {
 		return [];
 	}
