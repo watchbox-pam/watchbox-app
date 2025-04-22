@@ -7,6 +7,7 @@ import {
 	Dimensions
 } from "react-native";
 
+import Emotion from "@/src/models/Emotion";
 import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
@@ -15,16 +16,6 @@ interface Movie {
 	id: number;
 	title: string;
 	poster_path: string | null;
-}
-
-interface Emotion {
-	id: number;
-	label: string;
-	value: string;
-	startAngle: number;
-	endAngle: number;
-	color: string;
-	emoji: string;
 }
 
 const emotions: Emotion[] = [
