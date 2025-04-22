@@ -87,7 +87,6 @@ export async function registerUser(user: UserSignup) {
 			};
 		}
 	} catch (error) {
-		console.log(error);
 		return {
 			success: false,
 			// @ts-ignore
