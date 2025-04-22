@@ -20,14 +20,7 @@ export default function Index() {
 	const { id } = useLocalSearchParams();
 
 	useEffect(() => {
-		console.log(id);
-
 		fetch(`nothing`);
-		/* .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setMedia(data);
-      }); */
 	});
 
 	return (

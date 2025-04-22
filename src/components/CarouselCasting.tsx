@@ -1,5 +1,6 @@
 import { FlatList, Image, StyleSheet, View } from "react-native";
 import StyledText from "./StyledText";
+import { Link } from "expo-router";
 
 export default function CarouselCasting({ cast }: any) {
 	if (!cast || cast.length === 0 || cast.every((item: any) => item === null))
@@ -12,21 +13,28 @@ export default function CarouselCasting({ cast }: any) {
 				keyExtractor={(item) => item.id.toString()}
 				horizontal
 				renderItem={({ item }) => (
-					<View style={{ margin: 5 }}>
-						<Image
-							style={styles.image}
-							source={{
-								uri: `https://image.tmdb.org/t/p/original${item.profile_path}`
-							}}
-							onMagicTap={() => {}}
-						/>
-						<StyledText style={styles.name}>{item.name}</StyledText>
-						{item.character && (
-							<StyledText style={styles.character}>
-								{item.character}
+					<Link
+						href={{
+							pathname: "/person/[id]",
+							params: { id: item.id.toString() }
+						}}>
+						<View style={{ margin: 5 }}>
+							<Image
+								style={styles.image}
+								source={{
+									uri: `https://image.tmdb.org/t/p/original${item.profile_path}`
+								}}
+							/>
+							<StyledText style={styles.name}>
+								{item.name}
 							</StyledText>
-						)}
-					</View>
+							{item.character && (
+								<StyledText style={styles.character}>
+									{item.character}
+								</StyledText>
+							)}
+						</View>
+					</Link>
 				)}
 			/>
 		</View>
