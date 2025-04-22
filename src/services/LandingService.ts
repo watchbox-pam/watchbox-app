@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 export async function checkLogin() {
 	try {
 		let currentUser: string | null;
+		await SecureStore.deleteItemAsync("currentUser");
 		if (Platform.OS === "ios" || Platform.OS === "android") {
 			currentUser = await SecureStore.getItemAsync("currentUser");
 		} else {

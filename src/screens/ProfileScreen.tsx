@@ -56,7 +56,6 @@ export default function Index() {
 			}
 		} catch (error) {
 			setError(error.message || "Une erreur est survenue");
-			console.error("Erreur:", error);
 		} finally {
 			setLoading(false);
 		}
