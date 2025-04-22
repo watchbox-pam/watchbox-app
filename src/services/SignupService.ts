@@ -2,6 +2,8 @@ import UserSignup from "@/src/models/UserSignup";
 import { ApiHelper } from "@/src/utils/axios";
 import { Encryption } from "@/src/utils/encryption";
 import Country from "@/src/models/Country";
+import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export async function registerUser(user: UserSignup) {
 	try {
@@ -63,9 +65,20 @@ export async function registerUser(user: UserSignup) {
 			birthdate: new Date(user.birthdate).toISOString().split("T")[0]
 		});
 		if (result.success) {
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			} else {
+				localStorage.setItem(
+					"currentUser",
+					JSON.stringify(result.data.token)
+				);
+			}
 			return {
 				success: true,
-				message: result.data
+				message: result.data.user_id
 			};
 		} else {
 			return {

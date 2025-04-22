@@ -17,8 +17,9 @@ import TraitGradiant from "../components/TraitGradiant";
 import Stats from "../components/Stats";
 import { TouchableOpacity } from "react-native";
 import CarouselWatchList from "../components/CarouselWatchList";
-import Playlist from "../models/Playlist";
+import { getUserProfile } from "../services/ProfileService";
 import useSessionStore from "../zustand/sessionStore";
+import Playlist from "../models/Playlist";
 import { createPlaylist } from "@/src/services/PlaylistService";
 
 export default function Index() {
@@ -34,6 +35,10 @@ export default function Index() {
 	];
 
 	const { id } = useLocalSearchParams();
+	const [profileData, setProfileData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const currentUser = useSessionStore((state) => state.user);
 	console.log("useLocalSearchParams id:", id);
 
 	const handleCreateWatchlist = () => {
@@ -77,25 +82,51 @@ export default function Index() {
 	};
 
 	useEffect(() => {
-		console.log(id);
+		const userId = id || (currentUser && currentUser.id);
 
-		fetch(`nothing`);
-		/* .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setMedia(data);
-      }); */
-	});
+		if (userId && typeof userId === "string") {
+			fetchProfileData(userId);
+		} else {
+			setError("ID utilisateur invalide");
+			setLoading(false);
+		}
+	}, [id, currentUser]);
+
+	const fetchProfileData = async (userId) => {
+		setLoading(true);
+		setError(null);
+
+		try {
+			const response = await getUserProfile(userId);
+			if (response.success) {
+				setProfileData(response.data);
+			} else {
+				setError(
+					response.message ||
+						"Erreur lors de la récupération du profil"
+				);
+				console.error(
+					"Erreur lors de la récupération du profil:",
+					response.message
+				);
+			}
+		} catch (error) {
+			setError(error.message || "Une erreur est survenue");
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<ScrollView
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
 			showsVerticalScrollIndicator={false}>
-			{/* <View style={styles.header}>
-        <BackButton />
-        <LogoButton />
-      </View> */}
+			{error && (
+				<View style={styles.errorContainer}>
+					<Text style={styles.errorText}>{error}</Text>
+				</View>
+			)}
 			<Modal
 				animationType="slide"
 				transparent={true}
@@ -139,7 +170,6 @@ export default function Index() {
 
 			<View style={styles.imageBannerContainer}>
 				<LinearGradient
-					// Background Linear Gradient
 					colors={["#0A1E38", "transparent"]}
 					style={styles.shadowBottom}
 				/>
@@ -155,7 +185,11 @@ export default function Index() {
 						source={require("../assets/images/Interstellar-film1.png")}
 						style={styles.ProfilPicture}
 					/>
-					<Text style={styles.title}>Julien-QTX</Text>
+					<Text style={styles.title}>
+						{loading
+							? "Chargement..."
+							: profileData?.username || "Utilisateur inconnu"}
+					</Text>
 				</View>
 				<DropDownButton />
 			</View>
@@ -163,10 +197,10 @@ export default function Index() {
 			<View>
 				<StyledText style={styles.description}>
 					Dans un futur proche, face à une Terre qui se meurt, un
-					groupe d’explorateurs utilise un vaisseau interstellaire
+					groupe d'explorateurs utilise un vaisseau interstellaire
 					pour franchir un trou de ver permettant de parcourir des
-					distances jusque‐là infranchissables. Leur but : trouver un
-					nouveau foyer pour l’humanité.
+					distances jusque‐là infranchissables. Leur but : trouver un
+					nouveau foyer pour l'humanité.
 				</StyledText>
 			</View>
 
@@ -218,6 +252,19 @@ const styles = StyleSheet.create({
 	contentContainer: {
 		alignItems: "center",
 		paddingVertical: 20
+	},
+	errorContainer: {
+		padding: 15,
+		backgroundColor: "rgba(255, 0, 0, 0.1)",
+		borderRadius: 8,
+		marginVertical: 10,
+		width: "90%",
+		alignItems: "center"
+	},
+	errorText: {
+		color: "#ffffff",
+		fontWeight: "bold",
+		textAlign: "center"
 	},
 	imageBannerContainer: {
 		width: "100%",
