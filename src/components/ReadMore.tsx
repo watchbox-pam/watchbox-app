@@ -12,7 +12,7 @@ export default function ReadMore({ data }: { data: any }) {
 					? showFullBio
 						? data
 						: `${data.substring(0, 400)}...`
-					: "Aucune biographie disponible"}
+					: "Information non disponible"}
 			</StyledText>
 			{data && data.length > 100 && (
 				<TouchableOpacity

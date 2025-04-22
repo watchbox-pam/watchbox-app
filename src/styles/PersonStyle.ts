@@ -35,6 +35,12 @@ export const styles = StyleSheet.create({
 	imageContainer: {
 		width: "50%"
 	},
+	noImage: {
+		aspectRatio: 3 / 4,
+		borderRadius: 5,
+		backgroundColor: "#ccc",
+		justifyContent: "center"
+	},
 	noDataText: {
 		fontSize: 20,
 		color: "#fff",

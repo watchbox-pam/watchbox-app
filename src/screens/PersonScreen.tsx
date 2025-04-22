@@ -34,39 +34,37 @@ export default function PersonScreen() {
 			setLoading(true);
 			let response = await fetchPerson(id);
 
-			console.log("response", response);
-
 			if (!response) {
 				setLoading(false);
 				return;
 			}
 
-			setPerson(response.person);
+			setPerson(response.data.person);
 
 			setMoviesCast(
 				removeDuplicates(
-					response.combined_credits.cast.filter(
+					response.data.combined_credits.cast.filter(
 						(item: Media) => item.media_type === "movie"
 					)
 				)
 			);
 			setTvCast(
 				removeDuplicates(
-					response.combined_credits.cast.filter(
+					response.data.combined_credits.cast.filter(
 						(item: Media) => item.media_type === "tv"
 					)
 				)
 			);
 			setMoviesCrew(
 				removeDuplicates(
-					response.combined_credits.crew.filter(
+					response.data.combined_credits.crew.filter(
 						(item: Media) => item.media_type === "movie"
 					)
 				)
 			);
 			setTvCrew(
 				removeDuplicates(
-					response.combined_credits.crew.filter(
+					response.data.combined_credits.crew.filter(
 						(item: Media) => item.media_type === "tv"
 					)
 				)
@@ -124,32 +122,44 @@ export default function PersonScreen() {
 			<View>
 				<View style={styles.personInfoRow}>
 					<View style={styles.imageContainer}>
-						<Image
-							style={styles.image}
-							source={{
-								uri: `https://image.tmdb.org/t/p/original${person?.profile_path}`
-							}}
-						/>
+						{!person?.profile_path ? (
+							<View style={styles.noImage}></View>
+						) : (
+							<Image
+								style={styles.image}
+								source={{
+									uri: `https://image.tmdb.org/t/p/original${person?.profile_path}`
+								}}
+							/>
+						)}
 					</View>
 
 					<View style={styles.personInfoContainer}>
 						<StyledText style={styles.personName}>
 							{person?.name}
 						</StyledText>
-						<StyledText style={styles.birthPlaceLabel}>
-							lieu de naissance{" "}
-							<StyledText style={styles.birthPlaceValue}>
-								{person?.place_of_birth}
+						{person?.birthday && (
+							<StyledText style={styles.birthPlaceLabel}>
+								lieu de naissance{" "}
+								<StyledText style={styles.birthPlaceValue}>
+									{person?.place_of_birth}
+								</StyledText>
 							</StyledText>
-						</StyledText>
-						<StyledText style={styles.ageText}>
-							{person?.deathday
-								? person?.deathday
-								: convertDateToAge(
-										person?.birthday ? person?.birthday : ""
-									)}{" "}
-							<StyledText style={styles.ageUnit}>ans</StyledText>
-						</StyledText>
+						)}
+						{person?.birthday && (
+							<StyledText style={styles.ageText}>
+								{person?.deathday
+									? person?.deathday
+									: convertDateToAge(
+											person?.birthday
+												? person?.birthday
+												: ""
+										)}{" "}
+								<StyledText style={styles.ageUnit}>
+									ans
+								</StyledText>
+							</StyledText>
+						)}
 					</View>
 				</View>
 				<ReadMore data={person?.biography} />

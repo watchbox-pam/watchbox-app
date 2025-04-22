@@ -1,4 +1,10 @@
-import { FlatList, Image, StyleSheet, View } from "react-native";
+import {
+	FlatList,
+	Image,
+	StyleSheet,
+	TouchableOpacity,
+	View
+} from "react-native";
 import StyledText from "./StyledText";
 import { Link } from "expo-router";
 
@@ -17,14 +23,19 @@ export default function CarouselCasting({ cast }: any) {
 						href={{
 							pathname: "/person/[id]",
 							params: { id: item.id.toString() }
-						}}>
-						<View style={{ margin: 5 }}>
-							<Image
-								style={styles.image}
-								source={{
-									uri: `https://image.tmdb.org/t/p/original${item.profile_path}`
-								}}
-							/>
+						}}
+						asChild>
+						<TouchableOpacity style={{ marginRight: 5 }}>
+							{item.profile_path ? (
+								<Image
+									style={styles.image}
+									source={{
+										uri: `https://image.tmdb.org/t/p/original${item.profile_path}`
+									}}
+								/>
+							) : (
+								<View style={styles.noImage} />
+							)}
 							<StyledText style={styles.name}>
 								{item.name}
 							</StyledText>
@@ -33,7 +44,7 @@ export default function CarouselCasting({ cast }: any) {
 									{item.character}
 								</StyledText>
 							)}
-						</View>
+						</TouchableOpacity>
 					</Link>
 				)}
 			/>
@@ -46,6 +57,12 @@ const styles = StyleSheet.create({
 		aspectRatio: 3 / 4,
 		borderRadius: 5,
 		width: 100
+	},
+	noImage: {
+		aspectRatio: 3 / 4,
+		borderRadius: 5,
+		width: 100,
+		backgroundColor: "#ccc"
 	},
 	name: {
 		textAlign: "center",

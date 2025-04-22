@@ -41,7 +41,7 @@ export default function PersonMediaList({
 							params: { id: item.id }
 						}}
 						asChild>
-						<View style={styles.imageContainer}>
+						<TouchableOpacity style={styles.imageContainer}>
 							{!item.poster_path ? (
 								<View style={styles.emptyImage}>
 									<StyledText style={styles.emptyImageText}>
@@ -56,7 +56,7 @@ export default function PersonMediaList({
 									style={styles.image}
 								/>
 							)}
-						</View>
+						</TouchableOpacity>
 					</Link>
 				)}
 				keyExtractor={(item, index) => index.toString()}
