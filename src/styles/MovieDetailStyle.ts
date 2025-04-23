@@ -77,8 +77,7 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-start",
 		marginRight: 20,
 		marginLeft: 20,
-		marginBottom: 30,
-		marginTop: 20
+		marginBottom: 10
 	},
 	providerTag: {
 		backgroundColor: "none"
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		paddingRight: 20,
 		paddingLeft: 20,
-		marginTop: 10
+		marginTop: 30
 	},
 	textCasting: {
 		fontSize: 25
@@ -111,6 +110,10 @@ const styles = StyleSheet.create({
 		height: "60%",
 		transform: [{ rotate: "180deg" }],
 		zIndex: 1
+	},
+	noImage: {
+		aspectRatio: 2 / 3,
+		backgroundColor: "#ccc"
 	}
 });
 
