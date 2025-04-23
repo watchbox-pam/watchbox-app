@@ -1,8 +1,9 @@
 import React from "react";
-import { FlatList, StyleSheet, View, Image } from "react-native";
+import { FlatList, StyleSheet, View, Image, Text } from "react-native";
 import { Link } from "expo-router";
 
 export default function CarouselWatchList({ providers }: { providers: any }) {
+	const hasItems = providers && providers.length > 0;
 	return (
 		<View style={styles.container}>
 			<FlatList
@@ -17,13 +18,24 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 							params: { id: index.toString() } // 🔥 Utilisation de l'index comme ID temporaire
 						}}
 						style={styles.imageContainer}>
-						<Image
-							source={{
-								uri: `https://image.tmdb.org/t/p/w500${item}`
-							}}
-							style={styles.image}
-							resizeMode="cover"
-						/>
+						{hasItems ? (
+							<Image
+								source={
+									typeof item.imageUrl === "string" &&
+									item.imageUrl
+										? { uri: item.imageUrl }
+										: require("../assets/images/watchbox-logo.png")
+								}
+								style={styles.image}
+								resizeMode="cover"
+							/>
+						) : (
+							<Image
+								source={require("../assets/images/watchbox-logo.png")}
+								style={styles.image}
+								resizeMode="cover"
+							/>
+						)}
 					</Link>
 				)}
 			/>

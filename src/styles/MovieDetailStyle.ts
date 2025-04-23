@@ -7,7 +7,9 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		paddingHorizontal: 25,
-		zIndex: 100
+		zIndex: 100,
+		alignItems: "center",
+		paddingVertical: 10
 	},
 	container: {
 		backgroundColor: "#0A1E38",
@@ -80,9 +82,6 @@ const styles = StyleSheet.create({
 		marginBottom: 30,
 		marginTop: 20
 	},
-	providerTag: {
-		backgroundColor: "none"
-	},
 	castingContainer: {
 		width: "100%",
 		paddingRight: 20,
@@ -111,6 +110,56 @@ const styles = StyleSheet.create({
 		height: "60%",
 		transform: [{ rotate: "180deg" }],
 		zIndex: 1
+	},
+	menuButton: {
+		fontSize: 24,
+		color: "#ffffff"
+	},
+	modalContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0, 0, 0, 0.5)"
+	},
+	modalContent: {
+		width: "80%",
+		backgroundColor: "#fff",
+		borderRadius: 10,
+		padding: 20,
+		alignItems: "center"
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 20
+	},
+	playlistText: {
+		fontSize: 16,
+		color: "#333"
+	},
+	selectedPlaylist: {
+		fontSize: 16,
+		color: "#1E90FF",
+		fontWeight: "bold"
+	},
+	modalButtons: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%",
+		marginTop: 20
+	},
+	noPlaylistsText: {
+		fontSize: 16,
+		color: "#666",
+		textAlign: "center",
+		marginVertical: 20
+	},
+	selectContainer: {
+		width: "100%",
+		marginVertical: 10,
+		backgroundColor: "#f9f9f9",
+		borderRadius: 5,
+		padding: 10
 	}
 });
 

@@ -20,7 +20,7 @@ export async function createPlaylist(playlist: Playlist) {
 			};
 		}
 
-		if (!playlist.userId) {
+		if (!playlist.user_id) {
 			return {
 				success: false,
 				message: "L'identifiant de l'utilisateur est requis",
@@ -28,12 +28,12 @@ export async function createPlaylist(playlist: Playlist) {
 			};
 		}
 
-		const result = await ApiHelper.post("/playlist", {
-			id: playlist.id || "",
-			userId: playlist.userId,
+		const result = await ApiHelper.post("/playlists/", {
+			id: "",
+			user_id: playlist.user_id,
 			title: playlist.title,
-			is_private: playlist.is_private,
-			created_at: playlist.created_at || new Date().toISOString()
+			created_at: new Date().toISOString(),
+			is_private: playlist.is_private
 		});
 
 		if (result.success) {
@@ -57,15 +57,105 @@ export async function createPlaylist(playlist: Playlist) {
 	}
 }
 
-export async function getAllPlaylists(userId: string) {
+export async function getUserPlaylists(userId: string) {
+	console.log("getUserPlaylists called with:", userId);
+	if (!userId || typeof userId !== "string") {
+		return {
+			success: false,
+			message: "ID utilisateur invalide"
+		};
+	}
+
 	try {
-		const result = await ApiHelper.get(`/playlists?userId=${userId}`);
-		if (result.success) {
-			return result.data; // Assuming the API returns an array of playlists
-		} else {
-			return [];
-		}
+		console.log("Making API call to /playlists/user/${userId}...");
+		const result = await ApiHelper.get(`/playlists/user/${userId}`);
+		console.log("API response for playlists:", result.data);
+		return {
+			success: true,
+			data: result.data
+		};
 	} catch (error) {
-		return [];
+		console.error(
+			"Error in getUserPlaylists:",
+			error.response?.data || error.message
+		);
+		return {
+			success: false,
+			message:
+				error.message || "Erreur lors de la récupération des playlists"
+		};
+	}
+}
+
+export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
+	console.log("addMediaToPlaylist called with:", playlistId, mediaId);
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	if (!mediaId || typeof mediaId !== "number") {
+		return {
+			success: false,
+			message: "ID du média invalide"
+		};
+	}
+
+	try {
+		console.log("Making API call to /playlists/${playlistId}/media...");
+		const result = await ApiHelper.post(
+			`/playlists/${playlistId}/media/${mediaId}`,
+			{
+				playlist_id: playlistId,
+				media_id: mediaId
+			}
+		);
+		console.log("API response for adding media:", result.data);
+		return {
+			success: true,
+			message: "Média ajouté à la playlist avec succès"
+		};
+	} catch (error) {
+		console.error(
+			"Error in addMediaToPlaylist:",
+			error.response?.data || error.message
+		);
+		return {
+			success: false,
+			message:
+				error.message || "Erreur lors de l'ajout du média à la playlist"
+		};
+	}
+}
+
+export async function getPlaylistById(playlistId: string) {
+	console.log("getPlaylistById called with:", playlistId);
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	try {
+		console.log("Making API call to /playlists/${playlistId}...");
+		const result = await ApiHelper.get(`/playlists/${playlistId}`);
+		console.log("API response for playlist:", result.data);
+		return {
+			success: true,
+			data: result.data
+		};
+	} catch (error) {
+		console.error(
+			"Error in getPlaylistById:",
+			error.response?.data || error.message
+		);
+		return {
+			success: false,
+			message:
+				error.message || "Erreur lors de la récupération de la playlist"
+		};
 	}
 }

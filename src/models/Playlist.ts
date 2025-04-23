@@ -1,9 +1,9 @@
 type Playlist = {
 	id: string;
-	userId: string;
+	user_id: string;
 	title: string;
-	is_private: boolean;
 	created_at: Date;
+	is_private: boolean;
 };
 
 export default Playlist;

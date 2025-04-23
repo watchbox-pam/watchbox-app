@@ -20,7 +20,10 @@ import CarouselWatchList from "../components/CarouselWatchList";
 import { getUserProfile } from "../services/ProfileService";
 import useSessionStore from "../zustand/sessionStore";
 import Playlist from "../models/Playlist";
-import { createPlaylist } from "@/src/services/PlaylistService";
+import {
+	createPlaylist,
+	getUserPlaylists
+} from "@/src/services/PlaylistService";
 
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
@@ -39,7 +42,8 @@ export default function Index() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const currentUser = useSessionStore((state) => state.user);
-	console.log("useLocalSearchParams id:", id);
+	console.log("Current user ID from store:", currentUser);
+	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
 	const handleCreateWatchlist = () => {
 		setModalVisible(true);
@@ -47,9 +51,8 @@ export default function Index() {
 
 	const handleSavePlaylist = async () => {
 		console.log("handleSavePlaylist triggered");
-		// const userId = useSessionStore((state: any) => state.userId);
-		console.log("userId:", userId);
 
+		const userId = id || (currentUser && currentUser.id);
 		if (!userId) {
 			alert("User is not logged in.");
 			return;
@@ -57,7 +60,7 @@ export default function Index() {
 
 		const playlistToInsert: Playlist = {
 			id: "",
-			userId: userId,
+			user_id: userId,
 			title: playlistTitle,
 			is_private: isPrivate,
 			created_at: new Date()
@@ -86,13 +89,14 @@ export default function Index() {
 
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
+			fetchUserPlaylists(userId);
 		} else {
 			setError("ID utilisateur invalide");
 			setLoading(false);
 		}
 	}, [id, currentUser]);
 
-	const fetchProfileData = async (userId) => {
+	const fetchProfileData = async (userId: string) => {
 		setLoading(true);
 		setError(null);
 
@@ -114,6 +118,16 @@ export default function Index() {
 			setError(error.message || "Une erreur est survenue");
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	const fetchUserPlaylists = async (userId: string) => {
+		const response = await getUserPlaylists(userId);
+		if (response.success) {
+			console.log("Fetched playlists:", response.data);
+			setUserPlaylists(response.data);
+		} else {
+			console.error("Error fetching user playlists:", response.message);
 		}
 	};
 
@@ -150,9 +164,7 @@ export default function Index() {
 								]}
 								onPress={() => setIsPrivate(!isPrivate)}
 							/>
-							<Text style={styles.checkboxLabel}>
-								{isPrivate ? "Private" : "Public"}
-							</Text>
+							<Text style={styles.checkboxLabel}>Privée</Text>
 						</View>
 						<View style={styles.modalButtons}>
 							<Button
@@ -208,14 +220,29 @@ export default function Index() {
 
 			<View style={styles.WatchList}>
 				<View style={styles.watchListHeader}>
-					<Text style={styles.TitleWatchList}>WatchList Film</Text>
+					<Text style={styles.TitleWatchList}>Mes Playlists</Text>
 					<TouchableOpacity
 						style={styles.createWatchlistButton}
 						onPress={handleCreateWatchlist}>
 						<Text style={styles.createWatchlistButtonText}>+</Text>
 					</TouchableOpacity>
 				</View>
-				<CarouselWatchList providers={providers} />
+				{userPlaylists.length > 0 ? (
+					userPlaylists.map((playlist) => (
+						<View key={playlist.id} style={styles.WatchList}>
+							<View style={styles.watchListHeader}>
+								<Text style={styles.TitleWatchList}>
+									{playlist.title}
+								</Text>
+							</View>
+							<CarouselWatchList providers={userPlaylists} />
+						</View>
+					))
+				) : (
+					<Text style={styles.noPlaylistsText}>
+						Aucune playlist disponible
+					</Text>
+				)}
 			</View>
 
 			<View style={styles.WatchList}>
@@ -423,5 +450,25 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		width: "100%"
+	},
+	playlistItem: {
+		backgroundColor: "#1E90FF",
+		padding: 10,
+		borderRadius: 5,
+		marginBottom: 10
+	},
+	playlistTitle: {
+		color: "#ffffff",
+		fontSize: 16,
+		fontWeight: "bold"
+	},
+	playlistPrivacy: {
+		color: "#ffffff",
+		fontSize: 14
+	},
+	noPlaylistsText: {
+		color: "#ffffff",
+		fontSize: 16,
+		textAlign: "center"
 	}
 });

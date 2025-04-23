@@ -1,8 +1,19 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, View } from "react-native";
+import {
+	Image,
+	ScrollView,
+	View,
+	TouchableOpacity,
+	Modal,
+	Button,
+	Text,
+	FlatList
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
+import { Menu, Provider } from "react-native-paper";
+import { Picker } from "@react-native-picker/picker";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";
@@ -15,12 +26,70 @@ import styles from "@/src/styles/MovieDetailStyle";
 import { ActivityIndicator } from "react-native-paper";
 import CommentaryScreen from "@/src/screens/CommentaryScreen";
 import { fetchMovieDetails } from "@/src/services/MovieDetailService";
+import {
+	addMediaToPlaylist,
+	getUserPlaylists
+} from "@/src/services/PlaylistService";
+import useSessionStore from "../zustand/sessionStore";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
 	const { id } = useLocalSearchParams();
+	console.log("Movie ID from params:", id);
 
 	const [media, setMedia] = useState<undefined | MovieProps>();
+
+	const currentUser = useSessionStore((state) => state.user);
+	console.log("Current user ID from store:", currentUser);
+
+	const [menuVisible, setMenuVisible] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [userPlaylists, setUserPlaylists] = useState([]);
+	const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+
+	const openMenu = () => setMenuVisible(true);
+	const closeMenu = () => setMenuVisible(false);
+
+	const fetchUserPlaylists = async (userId: string) => {
+		console.log("Fetching user playlists for userId:", userId);
+		const response = await getUserPlaylists(userId);
+		if (response.success) {
+			console.log("Fetched playlists:", response.data);
+			setUserPlaylists(response.data);
+		} else {
+			console.error("Error fetching user playlists:", response.message);
+		}
+	};
+
+	const openModal = async () => {
+		const userId = currentUser && currentUser.id;
+		setModalVisible(true);
+		console.log("User ID from store:", userId);
+		if (userId) {
+			await fetchUserPlaylists(userId);
+			console.log("Fetched user playlists:", userPlaylists);
+		}
+	};
+
+	const closeModal = () => {
+		setModalVisible(false);
+	};
+
+	const handleAddToPlaylist = async () => {
+		if (selectedPlaylistId && id) {
+			console.log("Adding media to playlist:", selectedPlaylistId, id);
+			const response = await addMediaToPlaylist(
+				String(selectedPlaylistId),
+				Number(id)
+			);
+			if (response.success) {
+				alert("Movie added to playlist successfully!");
+				closeModal();
+			} else {
+				alert("Failed to add movie to playlist.");
+			}
+		}
+	};
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -36,9 +105,17 @@ export default function MovieScreen() {
 	};
 
 	useEffect(() => {
-		setLoading(true);
-		fetchData();
-	}, [id]);
+		const userId = currentUser && currentUser.id;
+
+		if (userId && typeof userId === "string") {
+			setLoading(true);
+			fetchData();
+			fetchUserPlaylists(userId);
+		} else {
+			setError("ID utilisateur invalide");
+			setLoading(false);
+		}
+	}, [id, currentUser]);
 
 	const convertMinutesToHours = (minutes: number) => {
 		const hours = Math.floor(minutes / 60);
@@ -55,115 +132,172 @@ export default function MovieScreen() {
 	}
 
 	return (
-		<ScrollView
-			style={styles.container}
-			contentContainerStyle={styles.contentContainer}
-			overScrollMode="never">
-			<View style={styles.headers}>
-				<BackButton />
-			</View>
+		<Provider>
+			<ScrollView
+				style={styles.container}
+				contentContainerStyle={styles.contentContainer}
+				overScrollMode="never">
+				<View style={styles.headers}>
+					<BackButton />
+					<Menu
+						visible={menuVisible}
+						onDismiss={closeMenu}
+						anchor={
+							<TouchableOpacity onPress={openMenu}>
+								<Text style={styles.menuButton}>⋮</Text>
+							</TouchableOpacity>
+						}>
+						<Menu.Item
+							onPress={() => {
+								closeMenu();
+								openModal();
+							}}
+							title="Add to Playlist"
+						/>
+					</Menu>
+				</View>
 
-			<View style={styles.imageBannerContainer}>
-				<LinearGradient
-					// Background Linear Gradient
-					colors={["#0A1E38", "transparent"]}
-					style={styles.shadowBottom}
-				/>
-				<Image
-					source={{
-						uri:
-							"https://image.tmdb.org/t/p/original" +
-							media?.backdrop_path
-					}}
-					style={styles.imageBanner}
-				/>
-			</View>
-
-			<View style={styles.infoContainer}>
-				<View style={styles.imagePosterContainer}>
+				<View style={styles.imageBannerContainer}>
+					<LinearGradient
+						// Background Linear Gradient
+						colors={["#0A1E38", "transparent"]}
+						style={styles.shadowBottom}
+					/>
 					<Image
 						source={{
 							uri:
 								"https://image.tmdb.org/t/p/original" +
-								media?.poster_path
+								media?.backdrop_path
 						}}
-						style={styles.imagePoster}
+						style={styles.imageBanner}
 					/>
 				</View>
-				<View style={styles.infoDiv}>
-					{media?.age_restriction && (
-						<Tag style={styles.tagContainer}>
-							<StyledText style={styles.textTag}>
-								{media?.age_restriction}
-							</StyledText>
-						</Tag>
-					)}
 
-					<StyledText style={styles.title}>{media?.title}</StyledText>
-
-					<StyledText style={styles.text}>
-						<StyledText>{media?.release_date}</StyledText> •{" "}
-						<StyledText>
-							{convertMinutesToHours(Number(media?.runtime) ?? 0)}
-						</StyledText>
-					</StyledText>
-					<StyledText style={styles.text}>
-						par{" "}
-						{media?.director?.name && (
-							<StyledText style={styles.textBold}>
-								{media?.director.name}
-							</StyledText>
+				<View style={styles.infoContainer}>
+					<View style={styles.imagePosterContainer}>
+						<Image
+							source={{
+								uri:
+									"https://image.tmdb.org/t/p/original" +
+									media?.poster_path
+							}}
+							style={styles.imagePoster}
+						/>
+					</View>
+					<View style={styles.infoDiv}>
+						{media?.age_restriction && (
+							<Tag style={styles.tagContainer}>
+								<StyledText style={styles.textTag}>
+									{media?.age_restriction}
+								</StyledText>
+							</Tag>
 						)}
+
+						<StyledText style={styles.title}>
+							{media?.title}
+						</StyledText>
+
+						<StyledText style={styles.text}>
+							<StyledText>{media?.release_date}</StyledText> •{" "}
+							<StyledText>
+								{convertMinutesToHours(
+									Number(media?.runtime) ?? 0
+								)}
+							</StyledText>
+						</StyledText>
+						<StyledText style={styles.text}>
+							par{" "}
+							{media?.director?.name && (
+								<StyledText style={styles.textBold}>
+									{media?.director.name}
+								</StyledText>
+							)}
+						</StyledText>
+
+						<TagList tags={media?.genres || []} />
+					</View>
+				</View>
+
+				<View style={styles.providersContainer}>
+					<StyledText>ou regarder ?</StyledText>
+					<CarouselProviders providers={media?.providers} />
+				</View>
+
+				<View>
+					<StyledText style={styles.description}>
+						{media?.overview}
 					</StyledText>
-
-					<TagList tags={media?.genres || []} />
 				</View>
-			</View>
 
-			<View style={styles.providersContainer}>
-				<StyledText>ou regarder ?</StyledText>
-				<CarouselProviders providers={media?.providers} />
-			</View>
+				<View style={styles.videoContainer}>
+					<StyledText style={styles.textCasting}>
+						Bande annonce
+					</StyledText>
+					<YoutubePlayer
+						height={275}
+						play={false}
+						videoId={media?.video_key}
+					/>
+				</View>
 
-			<View>
-				<StyledText style={styles.description}>
-					{media?.overview}
-				</StyledText>
-			</View>
+				<View style={styles.castingContainer}>
+					<StyledText style={styles.textCasting}>Casting</StyledText>
+					<CarouselCasting cast={media?.casting} />
 
-			<View style={styles.videoContainer}>
-				<StyledText style={styles.textCasting}>
-					Bande annonce
-				</StyledText>
-				<YoutubePlayer
-					height={275}
-					play={false}
-					videoId={media?.video_key}
-				/>
-			</View>
+					<View style={styles.directorContainer}>
+						<View>
+							<StyledText style={styles.textCasting}>
+								Réalisateur
+							</StyledText>
+							<CarouselCasting cast={[media?.director]} />
+						</View>
 
-			<View style={styles.castingContainer}>
-				<StyledText style={styles.textCasting}>Casting</StyledText>
-				<CarouselCasting cast={media?.casting} />
-
-				<View style={styles.directorContainer}>
-					<View>
-						<StyledText style={styles.textCasting}>
-							Réalisateur
-						</StyledText>
-						<CarouselCasting cast={[media?.director]} />
-					</View>
-
-					<View>
-						<StyledText style={styles.textCasting}>
-							Compositeur
-						</StyledText>
-						<CarouselCasting cast={[media?.composer]} />
+						<View>
+							<StyledText style={styles.textCasting}>
+								Compositeur
+							</StyledText>
+							<CarouselCasting cast={[media?.composer]} />
+						</View>
 					</View>
 				</View>
-			</View>
-			<CommentaryScreen />
-		</ScrollView>
+				<CommentaryScreen />
+			</ScrollView>
+
+			<Modal
+				visible={modalVisible}
+				transparent={true}
+				animationType="slide"
+				onRequestClose={closeModal}>
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>Select a Playlist</Text>
+						<View style={styles.selectContainer}>
+							<Picker
+								selectedValue={selectedPlaylistId}
+								onValueChange={(itemValue) =>
+									setSelectedPlaylistId(itemValue)
+								}>
+								<Picker.Item
+									label="--Please choose a playlist--"
+									value=""
+								/>
+								{userPlaylists.map((playlist) => (
+									<Picker.Item
+										key={playlist.id}
+										label={playlist.title}
+										value={playlist.id}
+									/>
+								))}
+							</Picker>
+						</View>
+						<View style={styles.modalButtons}>
+							<Button title="Cancel" onPress={closeModal} />
+							<Button title="Add" onPress={handleAddToPlaylist} />
+						</View>
+					</View>
+				</View>
+			</Modal>
+		</Provider>
 	);
 }
 
