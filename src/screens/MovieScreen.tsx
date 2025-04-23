@@ -116,6 +116,10 @@ export default function MovieScreen() {
 			setLoading(false);
 		}
 	}, [id, currentUser]);
+		setLoading(true);
+		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [id]);
 
 	const convertMinutesToHours = (minutes: number) => {
 		const hours = Math.floor(minutes / 60);
@@ -171,6 +175,20 @@ export default function MovieScreen() {
 						}}
 						style={styles.imageBanner}
 					/>
+			<View style={styles.infoContainer}>
+				<View style={styles.imagePosterContainer}>
+					{!media?.poster_path ? (
+						<View style={styles.noImage}></View>
+					) : (
+						<Image
+							source={{
+								uri:
+									"https://image.tmdb.org/t/p/original" +
+									media?.poster_path
+							}}
+							style={styles.imagePoster}
+						/>
+					)}
 				</View>
 
 				<View style={styles.infoContainer}>
@@ -205,6 +223,20 @@ export default function MovieScreen() {
 								)}
 							</StyledText>
 						</StyledText>
+					<StyledText style={styles.text}>
+						{media?.release_date ? (
+							<>
+								<StyledText>{media.release_date}</StyledText>{" "}
+								•{" "}
+							</>
+						) : null}
+						<StyledText>
+							{media?.runtime
+								? convertMinutesToHours(Number(media?.runtime))
+								: "duration inconnue"}
+						</StyledText>
+					</StyledText>
+					{media?.director?.name && (
 						<StyledText style={styles.text}>
 							par{" "}
 							{media?.director?.name && (
@@ -213,15 +245,18 @@ export default function MovieScreen() {
 								</StyledText>
 							)}
 						</StyledText>
+					)}
 
 						<TagList tags={media?.genres || []} />
 					</View>
 				</View>
 
+			{!media?.providers || media?.providers.length <= 0 ? null : (
 				<View style={styles.providersContainer}>
 					<StyledText>ou regarder ?</StyledText>
 					<CarouselProviders providers={media?.providers} />
 				</View>
+			)}
 
 				<View>
 					<StyledText style={styles.description}>
@@ -245,6 +280,8 @@ export default function MovieScreen() {
 					<CarouselCasting cast={media?.casting} />
 
 					<View style={styles.directorContainer}>
+				<View style={styles.directorContainer}>
+					{media?.director && (
 						<View>
 							<StyledText style={styles.textCasting}>
 								Réalisateur
@@ -295,6 +332,16 @@ export default function MovieScreen() {
 							<Button title="Add" onPress={handleAddToPlaylist} />
 						</View>
 					</View>
+					)}
+
+					{media?.composer && (
+						<View>
+							<StyledText style={styles.textCasting}>
+								Compositeur
+							</StyledText>
+							<CarouselCasting cast={[media?.composer]} />
+						</View>
+					)}
 				</View>
 			</Modal>
 		</Provider>

@@ -1,13 +1,13 @@
 import { useFonts } from "expo-font";
 import React from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, StyleProp, TextStyle } from "react-native";
 
 export default function StyledText({
 	children,
 	style
 }: {
 	children: React.ReactNode;
-	style?: any;
+	style?: StyleProp<TextStyle>;
 }) {
 	const [fontsLoaded] = useFonts({
 		Oswald: require("@/src/assets/fonts/Oswald-VariableFont_wght.ttf")

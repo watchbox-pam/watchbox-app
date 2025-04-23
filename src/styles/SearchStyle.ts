@@ -38,7 +38,8 @@ const styles = StyleSheet.create({
 	listFilters: {
 		marginVertical: 10,
 		flexDirection: "row",
-		marginBottom: 20
+		marginBottom: 20,
+		height: 300
 	},
 	filterContainer: {
 		borderWidth: 0.5,
@@ -70,6 +71,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: "row",
 		width: "100%"
+	},
+	resultatInfo: {
+		flex: 1,
+		flexDirection: "row"
 	},
 	image: {
 		width: "25%",

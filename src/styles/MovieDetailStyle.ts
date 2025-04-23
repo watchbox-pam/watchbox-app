@@ -79,14 +79,13 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-start",
 		marginRight: 20,
 		marginLeft: 20,
-		marginBottom: 30,
-		marginTop: 20
+		marginBottom: 10
 	},
 	castingContainer: {
 		width: "100%",
 		paddingRight: 20,
 		paddingLeft: 20,
-		marginTop: 10
+		marginTop: 30
 	},
 	textCasting: {
 		fontSize: 25
@@ -160,6 +159,9 @@ const styles = StyleSheet.create({
 		backgroundColor: "#f9f9f9",
 		borderRadius: 5,
 		padding: 10
+	noImage: {
+		aspectRatio: 2 / 3,
+		backgroundColor: "#ccc"
 	}
 });
 

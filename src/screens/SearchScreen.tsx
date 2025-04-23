@@ -81,7 +81,8 @@ export default function SearchScreen() {
 								<TouchableOpacity
 									onPress={() =>
 										router.push(`/movie/${result.id}`)
-									}>
+									}
+									style={styles.resultatInfo}>
 									<Image
 										source={{
 											uri: `https://image.tmdb.org/t/p/w500${result.poster_path}`
