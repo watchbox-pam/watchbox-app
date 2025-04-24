@@ -13,15 +13,6 @@ export default function Index() {
 	});
 
 	useEffect(() => {
-		console.log(id);
-
-		fetch(`nothing`);
-		/* .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setMedia(data);
-      }); */
-
 		setMedia({
 			providers: [
 				"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",

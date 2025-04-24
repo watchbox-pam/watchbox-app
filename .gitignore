@@ -44,3 +44,6 @@ app-example
 bun.lockb
 package-lock.json
 yarn.lock
+
+#exceptions
+.swp

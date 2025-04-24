@@ -1,14 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-interface Emotion {
-	id: number;
-	label: string;
-	value: string;
-	startAngle: number;
-	endAngle: number;
-	color: string;
-	emoji: string;
-}
+import Emotion from "@/src/models/Emotion";
 
 interface EmotionCardProps {
 	emotion: Emotion;
