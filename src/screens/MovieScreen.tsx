@@ -47,6 +47,8 @@ export default function MovieScreen() {
 	>([]);
 	const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
 
+	const [error, setError] = useState(null);
+
 	const openMenu = () => setMenuVisible(true);
 	const closeMenu = () => setMenuVisible(false);
 
