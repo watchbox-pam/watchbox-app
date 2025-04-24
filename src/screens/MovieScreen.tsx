@@ -35,12 +35,10 @@ import useSessionStore from "../zustand/sessionStore";
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
 	const { id } = useLocalSearchParams();
-	console.log("Movie ID from params:", id);
 
 	const [media, setMedia] = useState<undefined | MovieProps>();
 
 	const currentUser = useSessionStore((state) => state.user);
-	console.log("Current user ID from store:", currentUser);
 
 	const [menuVisible, setMenuVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
@@ -51,10 +49,8 @@ export default function MovieScreen() {
 	const closeMenu = () => setMenuVisible(false);
 
 	const fetchUserPlaylists = async (userId: string) => {
-		console.log("Fetching user playlists for userId:", userId);
 		const response = await getUserPlaylists(userId);
 		if (response.success) {
-			console.log("Fetched playlists:", response.data);
 			setUserPlaylists(response.data);
 		} else {
 			console.error("Error fetching user playlists:", response.message);
@@ -64,10 +60,8 @@ export default function MovieScreen() {
 	const openModal = async () => {
 		const userId = currentUser && currentUser.id;
 		setModalVisible(true);
-		console.log("User ID from store:", userId);
 		if (userId) {
 			await fetchUserPlaylists(userId);
-			console.log("Fetched user playlists:", userPlaylists);
 		}
 	};
 
@@ -77,7 +71,6 @@ export default function MovieScreen() {
 
 	const handleAddToPlaylist = async () => {
 		if (selectedPlaylistId && id) {
-			console.log("Adding media to playlist:", selectedPlaylistId, id);
 			const response = await addMediaToPlaylist(
 				String(selectedPlaylistId),
 				Number(id)

@@ -42,7 +42,6 @@ export default function Index() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const currentUser = useSessionStore((state) => state.user);
-	console.log("Current user ID from store:", currentUser);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
 	const handleCreateWatchlist = () => {
@@ -50,8 +49,6 @@ export default function Index() {
 	};
 
 	const handleSavePlaylist = async () => {
-		console.log("handleSavePlaylist triggered");
-
 		const userId = id || (currentUser && currentUser.id);
 		if (!userId) {
 			alert("User is not logged in.");
@@ -66,10 +63,7 @@ export default function Index() {
 			created_at: new Date()
 		};
 
-		console.log("Calling createPlaylist with:", playlistToInsert);
-
 		const result = await createPlaylist(playlistToInsert);
-		console.log("createPlaylist result:", result);
 
 		if (result.success) {
 			alert(result.message || "Playlist created successfully!");
@@ -124,7 +118,6 @@ export default function Index() {
 	const fetchUserPlaylists = async (userId: string) => {
 		const response = await getUserPlaylists(userId);
 		if (response.success) {
-			console.log("Fetched playlists:", response.data);
 			setUserPlaylists(response.data);
 		} else {
 			console.error("Error fetching user playlists:", response.message);

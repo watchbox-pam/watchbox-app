@@ -3,7 +3,6 @@ import { ApiHelper } from "@/src/utils/axios";
 
 export async function createPlaylist(playlist: Playlist) {
 	try {
-		console.log("createPlaylist called with:", playlist);
 		if (!playlist.title) {
 			return {
 				success: false,
@@ -58,7 +57,6 @@ export async function createPlaylist(playlist: Playlist) {
 }
 
 export async function getUserPlaylists(userId: string) {
-	console.log("getUserPlaylists called with:", userId);
 	if (!userId || typeof userId !== "string") {
 		return {
 			success: false,
@@ -67,9 +65,7 @@ export async function getUserPlaylists(userId: string) {
 	}
 
 	try {
-		console.log("Making API call to /playlists/user/${userId}...");
 		const result = await ApiHelper.get(`/playlists/user/${userId}`);
-		console.log("API response for playlists:", result.data);
 		return {
 			success: true,
 			data: result.data
@@ -88,7 +84,6 @@ export async function getUserPlaylists(userId: string) {
 }
 
 export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
-	console.log("addMediaToPlaylist called with:", playlistId, mediaId);
 	if (!playlistId || typeof playlistId !== "string") {
 		return {
 			success: false,
@@ -104,7 +99,6 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 	}
 
 	try {
-		console.log("Making API call to /playlists/${playlistId}/media...");
 		const result = await ApiHelper.post(
 			`/playlists/${playlistId}/media/${mediaId}`,
 			{
@@ -112,7 +106,6 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 				media_id: mediaId
 			}
 		);
-		console.log("API response for adding media:", result.data);
 		return {
 			success: true,
 			message: "Média ajouté à la playlist avec succès"
@@ -131,7 +124,6 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 }
 
 export async function getPlaylistById(playlistId: string) {
-	console.log("getPlaylistById called with:", playlistId);
 	if (!playlistId || typeof playlistId !== "string") {
 		return {
 			success: false,
@@ -140,9 +132,7 @@ export async function getPlaylistById(playlistId: string) {
 	}
 
 	try {
-		console.log("Making API call to /playlists/${playlistId}...");
 		const result = await ApiHelper.get(`/playlists/${playlistId}`);
-		console.log("API response for playlist:", result.data);
 		return {
 			success: true,
 			data: result.data
