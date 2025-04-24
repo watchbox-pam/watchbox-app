@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#f9f9f9",
 		borderRadius: 5,
 		padding: 10
+	},
 	noImage: {
 		aspectRatio: 2 / 3,
 		backgroundColor: "#ccc"
