@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#0A1E38",
-		width: "100%",
 		margin: 0,
 		padding: 10
 	},
@@ -36,10 +35,9 @@ const styles = StyleSheet.create({
 		margin: "auto"
 	},
 	listFilters: {
-		marginVertical: 10,
 		flexDirection: "row",
-		marginBottom: 20,
-		height: 300
+		marginBottom: 2,
+		height: 50
 	},
 	filterContainer: {
 		borderWidth: 0.5,
@@ -64,21 +62,21 @@ const styles = StyleSheet.create({
 	selectedFilter: {
 		color: "#000"
 	},
-	resultsContainer: {
-		flex: 1
-	},
 	contInfo: {
 		flex: 1,
 		flexDirection: "row",
 		width: "100%"
 	},
+	viewResult: {
+		height: 175
+	},
 	resultatInfo: {
 		flex: 1,
-		flexDirection: "row"
+		flexDirection: "row",
+		height: 100
 	},
 	image: {
-		width: "25%",
-		height: 150,
+		width: "30%",
 		borderRadius: 10,
 		backgroundColor: "#313131"
 	},

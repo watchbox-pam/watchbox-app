@@ -53,6 +53,7 @@ export default function SearchScreen() {
 				showsHorizontalScrollIndicator={false}
 				style={styles.listFilters}
 				data={filters}
+				keyExtractor={(item) => item.key}
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						onPress={() => setSelectedFilter(item.key)}
@@ -71,13 +72,12 @@ export default function SearchScreen() {
 						</Text>
 					</TouchableOpacity>
 				)}
-				keyExtractor={(item) => item.key}
 			/>
-			<ScrollView contentContainerStyle={styles.resultsContainer}>
+			<ScrollView>
 				{results !== null && results?.length > 0 ? (
 					results.map((result) => {
 						return (
-							<View key={result.id}>
+							<View key={result.id} style={styles.viewResult}>
 								<TouchableOpacity
 									onPress={() =>
 										router.push(`/movie/${result.id}`)
