@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#0A1E38",
-		width: "100%",
 		margin: 0,
 		padding: 10
 	},
@@ -12,44 +11,37 @@ const styles = StyleSheet.create({
 		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		height: 40,
 		marginVertical: 10,
 		backgroundColor: "#fff",
 		borderWidth: 1,
 		borderRadius: 8
 	},
 	input: {
-		height: 40,
 		color: "#000",
-		paddingVertical: "auto",
 		paddingLeft: 20,
-		flex: 1,
 		marginRight: 5,
-		width: "65%"
+		height: 40,
+		width: "75%"
 	},
 	BtnSearch: {
-		height: 40,
-		width: "35%"
+		width: "25%"
 	},
 	TextSearch: {
 		color: "#000",
 		margin: "auto"
 	},
 	listFilters: {
-		marginVertical: 10,
 		flexDirection: "row",
-		marginBottom: 20,
-		height: 300
+		marginBottom: 10
 	},
 	filterContainer: {
+		flex: 1,
 		borderWidth: 0.5,
 		borderColor: "#AC2821",
-		padding: 5,
 		borderRadius: 5,
-		fontSize: 16,
 		marginRight: 10,
 		paddingHorizontal: 15,
-		height: 30
+		height: 35
 	},
 	selectedFilterContainer: {
 		backgroundColor: "#fff",
@@ -64,21 +56,21 @@ const styles = StyleSheet.create({
 	selectedFilter: {
 		color: "#000"
 	},
-	resultsContainer: {
-		flex: 1
-	},
 	contInfo: {
 		flex: 1,
 		flexDirection: "row",
 		width: "100%"
 	},
+	viewResult: {
+		height: 175
+	},
 	resultatInfo: {
 		flex: 1,
-		flexDirection: "row"
+		flexDirection: "row",
+		height: 100
 	},
 	image: {
-		width: "25%",
-		height: 150,
+		width: "30%",
 		borderRadius: 10,
 		backgroundColor: "#313131"
 	},
