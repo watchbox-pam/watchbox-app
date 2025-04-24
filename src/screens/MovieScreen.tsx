@@ -18,6 +18,7 @@ import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
 	const { id } = useLocalSearchParams();
 
 	const [media, setMedia] = useState<undefined | MovieProps>();
@@ -28,10 +29,14 @@ export default function MovieScreen() {
 			const response = await fetchMovieDetails(+id);
 			if (response.success) {
 				setMedia(response.data);
+			} else {
+				setError(true);
 			}
 			setLoading(false);
 		} catch (e) {
 			console.error(e);
+			setError(true);
+			setLoading(false);
 		}
 	};
 
@@ -49,8 +54,18 @@ export default function MovieScreen() {
 
 	if (loading) {
 		return (
-			<View style={styles.loading}>
+			<View style={styles.loading} testID="loading">
 				<ActivityIndicator size="large" color="#fff" />
+			</View>
+		);
+	}
+
+	if (error) {
+		return (
+			<View style={styles.errorContainer} testID="error">
+				<StyledText style={styles.errorText}>
+					Erreur lors du chargement des données.
+				</StyledText>
 			</View>
 		);
 	}
@@ -71,6 +86,7 @@ export default function MovieScreen() {
 					style={styles.shadowBottom}
 				/>
 				<Image
+					testID="movie-banner"
 					source={{
 						uri:
 							"https://image.tmdb.org/t/p/original" +
@@ -86,6 +102,7 @@ export default function MovieScreen() {
 						<View style={styles.noImage}></View>
 					) : (
 						<Image
+							testID="movie-poster"
 							source={{
 								uri:
 									"https://image.tmdb.org/t/p/original" +
@@ -95,7 +112,7 @@ export default function MovieScreen() {
 						/>
 					)}
 				</View>
-				<View style={styles.infoDiv}>
+				<View style={styles.infoDiv} testID="movie-info">
 					{media?.age_restriction && (
 						<Tag style={styles.tagContainer}>
 							<StyledText style={styles.textTag}>
@@ -107,47 +124,48 @@ export default function MovieScreen() {
 					<StyledText style={styles.title}>{media?.title}</StyledText>
 
 					<StyledText style={styles.text}>
-						{media?.release_date ? (
-							<>
-								<StyledText>{media.release_date}</StyledText>{" "}
-								•{" "}
-							</>
-						) : null}
-						<StyledText>
-							{media?.runtime
-								? convertMinutesToHours(Number(media?.runtime))
-								: "duration inconnue"}
-						</StyledText>
+						{media?.release_date ? `${media.release_date} • ` : ""}
+						{media?.runtime
+							? convertMinutesToHours(Number(media?.runtime))
+							: "duration inconnue"}
 					</StyledText>
+
 					{media?.director?.name && (
 						<StyledText style={styles.text}>
-							par{" "}
-							{media?.director?.name && (
-								<StyledText style={styles.textBold}>
-									{media?.director.name}
-								</StyledText>
-							)}
+							par {media?.director.name}
 						</StyledText>
 					)}
 
-					<TagList tags={media?.genres || []} />
+					<TagList
+						testID="movie-tags"
+						tags={
+							media?.genres
+								? media.genres.map((genre: any) => genre.name)
+								: []
+						}
+					/>
 				</View>
 			</View>
 
 			{!media?.providers || media?.providers.length <= 0 ? null : (
 				<View style={styles.providersContainer}>
 					<StyledText>ou regarder ?</StyledText>
-					<CarouselProviders providers={media?.providers} />
+					<CarouselProviders
+						providers={media?.providers}
+						testID="carousel-providers"
+					/>
 				</View>
 			)}
 
-			<View>
+			<View testID="movie-overview">
 				<StyledText style={styles.description}>
-					{media?.overview}
+					{media?.overview
+						? media.overview
+						: "Aucune description disponible pour ce film."}
 				</StyledText>
 			</View>
 
-			<View style={styles.videoContainer}>
+			<View style={styles.videoContainer} testID="movie-video">
 				<StyledText style={styles.textCasting}>
 					Bande annonce
 				</StyledText>
@@ -160,11 +178,14 @@ export default function MovieScreen() {
 
 			<View style={styles.castingContainer}>
 				<StyledText style={styles.textCasting}>Casting</StyledText>
-				<CarouselCasting cast={media?.casting} />
+				<CarouselCasting
+					cast={media?.casting}
+					testID="carousel-casting"
+				/>
 
 				<View style={styles.directorContainer}>
 					{media?.director && (
-						<View>
+						<View testID="movie-director">
 							<StyledText style={styles.textCasting}>
 								Réalisateur
 							</StyledText>
@@ -173,7 +194,7 @@ export default function MovieScreen() {
 					)}
 
 					{media?.composer && (
-						<View>
+						<View testID="movie-composer">
 							<StyledText style={styles.textCasting}>
 								Compositeur
 							</StyledText>
