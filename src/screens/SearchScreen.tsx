@@ -48,31 +48,33 @@ export default function SearchScreen() {
 					<Text style={styles.TextSearch}>Rechercher</Text>
 				</TouchableOpacity>
 			</View>
-			<FlatList
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={styles.listFilters}
-				data={filters}
-				keyExtractor={(item) => item.key}
-				renderItem={({ item }) => (
-					<TouchableOpacity
-						onPress={() => setSelectedFilter(item.key)}
-						style={[
-							styles.filterContainer,
-							selectedFilter === item.key &&
-								styles.selectedFilterContainer
-						]}>
-						<Text
+			<View>
+				<FlatList
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					style={styles.listFilters}
+					data={filters}
+					keyExtractor={(item) => item.key}
+					renderItem={({ item }) => (
+						<TouchableOpacity
+							onPress={() => setSelectedFilter(item.key)}
 							style={[
-								styles.filter,
+								styles.filterContainer,
 								selectedFilter === item.key &&
-									styles.selectedFilter
+									styles.selectedFilterContainer
 							]}>
-							{item.label}
-						</Text>
-					</TouchableOpacity>
-				)}
-			/>
+							<Text
+								style={[
+									styles.filter,
+									selectedFilter === item.key &&
+										styles.selectedFilter
+								]}>
+								{item.label}
+							</Text>
+						</TouchableOpacity>
+					)}
+				/>
+			</View>
 			<ScrollView>
 				{results !== null && results?.length > 0 ? (
 					results.map((result) => {

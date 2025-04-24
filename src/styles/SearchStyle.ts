@@ -11,24 +11,20 @@ const styles = StyleSheet.create({
 		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		height: 40,
 		marginVertical: 10,
 		backgroundColor: "#fff",
 		borderWidth: 1,
 		borderRadius: 8
 	},
 	input: {
-		height: 40,
 		color: "#000",
-		paddingVertical: "auto",
 		paddingLeft: 20,
-		flex: 1,
 		marginRight: 5,
-		width: "65%"
+		height: 40,
+		width: "75%"
 	},
 	BtnSearch: {
-		height: 40,
-		width: "35%"
+		width: "25%"
 	},
 	TextSearch: {
 		color: "#000",
@@ -36,18 +32,16 @@ const styles = StyleSheet.create({
 	},
 	listFilters: {
 		flexDirection: "row",
-		marginBottom: 2,
-		height: 50
+		marginBottom: 10
 	},
 	filterContainer: {
+		flex: 1,
 		borderWidth: 0.5,
 		borderColor: "#AC2821",
-		padding: 5,
 		borderRadius: 5,
-		fontSize: 16,
 		marginRight: 10,
 		paddingHorizontal: 15,
-		height: 30
+		height: 35
 	},
 	selectedFilterContainer: {
 		backgroundColor: "#fff",
