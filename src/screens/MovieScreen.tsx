@@ -196,14 +196,6 @@ export default function MovieScreen() {
 						</StyledText>
 
 						<StyledText style={styles.text}>
-							<StyledText>{media?.release_date}</StyledText> •{" "}
-							<StyledText>
-								{convertMinutesToHours(
-									Number(media?.runtime) ?? 0
-								)}
-							</StyledText>
-						</StyledText>
-						<StyledText style={styles.text}>
 							{media?.release_date ? (
 								<>
 									<StyledText>
