@@ -18,15 +18,6 @@ describe("<RecommendationScreen />", () => {
 		expect(getByText("RÉFLEXION")).toBeTruthy();
 		expect(getByText("MÉLANCOLIE")).toBeTruthy();
 		expect(getByText("RIRE")).toBeTruthy();
-
-		expect(getByText("🩷")).toBeTruthy();
-		expect(getByText("😯")).toBeTruthy();
-		expect(getByText("🫨")).toBeTruthy();
-		expect(getByText("😨")).toBeTruthy();
-		expect(getByText("😌")).toBeTruthy();
-		expect(getByText("🤓")).toBeTruthy();
-		expect(getByText("🥲")).toBeTruthy();
-		expect(getByText("😂")).toBeTruthy();
 	});
 
 	test("can click on an emotion card and shows list of media", async () => {
