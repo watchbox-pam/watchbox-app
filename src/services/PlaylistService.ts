@@ -123,6 +123,36 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 	}
 }
 
+export async function getMediaInPlaylist(playlistId: string) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	try {
+		const result = await ApiHelper.get(
+			`/playlists/${playlistId}/media_list`
+		);
+		return {
+			success: true,
+			data: Array.isArray(result.data) ? result.data : [] // Ensure data is always an array
+		};
+	} catch (error) {
+		console.error(
+			"Error in getMediaInPlaylist:",
+			error.response?.data || error.message || "Unknown error"
+		);
+		return {
+			success: false,
+			message:
+				error.message ||
+				"Erreur lors de la récupération des médias de la playlist"
+		};
+	}
+}
+
 export async function getPlaylistById(playlistId: string) {
 	if (!playlistId || typeof playlistId !== "string") {
 		return {
