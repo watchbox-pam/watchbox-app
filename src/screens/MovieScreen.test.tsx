@@ -1,10 +1,34 @@
 import { render, waitFor } from "@testing-library/react-native";
 import MovieScreen from "./MovieScreen";
+import { getUserPlaylists } from "../services/PlaylistService";
 import { fetchMovieDetails } from "../services/MovieDetailService";
 
 jest.mock("@/src/services/MovieDetailService", () => ({
 	fetchMovieDetails: jest.fn()
 }));
+
+jest.mock("@/src/services/PlaylistService", () => ({
+	getUserPlaylists: jest.fn()
+}));
+
+jest.mock("../zustand/sessionStore", () => {
+	const mockFn = jest.fn();
+	mockFn.mockImplementation((selector) => {
+		const state = {
+			isLoggedIn: true,
+			user: {
+				id: "1"
+			},
+			signIn: jest.fn(),
+			signOut: jest.fn()
+		};
+		return selector ? selector(state) : state;
+	});
+	return {
+		__esModule: true,
+		default: mockFn
+	};
+});
 
 jest.mock("react-native-youtube-iframe", () => "YoutubePlayer");
 
@@ -17,7 +41,34 @@ jest.mock("@/src/components/StyledText", () => {
 	return ({ children }: any) => children;
 });
 
-const data = {
+jest.mock("@/src/components/TagList", () => {
+	const { View, Text } = require("react-native");
+
+	// mock les composants de TagList
+	return function MockTagList({
+		tags,
+		testID
+	}: {
+		tags: string[];
+		testID?: string;
+	}) {
+		return (
+			<View testID={testID}>
+				{tags.map((tag, index) => (
+					<Text key={index}>{tag}</Text>
+				))}
+			</View>
+		);
+	};
+});
+
+jest.mock("@/src/screens/CommentaryScreen", () => "CommentaryScreen");
+
+beforeEach(() => {
+	jest.clearAllMocks();
+});
+
+const movieDetails = {
 	adult: false,
 	age_restriction: "16+",
 	backdrop_path: "/9KSGUPHZpqhqkRXE2eebu701ONU.jpg",
@@ -89,13 +140,30 @@ const data = {
 	video_key: "uvp2EYCXYwU"
 };
 
+const playlists = [
+	{
+		created_at: false,
+		id: "193b3859-8df4-4930-90e9-5d9ac11f8559",
+		is_private: "2025-04-24T22:22:38.631705",
+		title: "test",
+		user_id: "71ae95b4-7f57-4ca1-9250-3184ad920486"
+	}
+];
+
 describe("<MovieScreen />", () => {
 	test("renders correctly with movie data", async () => {
-		(fetchMovieDetails as jest.Mock).mockResolvedValueOnce({
+		(fetchMovieDetails as jest.Mock).mockResolvedValue({
 			success: true,
-			data: data
+			data: movieDetails
 		});
+
+		(getUserPlaylists as jest.Mock).mockResolvedValue({
+			success: true,
+			data: playlists
+		});
+
 		const { getByTestId } = render(<MovieScreen />);
+
 		expect(getByTestId("loading")).toBeTruthy();
 
 		await waitFor(() => {
@@ -123,11 +191,17 @@ describe("<MovieScreen />", () => {
 	});
 
 	test("renders correctly with error", async () => {
-		(fetchMovieDetails as jest.Mock).mockResolvedValueOnce({
+		(fetchMovieDetails as jest.Mock).mockResolvedValue({
 			success: false,
 			data: undefined
 		});
+
+		(getUserPlaylists as jest.Mock).mockResolvedValue({
+			success: false,
+			data: []
+		});
 		const { getByTestId } = render(<MovieScreen />);
+
 		expect(getByTestId("loading")).toBeTruthy();
 
 		await waitFor(() => {

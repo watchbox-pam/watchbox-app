@@ -125,20 +125,20 @@ export default function MovieScreen() {
 		return `${hours}h ${remainingMinutes}min`;
 	};
 
-	if (loading) {
-		return (
-			<View style={styles.loading} testID="loading">
-				<ActivityIndicator size="large" color="#fff" />
-			</View>
-		);
-	}
-
 	if (error) {
 		return (
 			<View style={styles.errorContainer} testID="error">
 				<StyledText style={styles.errorText}>
 					Erreur lors du chargement des données.
 				</StyledText>
+			</View>
+		);
+	}
+
+	if (loading) {
+		return (
+			<View style={styles.loading} testID="loading">
+				<ActivityIndicator size="large" color="#fff" />
 			</View>
 		);
 	}
