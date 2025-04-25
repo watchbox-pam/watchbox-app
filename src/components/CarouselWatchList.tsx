@@ -1,44 +1,84 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View, Image, Text } from "react-native";
 import { Link } from "expo-router";
+import { getMediaInPlaylist } from "../services/PlaylistService";
 
 export default function CarouselWatchList({ providers }: { providers: any }) {
-	const hasItems = providers && providers.length > 0;
+	interface Movie {
+		image?: string;
+	}
+
+	const [movies, setMovies] = useState<Movie[]>([]);
+
+	useEffect(() => {
+		const fetchMoviesForPlaylist = async () => {
+			if (providers && providers.id) {
+				try {
+					const result = await getMediaInPlaylist(providers.id);
+					if (result.success && Array.isArray(result.data)) {
+						setMovies(result.data);
+					} else {
+						console.error(
+							"Error fetching movies for playlist or invalid data format:",
+							result.message
+						);
+						setMovies([]); // Ensure movies is always an array
+					}
+				} catch (error) {
+					console.error("Error in fetchMoviesForPlaylist:", error);
+					setMovies([]); // Ensure movies is always an array
+				}
+			}
+		};
+		fetchMoviesForPlaylist();
+	}, [providers]);
+
+	const filteredMovies = movies.filter((movie) => movie && movie.image);
+
 	return (
 		<View style={styles.container}>
-			<FlatList
-				data={providers}
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				keyExtractor={(item, index) => index.toString()}
-				renderItem={({ item, index }) => (
-					<Link
-						href={{
-							pathname: "/watchList/[id]",
-							params: { id: index.toString() } // 🔥 Utilisation de l'index comme ID temporaire
-						}}
-						style={styles.imageContainer}>
-						{hasItems ? (
+			{filteredMovies.length > 0 ? (
+				<FlatList
+					data={filteredMovies}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					keyExtractor={(item, index) => index.toString()}
+					renderItem={({
+						item,
+						index
+					}: {
+						item: Movie;
+						index: number;
+					}) => (
+						<Link
+							href={{
+								pathname: "/watchList/[id]",
+								params: { id: index.toString() }
+							}}
+							style={styles.imageContainer}>
 							<Image
 								source={
-									typeof item.imageUrl === "string" &&
-									item.imageUrl
-										? { uri: item.imageUrl }
+									item.image
+										? {
+												uri: `https://image.tmdb.org/t/p/w500${item.image}`
+											}
 										: require("../assets/images/watchbox-logo.png")
 								}
 								style={styles.image}
 								resizeMode="cover"
 							/>
-						) : (
-							<Image
-								source={require("../assets/images/watchbox-logo.png")}
-								style={styles.image}
-								resizeMode="cover"
-							/>
-						)}
-					</Link>
-				)}
-			/>
+						</Link>
+					)}
+				/>
+			) : (
+				<View style={styles.emptyContainer}>
+					<Image
+						source={require("../assets/images/watchbox-logo.png")}
+						style={styles.emptyImage}
+						resizeMode="contain"
+					/>
+				</View>
+			)}
 		</View>
 	);
 }
@@ -57,5 +97,14 @@ const styles = StyleSheet.create({
 	container: {
 		height: 160,
 		paddingLeft: 10
+	},
+	emptyContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	emptyImage: {
+		width: 100,
+		height: 100
 	}
 });
