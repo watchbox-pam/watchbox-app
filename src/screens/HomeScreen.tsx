@@ -1,29 +1,23 @@
 import { useEffect, useState } from "react";
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
-import { Text, View, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, ScrollView } from "react-native";
 
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
-import { fetchPopular } from "@/src/services/HomePageService";
+import { fetchPopularMovies } from "./utils/utils";
 
 export default function HomeScreen() {
 	const [popularDay, setPopularDay] = useState();
 	const [popularWeek, setPopularWeek] = useState();
 
-	const fetchPopularMovies = async () => {
-		const popularDay = await fetchPopular("day");
-		if (popularDay.success) {
-			setPopularDay(popularDay.data);
-		}
-		const popularWeek = await fetchPopular("week");
-		if (popularWeek.success) {
-			setPopularWeek(popularWeek.data);
-		}
-	};
-
 	useEffect(() => {
-		fetchPopularMovies();
+		async function fetchData() {
+			const { day, week } = await fetchPopularMovies();
+			setPopularDay(day);
+			setPopularWeek(week);
+		}
+		fetchData();
 	}, []);
 
 	return (

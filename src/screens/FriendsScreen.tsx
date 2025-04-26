@@ -9,8 +9,9 @@ import {
 	KeyboardAvoidingView,
 	Platform
 } from "react-native";
+import { addFriend } from "./utils/utils";
 
-interface Friend {
+export interface Friend {
 	id: number;
 	name: string;
 }
@@ -23,16 +24,6 @@ const FriendsScreen: React.FC = () => {
 	]);
 	const [search, setSearch] = useState("");
 	const [newFriend, setNewFriend] = useState("");
-
-	const addFriend = () => {
-		if (newFriend.trim()) {
-			setFriends([
-				...friends,
-				{ id: Date.now(), name: newFriend.trim() }
-			]);
-			setNewFriend("");
-		}
-	};
 
 	const filteredFriends = friends.filter((friend) =>
 		friend.name.toLowerCase().includes(search.toLowerCase())
@@ -66,7 +57,12 @@ const FriendsScreen: React.FC = () => {
 				value={newFriend}
 				onChangeText={setNewFriend}
 			/>
-			<Button title="Ajouter" onPress={addFriend} />
+			<Button
+				title="Ajouter"
+				onPress={() =>
+					addFriend(newFriend, setFriends, setNewFriend, friends)
+				}
+			/>
 		</View>
 	);
 };

@@ -4,27 +4,11 @@ import BackButton from "@/src/components/BackButton";
 import Logo from "@/src/components/Logo";
 import StyledText from "@/src/components/StyledText";
 import { useState } from "react";
-import { loginUser } from "@/src/services/LoginService";
-import { router } from "expo-router";
-import useSessionStore from "@/src/zustand/sessionStore";
+import { handleLoginSubmit } from "@/src/screens/utils/utils";
 
 export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
-
-	// @ts-ignore
-	const signIn = useSessionStore((state) => state.signIn);
-
-	const handleSubmit = async () => {
-		const result = await loginUser({ identifier, password });
-		if (result.success) {
-			signIn(result.message, identifier);
-			router.replace("/");
-			return;
-		} else {
-			alert(result.message);
-		}
-	};
 
 	return (
 		<View style={styles.container}>
@@ -50,7 +34,9 @@ export default function LoginScreen() {
 				<View style={styles.btnForm}>
 					<TouchableOpacity
 						style={styles.button}
-						onPress={handleSubmit}>
+						onPress={async () =>
+							await handleLoginSubmit(identifier, password)
+						}>
 						<Text style={styles.buttonText}>Connexion</Text>
 					</TouchableOpacity>
 				</View>

@@ -9,22 +9,9 @@ import styles from "@/src/styles/BasePageStyle";
 import StyledText from "@/src/components/StyledText";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { checkLogin } from "@/src/services/LandingService";
-import useSessionStore from "@/src/zustand/sessionStore";
+import { checkUserLogin } from "./utils/utils";
 
 export default function BaseScreen() {
-	// @ts-ignore
-	const signIn = useSessionStore((state) => state.signIn);
-
-	const checkUserLogin = async () => {
-		const result = await checkLogin();
-		if (result !== null) {
-			signIn(result.id, result.identifier);
-			router.replace("/");
-			return;
-		}
-	};
-
 	useEffect(() => {
 		checkUserLogin();
 	}, []);

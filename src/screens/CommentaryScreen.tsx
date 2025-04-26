@@ -2,8 +2,6 @@ import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import CommentSection from "../components/CommentSection";
 import SwitchButton from "../components/SwitchButton";
-import BackButton from "../components/BackButton";
-import Logo from "../components/Logo";
 
 const CommentaryScreen = () => {
 	const [isMyComments, setIsMyComments] = useState(true);

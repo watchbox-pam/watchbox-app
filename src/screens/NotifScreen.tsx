@@ -9,8 +9,9 @@ import {
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
+import { markAsRead } from "./utils/utils";
 
-interface Notification {
+export interface Notification {
 	id: number;
 	message: string;
 	read: boolean;
@@ -22,14 +23,6 @@ const NotifScreen: React.FC = () => {
 		{ id: 2, message: "Mise à jour disponible", read: false },
 		{ id: 3, message: "Votre ami a commenté votre post", read: true }
 	]);
-
-	const markAsRead = (id: number) => {
-		setNotifications((prev) =>
-			prev.map((notif) =>
-				notif.id === id ? { ...notif, read: true } : notif
-			)
-		);
-	};
 
 	return (
 		<ScrollView style={styles.container}>
@@ -47,7 +40,7 @@ const NotifScreen: React.FC = () => {
 							styles.notification,
 							item.read && styles.readNotification
 						]}
-						onPress={() => markAsRead(item.id)}>
+						onPress={() => markAsRead(item.id, setNotifications)}>
 						<Text style={styles.message}>{item.message}</Text>
 					</TouchableOpacity>
 				)}

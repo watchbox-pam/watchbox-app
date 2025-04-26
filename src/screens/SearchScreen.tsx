@@ -8,16 +8,15 @@ import {
 	View
 } from "react-native";
 import React, { useState } from "react";
-import { searchInfos } from "@/src/services/SearchService";
 import styles from "@/src/styles/SearchStyle";
 import { router } from "expo-router";
 import Movie from "@/src/models/Movie";
 import StyledText from "../components/StyledText";
+import { search } from "./utils/utils";
 
 export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [results, setResults] = useState<Movie[]>([]);
-	const [category, setCategory] = useState("all");
 	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
 
 	const filters = [
@@ -31,20 +30,13 @@ export default function SearchScreen() {
 		{ key: "score-", label: "Mal noté" }
 	];
 
-	const search = async () => {
-		if (searchTerm.trim()) {
-			const searchResults = await searchInfos(searchTerm);
-			if (searchResults.success) {
-				setResults(searchResults.data);
-			}
-		}
-	};
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.topSection}>
 				<TextInput style={styles.input} onChangeText={setSearchTerm} />
-				<TouchableOpacity onPress={search} style={styles.BtnSearch}>
+				<TouchableOpacity
+					onPress={async () => await search(searchTerm, setResults)}
+					style={styles.BtnSearch}>
 					<Text style={styles.TextSearch}>Rechercher</Text>
 				</TouchableOpacity>
 			</View>

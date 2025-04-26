@@ -1,6 +1,6 @@
 import { ApiHelper } from "@/src/utils/axios";
 
-type TimePeriods = "day" | "week";
+export type TimePeriods = "day" | "week";
 
 export const fetchPopular = async (timePeriod: TimePeriods) => {
 	try {

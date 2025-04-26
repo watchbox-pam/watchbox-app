@@ -5,7 +5,6 @@ import Logo from "../components/Logo";
 
 const ParamScreen: React.FC = () => {
 	const [accueil, setAccueil] = useState(false);
-	const [plateforme, setPlateforme] = useState(false);
 	const [notifications, setNotifications] = useState(false);
 	const [darkMode, setDarkMode] = useState(true);
 	const [profilpublic, setProfilpublic] = useState(false);

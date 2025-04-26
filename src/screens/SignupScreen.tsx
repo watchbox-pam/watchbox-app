@@ -6,13 +6,9 @@ import StyledText from "@/src/components/StyledText";
 import { useEffect, useState } from "react";
 import Country from "@/src/models/Country";
 import { Picker } from "@react-native-picker/picker";
-import { getAllCountries, registerUser } from "@/src/services/SignupService";
-import RNDateTimePicker, {
-	DateTimePickerEvent
-} from "@react-native-community/datetimepicker";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 import UserSignup from "@/src/models/UserSignup";
-import useSessionStore from "@/src/zustand/sessionStore";
-import { router } from "expo-router";
+import { getCountries, onChangeBirthdate, signupUser } from "./utils/utils";
 
 export default function SignupScreen() {
 	const [username, setUsername] = useState<string>("");
@@ -24,44 +20,8 @@ export default function SignupScreen() {
 	const [dtPickerVisible, setDtPickerVisible] = useState<boolean>(false);
 	const [birthdate, setBirthdate] = useState<Date | null>(null);
 
-	const signIn = useSessionStore((state: any) => state.signIn);
-
-	const getCountries = async () => {
-		const countriesResult = await getAllCountries();
-		setCountries(countriesResult);
-	};
-
-	const onChangeBirthdate = (
-		event: DateTimePickerEvent,
-		selectedDate: Date
-	) => {
-		const currentDate = selectedDate;
-		setDtPickerVisible(false);
-		setBirthdate(currentDate);
-	};
-
-	const signupUser = async () => {
-		const userToInsert: UserSignup = {
-			id: "",
-			username: username,
-			email: email,
-			password: password,
-			confirmPassword: confirmPassword,
-			country: country,
-			birthdate: birthdate
-		};
-		const result = await registerUser(userToInsert);
-		if (result.success) {
-			signIn(result.message, username);
-			router.replace("/");
-			return;
-		} else {
-			alert(result.message);
-		}
-	};
-
 	useEffect(() => {
-		getCountries();
+		getCountries(setCountries);
 	}, []);
 
 	return (
@@ -122,13 +82,31 @@ export default function SignupScreen() {
 					testID="dateTimePicker"
 					value={new Date(Date.now())}
 					mode="date"
-					onChange={onChangeBirthdate}
+					onChange={(event, selectedDate) =>
+						onChangeBirthdate(
+							selectedDate,
+							setDtPickerVisible,
+							setBirthdate
+						)
+					}
 					minimumDate={new Date(1900, 0, 1)}
 					maximumDate={new Date(Date.now())}
 				/>
 			)}
 			<View style={styles.btnSignUp}>
-				<TouchableOpacity style={styles.button} onPress={signupUser}>
+				<TouchableOpacity
+					style={styles.button}
+					onPress={async () =>
+						await signupUser({
+							id: "",
+							username: username,
+							email: email,
+							password: password,
+							confirmPassword: confirmPassword,
+							country: country,
+							birthdate: birthdate
+						} as UserSignup)
+					}>
 					<Text style={styles.buttonText}>Créez votre compte</Text>
 				</TouchableOpacity>
 			</View>

@@ -8,6 +8,7 @@ import StyledText from "../components/StyledText";
 import ReadMore from "../components/ReadMore";
 import PersonMediaList from "../components/PersonMediaList";
 import { fetchPerson } from "@/src/services/PersonService";
+import { convertDateToAge, processCreditData } from "./utils/utils";
 
 export default function PersonScreen() {
 	const [loading, setLoading] = useState(true);
@@ -22,13 +23,6 @@ export default function PersonScreen() {
 	const [tvCrew, setTvCrew] = useState<Media[] | undefined>(undefined);
 	const { id }: { id: string } = useLocalSearchParams();
 
-	const removeDuplicates = (arr: Media[]) => {
-		return arr.filter(
-			(item: Media, index: number, self: Media[]) =>
-				index === self.findIndex((t: Media) => t.title === item.title)
-		);
-	};
-
 	useEffect(() => {
 		(async () => {
 			setLoading(true);
@@ -41,59 +35,20 @@ export default function PersonScreen() {
 
 			setPerson(response.data.person);
 
-			setMoviesCast(
-				removeDuplicates(
-					response.data.combined_credits.cast.filter(
-						(item: Media) => item.media_type === "movie"
-					)
-				)
-			);
-			setTvCast(
-				removeDuplicates(
-					response.data.combined_credits.cast.filter(
-						(item: Media) => item.media_type === "tv"
-					)
-				)
-			);
-			setMoviesCrew(
-				removeDuplicates(
-					response.data.combined_credits.crew.filter(
-						(item: Media) => item.media_type === "movie"
-					)
-				)
-			);
-			setTvCrew(
-				removeDuplicates(
-					response.data.combined_credits.crew.filter(
-						(item: Media) => item.media_type === "tv"
-					)
-				)
-			);
+			const mediaTypes = [
+				{ type: "movie", role: "cast", setter: setMoviesCast },
+				{ type: "tv", role: "cast", setter: setTvCast },
+				{ type: "movie", role: "crew", setter: setMoviesCrew },
+				{ type: "tv", role: "crew", setter: setTvCrew }
+			];
+
+			// separates the media data into different categories
+			processCreditData(response.data, mediaTypes);
+
 			setLoading(false);
 		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
-
-	const checkData = () => {
-		return person && moviesCast && tvCast && moviesCrew && tvCrew
-			? true
-			: false;
-	};
-
-	const convertDateToAge = (date: string) => {
-		const today = new Date();
-		const birthDate = new Date(date);
-		let age = today.getFullYear() - birthDate.getFullYear();
-
-		const monthDiff = today.getMonth() - birthDate.getMonth();
-		const dayDiff = today.getDate() - birthDate.getDate();
-
-		// Adjust if the birthday hasn't occurred yet this year
-		if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-			age--;
-		}
-
-		return age;
-	};
 
 	if (loading) {
 		return (
@@ -103,7 +58,7 @@ export default function PersonScreen() {
 		);
 	}
 
-	if (!checkData()) {
+	if (!person) {
 		return (
 			<View style={styles.loading}>
 				<StyledText style={styles.noDataText}>

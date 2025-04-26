@@ -17,13 +17,13 @@ import TraitGradiant from "../components/TraitGradiant";
 import Stats from "../components/Stats";
 import { TouchableOpacity } from "react-native";
 import CarouselWatchList from "../components/CarouselWatchList";
-import { getUserProfile } from "../services/ProfileService";
 import useSessionStore from "../zustand/sessionStore";
 import Playlist from "../models/Playlist";
 import {
-	createPlaylist,
-	getUserPlaylists
-} from "@/src/services/PlaylistService";
+	fetchProfileData,
+	fetchUserPlaylists,
+	handleSavePlaylist
+} from "./utils/utils";
 
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
@@ -41,88 +41,24 @@ export default function Index() {
 	const [profileData, setProfileData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const currentUser = useSessionStore((state) => state.user);
+	const currentUser = useSessionStore((state: any) => state.user);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
 	const handleCreateWatchlist = () => {
 		setModalVisible(true);
 	};
 
-	const handleSavePlaylist = async () => {
-		const userId = id || (currentUser && currentUser.id);
-		if (!userId) {
-			alert("User is not logged in.");
-			return;
-		}
-
-		const playlistToInsert: Playlist = {
-			id: "",
-			user_id: userId,
-			title: playlistTitle,
-			is_private: isPrivate,
-			created_at: new Date()
-		};
-
-		const result = await createPlaylist(playlistToInsert);
-
-		if (result.success) {
-			alert(result.message || "Playlist created successfully!");
-			setModalVisible(false);
-			setPlaylistTitle("");
-			setIsPrivate(false);
-		} else {
-			alert(
-				result.message ||
-					"An error occurred while creating the playlist."
-			);
-		}
-	};
-
 	useEffect(() => {
 		const userId = id || (currentUser && currentUser.id);
 
 		if (userId && typeof userId === "string") {
-			fetchProfileData(userId);
-			fetchUserPlaylists(userId);
+			fetchProfileData(userId, setLoading, setProfileData, setError);
+			fetchUserPlaylists(userId, setUserPlaylists);
 		} else {
 			setError("ID utilisateur invalide");
 			setLoading(false);
 		}
 	}, [id, currentUser]);
-
-	const fetchProfileData = async (userId: string) => {
-		setLoading(true);
-		setError(null);
-
-		try {
-			const response = await getUserProfile(userId);
-			if (response.success) {
-				setProfileData(response.data);
-			} else {
-				setError(
-					response.message ||
-						"Erreur lors de la récupération du profil"
-				);
-				console.error(
-					"Erreur lors de la récupération du profil:",
-					response.message
-				);
-			}
-		} catch (error) {
-			setError(error.message || "Une erreur est survenue");
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const fetchUserPlaylists = async (userId: string) => {
-		const response = await getUserPlaylists(userId);
-		if (response.success) {
-			setUserPlaylists(response.data);
-		} else {
-			console.error("Error fetching user playlists:", response.message);
-		}
-	};
 
 	return (
 		<ScrollView
@@ -166,7 +102,17 @@ export default function Index() {
 							/>
 							<Button
 								title="Ajouter"
-								onPress={handleSavePlaylist}
+								onPress={async () =>
+									await handleSavePlaylist(
+										id,
+										currentUser,
+										playlistTitle,
+										isPrivate,
+										setModalVisible,
+										setPlaylistTitle,
+										setIsPrivate
+									)
+								}
 							/>
 						</View>
 					</View>
