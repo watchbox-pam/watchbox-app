@@ -103,10 +103,13 @@ export default function RecommendationScreen() {
 	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
 
-	//const size = 300;
-	const windowHeight = Dimensions.get("window").height;
-
 	useEffect(() => {
+		/**
+		 * Why this if in useEffect ?
+		 * 1. useEffect is executed when the component is initially mounted (the first time it is rendered), at this point selectedEmotion is null
+		 * 2. The useEffect is also executed after a resetAnimation(), which sets selectedEmotion to null
+		 * 3. Without this condition, you would have useless calls to fetchMoviesByEmotion() with a null value
+		 */
 		if (selectedEmotion) {
 			fetchMoviesByEmotion();
 			animateTransition();
@@ -114,11 +117,11 @@ export default function RecommendationScreen() {
 	}, [selectedEmotion]);
 
 	/**
-	 * 	Fonction d'animation pour la transition entre la roue des émotions et les résultats
+	 * 	Animation function for the transition between the list of emotions and the results
 	 */
 	const animateTransition = () => {
 		/**
-		 *  Éxécution en simultané des 2 animations
+		 *  Simultaneous execution of the 2 animations
 		 */
 		Animated.parallel([
 			Animated.timing(emotionsOpacity, {
@@ -137,7 +140,7 @@ export default function RecommendationScreen() {
 
 	const resetAnimation = () => {
 		/**
-		 *  Éxécution en simultané des 2 animations
+		 *  Simultaneous execution of the 2 animations
 		 */
 		Animated.parallel([
 			Animated.timing(emotionsOpacity, {
@@ -151,7 +154,6 @@ export default function RecommendationScreen() {
 				useNativeDriver: true
 			})
 		]).start(() => {
-			// Réinitialise les états
 			setSelectedEmotion(null);
 			setMovies([]);
 			setError(null);
@@ -159,7 +161,7 @@ export default function RecommendationScreen() {
 	};
 
 	/**
-	 * Fonction asynchrone pour récupérer les films basés sur l'émotion sélectionnée
+	 * Asynchronous function to retrieve films based on the selected emotion
 	 */
 	const fetchMoviesByEmotion = async (): Promise<void> => {
 		if (!selectedEmotion) return;
@@ -172,10 +174,10 @@ export default function RecommendationScreen() {
 			if (response.success) {
 				setMovies(response.data);
 			} else {
-				setError("Impossible de charger les recommandations.");
+				setError("Unable to load recommendations.");
 			}
 		} catch (err) {
-			setError("Impossible de charger les recommandations.");
+			setError("Unable to load recommendations.");
 		} finally {
 			setLoading(false);
 		}
@@ -190,10 +192,7 @@ export default function RecommendationScreen() {
 			<StatusBar barStyle="light-content" />
 
 			<Animated.View
-				style={[
-					styles.centeredContainer,
-					{ height: windowHeight, opacity: emotionsOpacity }
-				]}
+				style={[styles.overlayContainer, { opacity: emotionsOpacity }]}
 				pointerEvents={selectedEmotion ? "none" : "auto"}>
 				<EmotionsList
 					emotions={emotions}
@@ -203,7 +202,7 @@ export default function RecommendationScreen() {
 			</Animated.View>
 
 			<Animated.View
-				style={[styles.moviesContainer, { opacity: resultsOpacity }]}
+				style={[styles.overlayContainer, { opacity: resultsOpacity }]}
 				pointerEvents={selectedEmotion ? "auto" : "none"}>
 				<MovieList
 					movies={movies}
@@ -223,21 +222,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#0A1E38"
 	},
-	centeredContainer: {
-		position: "absolute",
-		width: "100%",
-		justifyContent: "center",
-		alignItems: "center",
-		zIndex: 1
-	},
-	moviesContainer: {
-		flex: 1,
-		width: "100%",
+	overlayContainer: {
 		position: "absolute",
 		top: 0,
-		bottom: 0,
 		left: 0,
 		right: 0,
-		zIndex: 2
+		bottom: 0,
+		width: "100%",
+		height: "100%",
+		zIndex: 1
 	}
 });

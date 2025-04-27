@@ -17,6 +17,7 @@ export default function EmotionList({
 	return (
 		<View style={styles.container}>
 			<ScrollView
+				style={{ flex: 1, width: "100%" }}
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}>
 				<View style={styles.grid}>
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		width: "100%",
+		height: "100%",
 		paddingHorizontal: 16
 	},
 	scrollContainer: {
