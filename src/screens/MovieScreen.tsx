@@ -7,8 +7,7 @@ import {
 	TouchableOpacity,
 	Modal,
 	Button,
-	Text,
-	FlatList
+	Text
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -89,18 +88,17 @@ export default function MovieScreen() {
 	};
 
 	const fetchData = async () => {
-		setLoading(true);
 		try {
 			const response = await fetchMovieDetails(+id);
-			if (response.success) {
+			if (response.success && response.data) {
 				setMedia(response.data);
 			} else {
 				setError(true);
 			}
-			setLoading(false);
 		} catch (e) {
 			console.error(e);
 			setError(true);
+		} finally {
 			setLoading(false);
 		}
 	};
@@ -109,7 +107,6 @@ export default function MovieScreen() {
 		const userId = currentUser && currentUser.id;
 
 		if (userId && typeof userId === "string") {
-			setLoading(true);
 			fetchData();
 			fetchUserPlaylists(userId);
 		} else {
