@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView, Animated } from "react-native";
 import EmotionCard from "./EmotionsCard";
-
+import styles from "@/src/styles/EmotionListStyle";
 import Emotion from "@/src/models/Emotion";
 
 interface EmotionsListProps {
@@ -17,6 +17,7 @@ export default function EmotionList({
 	return (
 		<View style={styles.container}>
 			<ScrollView
+				style={{ flex: 1, width: "100%" }}
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}>
 				<View style={styles.grid}>
@@ -33,20 +34,3 @@ export default function EmotionList({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		width: "100%",
-		paddingHorizontal: 16
-	},
-	scrollContainer: {
-		paddingVertical: 20,
-		paddingBottom: 40
-	},
-	grid: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "space-between"
-	}
-});
