@@ -8,7 +8,13 @@ import {
 import StyledText from "./StyledText";
 import { Link } from "expo-router";
 
-export default function CarouselCasting({ cast }: any) {
+export default function CarouselCasting({
+	cast,
+	testID
+}: {
+	cast: any;
+	testID?: string;
+}) {
 	if (!cast || cast.length === 0 || cast.every((item: any) => item === null))
 		return null;
 	return (
@@ -18,6 +24,7 @@ export default function CarouselCasting({ cast }: any) {
 				data={cast}
 				keyExtractor={(item) => item.id.toString()}
 				horizontal
+				testID={testID}
 				renderItem={({ item }) => (
 					<Link
 						href={{

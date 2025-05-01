@@ -5,28 +5,28 @@ import StyledText from "./StyledText";
 
 export default function TagList({
 	tags,
-	tagStyle
+	tagStyle,
+	testID
 }: {
-	tags: any[];
+	tags: string[];
 	tagStyle?: any;
+	testID?: string;
 }) {
 	return (
-		<View style={styles.tagsContainer}>
-			<FlatList
-				overScrollMode="never"
-				horizontal
-				data={tags}
-				renderItem={({ item }) => (
-					<View style={styles.tagContainer}>
-						<Tag style={tagStyle}>
-							<StyledText style={styles.tag}>
-								{item.name}
-							</StyledText>
-						</Tag>
-					</View>
-				)}
-			/>
-		</View>
+		<FlatList
+			overScrollMode="never"
+			horizontal
+			data={tags}
+			style={styles.tagsContainer}
+			testID={testID}
+			renderItem={({ item }) => (
+				<View style={styles.tagContainer}>
+					<Tag style={tagStyle}>
+						<StyledText style={styles.tag}>{item}</StyledText>
+					</Tag>
+				</View>
+			)}
+		/>
 	);
 }
 

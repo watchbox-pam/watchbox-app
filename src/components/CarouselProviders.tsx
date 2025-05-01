@@ -6,6 +6,7 @@ export default function CarouselProviders({
 }: {
 	providers: any;
 	tagStyle?: any;
+	testID?: string;
 }) {
 	return (
 		<View style={styles.container}>
@@ -13,6 +14,7 @@ export default function CarouselProviders({
 				overScrollMode="never"
 				data={providers}
 				horizontal
+				testID="carousel-providers"
 				renderItem={({ item }) => (
 					<View style={styles.imageContainer}>
 						<Image

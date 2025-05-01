@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 5,
 		paddingBottom: 3,
 		alignSelf: "flex-start",
-		justifyContent: "center"
+		justifyContent: "center",
+		zIndex: 1
 	}
 });

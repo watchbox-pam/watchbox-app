@@ -63,7 +63,10 @@ const MovieList: React.FC<MovieListProps> = ({
 					<Text style={styles.noPosterText}>Pas d'image</Text>
 				</View>
 			)}
-			<Text style={styles.movieTitle} numberOfLines={2}>
+			<Text
+				style={styles.movieTitle}
+				numberOfLines={2}
+				testID="movie-title">
 				{item.title}
 			</Text>
 		</Link>
