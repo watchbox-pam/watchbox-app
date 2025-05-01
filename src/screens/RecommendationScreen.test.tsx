@@ -2,6 +2,43 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import RecommendationScreen from "./RecommendationScreen";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 
+// Mock the animated API bs
+jest.mock("react-native", () => {
+	const RN = jest.requireActual("react-native");
+	RN.Animated = {
+		View: "Animated.View",
+		createAnimatedComponent: jest.fn(() => "Animated.Component"),
+		timing: jest.fn(() => ({
+			start: jest.fn((cb) => cb && cb())
+		})),
+		parallel: jest.fn(() => ({
+			start: jest.fn((cb) => cb && cb())
+		})),
+		Value: jest.fn((value) => ({
+			value,
+			setValue: jest.fn(),
+			interpolate: jest.fn(() => ({
+				interpolate: jest.fn()
+			})),
+			addListener: jest.fn(),
+			removeAllListeners: jest.fn()
+		}))
+	};
+
+	RN.TouchableOpacity = ({
+		children,
+		onPress
+	}: {
+		children: React.ReactNode;
+		onPress: () => void;
+	}) => {
+		return RN.createElement("TouchableOpacity", { onPress }, children);
+	};
+
+	return RN;
+});
+
+// Mock the RecommendationService
 jest.mock("@/src/services/RecommendationService", () => ({
 	fetchRecommendations: jest.fn()
 }));
