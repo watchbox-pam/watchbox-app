@@ -4,10 +4,12 @@ import { StyleSheet, Text, StyleProp, TextStyle } from "react-native";
 
 export default function StyledText({
 	children,
-	style
+	style,
+	testID
 }: {
 	children: React.ReactNode;
 	style?: StyleProp<TextStyle>;
+	testID?: string;
 }) {
 	const [fontsLoaded] = useFonts({
 		Oswald: require("@/src/assets/fonts/Oswald-VariableFont_wght.ttf")
