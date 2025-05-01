@@ -163,6 +163,17 @@ const styles = StyleSheet.create({
 	noImage: {
 		aspectRatio: 2 / 3,
 		backgroundColor: "#ccc"
+	},
+	errorContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20
+	},
+	errorText: {
+		color: "#ff6b6b",
+		textAlign: "center",
+		marginBottom: 20
 	}
 });
 
