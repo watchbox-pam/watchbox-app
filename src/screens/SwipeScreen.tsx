@@ -109,10 +109,8 @@ export default function App() {
 
 		if (direction === "right") {
 			setLikedMovies((prev) => [...prev, item]);
-			console.log("Liked: ", item.title);
 		} else {
 			setDislikedMovies((prev) => [...prev, item]);
-			console.log("Disliked: ", item.title);
 		}
 
 		setCurrentIndex((prev) => prev + 1);

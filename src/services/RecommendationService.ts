@@ -3,7 +3,7 @@ import { ApiHelper } from "@/src/utils/axios";
 export const fetchRecommendations = async (emotion: string) => {
 	try {
 		const response = await ApiHelper.get(
-			`/recommendations/emotion/${emotion}?limit=10`
+			`/recommendations/recommended/${emotion}`
 		);
 		return response;
 	} catch (err) {
