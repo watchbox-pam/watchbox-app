@@ -175,10 +175,10 @@ export default function RecommendationScreen() {
 			if (response.success) {
 				setMovies(response.data);
 			} else {
-				setError("Impossible de charger les recommendations.");
+				setError("Impossible de charger les recommandations.");
 			}
 		} catch (err) {
-			setError("Impossible de charger les recommendations.");
+			setError("Impossible de charger les recommandations.");
 		} finally {
 			setLoading(false);
 		}
