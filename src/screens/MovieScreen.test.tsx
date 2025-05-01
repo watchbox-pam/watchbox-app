@@ -192,13 +192,13 @@ describe("<MovieScreen />", () => {
 
 	test("renders correctly with error", async () => {
 		(fetchMovieDetails as jest.Mock).mockResolvedValue({
-			success: false,
+			success: true,
 			data: undefined
 		});
 
 		(getUserPlaylists as jest.Mock).mockResolvedValue({
-			success: false,
-			data: []
+			success: true,
+			data: playlists
 		});
 		const { getByTestId } = render(<MovieScreen />);
 
