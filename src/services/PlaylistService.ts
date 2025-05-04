@@ -65,7 +65,8 @@ export async function getUserPlaylists(userId: string) {
 	}
 
 	try {
-		const result = await ApiHelper.get(`/playlists/user/${userId}`);
+		const stringUserId = String(userId);
+		const result = await ApiHelper.get(`/playlists/user/${stringUserId}`);
 		return {
 			success: true,
 			data: result.data
@@ -132,8 +133,9 @@ export async function getMediaInPlaylist(playlistId: string) {
 	}
 
 	try {
+		const stringPlaylistId = String(playlistId);
 		const result = await ApiHelper.get(
-			`/playlists/${playlistId}/media_list`
+			`/playlists/${stringPlaylistId}/media_list`
 		);
 		return {
 			success: true,
