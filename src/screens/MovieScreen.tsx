@@ -292,7 +292,7 @@ export default function MovieScreen() {
 						)}
 					</View>
 				</View>
-				<CommentaryScreen />
+				<CommentaryScreen mediaId={id} />
 			</ScrollView>
 
 			<Modal

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import CommentSection from "../components/CommentSection";
 import SwitchButton from "../components/SwitchButton";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
+import styles from "@/src/styles/CommentaryStyle";
+import { Link } from "expo-router";
 
-const CommentaryScreen = () => {
+const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 	const [isMyComments, setIsMyComments] = useState(true);
 
 	const handleSwitch = () => {
@@ -19,30 +21,13 @@ const CommentaryScreen = () => {
 				<Text style={styles.CommentTitle}>Commentaires</Text>
 				{/*<Logo />*/}
 			</View>
+			<Link
+				style={styles.addComment}
+				href={`/movie/${mediaId}/review`}></Link>
 			<SwitchButton isOn={isMyComments} onToggle={handleSwitch} />
 			<CommentSection isMyComments={isMyComments} />
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#0A1E38",
-		width: "100%"
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		padding: 20
-	},
-	CommentTitle: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 10,
-		color: "#fff"
-	}
-});
 
 export default CommentaryScreen;
