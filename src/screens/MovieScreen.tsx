@@ -73,7 +73,12 @@ export default function MovieScreen() {
 	};
 
 	const handleAddToPlaylist = async () => {
-		if (selectedPlaylistId && id) {
+		if (!selectedPlaylistId) {
+			alert("Please select a playlist before adding the movie.");
+			return;
+		}
+
+		if (id) {
 			const response = await addMediaToPlaylist(
 				String(selectedPlaylistId),
 				Number(id)
@@ -82,8 +87,10 @@ export default function MovieScreen() {
 				alert("Movie added to playlist successfully!");
 				closeModal();
 			} else {
-				alert("Failed to add movie to playlist.");
+				alert(response.message || "Failed to add movie to playlist.");
 			}
+		} else {
+			alert("Invalid movie ID. Please try again.");
 		}
 	};
 
@@ -313,13 +320,20 @@ export default function MovieScreen() {
 									label="--Please choose a playlist--"
 									value=""
 								/>
-								{userPlaylists.map((playlist) => (
+								{userPlaylists.length > 0 ? (
+									userPlaylists.map((playlist) => (
+										<Picker.Item
+											key={playlist.id}
+											label={playlist.title}
+											value={playlist.id}
+										/>
+									))
+								) : (
 									<Picker.Item
-										key={playlist.id}
-										label={playlist.title}
-										value={playlist.id}
+										label="Error loading playlists. Please try again later."
+										value=""
 									/>
-								))}
+								)}
 							</Picker>
 						</View>
 						<View style={styles.modalButtons}>

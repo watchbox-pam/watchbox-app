@@ -65,7 +65,8 @@ export async function getUserPlaylists(userId: string) {
 	}
 
 	try {
-		const result = await ApiHelper.get(`/playlists/user/${userId}`);
+		const stringUserId = String(userId);
+		const result = await ApiHelper.get(`/playlists/user/${stringUserId}`);
 		return {
 			success: true,
 			data: result.data
@@ -123,6 +124,37 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 	}
 }
 
+export async function getMediaInPlaylist(playlistId: string) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	try {
+		const stringPlaylistId = String(playlistId);
+		const result = await ApiHelper.get(
+			`/playlists/${stringPlaylistId}/media_list`
+		);
+		return {
+			success: true,
+			data: Array.isArray(result.data) ? result.data : [] // Ensure data is always an array
+		};
+	} catch (error) {
+		console.error(
+			"Error in getMediaInPlaylist:",
+			error.response?.data || error.message || "Unknown error"
+		);
+		return {
+			success: false,
+			message:
+				error.message ||
+				"Erreur lors de la récupération des médias de la playlist"
+		};
+	}
+}
+
 export async function getPlaylistById(playlistId: string) {
 	if (!playlistId || typeof playlistId !== "string") {
 		return {
@@ -146,6 +178,46 @@ export async function getPlaylistById(playlistId: string) {
 			success: false,
 			message:
 				error.message || "Erreur lors de la récupération de la playlist"
+		};
+	}
+}
+
+export async function deleteMediaFromPlaylist(
+	playlistId: string,
+	mediaId: number
+) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	if (!mediaId || typeof mediaId !== "number") {
+		return {
+			success: false,
+			message: "ID du média invalide"
+		};
+	}
+
+	try {
+		const result = await ApiHelper.delete(
+			`/playlists/${playlistId}/media/${mediaId}`
+		);
+		return {
+			success: true,
+			message: "Média supprimé de la playlist avec succès"
+		};
+	} catch (error) {
+		console.error(
+			"Error in deleteMediaFromPlaylist:",
+			error.response?.data || error.message
+		);
+		return {
+			success: false,
+			message:
+				error.message ||
+				"Erreur lors de la suppression du média de la playlist"
 		};
 	}
 }
