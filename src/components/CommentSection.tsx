@@ -1,43 +1,47 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, FlatList, Image } from "react-native";
+import Stars from "@/src/components/Stars";
+import Review from "@/src/models/Review";
+import styles from "@/src/styles/CommentaryStyle";
+import React from "react";
+import StyledText from "./StyledText";
 
 interface CommentSectionProps {
 	isMyComments: boolean;
+	reviews: Review[];
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ isMyComments }) => {
-	const comments = isMyComments
-		? ["Mon premier commentaire", "J'aime ce film", "Très intéressant !"]
-		: [
-				"Commentaire de mon ami 1",
-				"Super film !",
-				"Je n'ai pas aimé ce film"
-			];
-
+const CommentSection: React.FC<CommentSectionProps> = ({
+	isMyComments,
+	reviews
+}) => {
 	return (
 		<View style={styles.commentContainer}>
-			{comments.map((comment, index) => (
-				<Text key={index} style={styles.comment}>
-					{comment}
-				</Text>
-			))}
+			<FlatList
+				scrollEnabled={false}
+				data={reviews}
+				renderItem={({ item }) => (
+					<View style={styles.comment} key={item.id}>
+						<View style={styles.commentTop}>
+							<View style={styles.userInfo}>
+								<Image
+									source={require("../assets/images/Interstellar-film1.png")}
+									style={styles.userPicture}
+								/>
+								<StyledText style={styles.userName}>
+									{item.user?.username}
+								</StyledText>
+							</View>
+							{item.rating !== null &&
+								item.rating !== undefined && (
+									<Stars rating={item.rating} />
+								)}
+						</View>
+						<StyledText>{item.comment}</StyledText>
+					</View>
+				)}
+			/>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	commentContainer: {
-		width: "100%",
-		paddingHorizontal: 20,
-		paddingVertical: 10
-	},
-	comment: {
-		fontSize: 16,
-		marginVertical: 5,
-		color: "#fff",
-		padding: 15,
-		backgroundColor: "#326bbb",
-		borderRadius: 8
-	}
-});
 
 export default CommentSection;

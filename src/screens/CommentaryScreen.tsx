@@ -1,48 +1,53 @@
-import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
 import CommentSection from "../components/CommentSection";
 import SwitchButton from "../components/SwitchButton";
-import BackButton from "../components/BackButton";
-import Logo from "../components/Logo";
+import styles from "@/src/styles/CommentaryStyle";
+import { Link } from "expo-router";
+import { getReviewsByMedia } from "@/src/services/ReviewService";
+import StyledText from "../components/StyledText";
 
-const CommentaryScreen = () => {
+const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 	const [isMyComments, setIsMyComments] = useState(true);
+	const [reviews, setReviews] = useState([]);
 
 	const handleSwitch = () => {
 		setIsMyComments((prevState) => !prevState);
 	};
 
+	const fetchReviews = async () => {
+		try {
+			const result = await getReviewsByMedia(parseInt(mediaId));
+			if (result.success) {
+				setReviews(result.data);
+			}
+		} catch (error: any) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchReviews();
+	}, []);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				{/*<BackButton />*/}
 				<Text style={styles.CommentTitle}>Commentaires</Text>
-				{/*<Logo />*/}
+				<Link
+					style={styles.addComment}
+					href={`/movie/${mediaId}/review`}>
+					Ajouter une review
+				</Link>
 			</View>
 			<SwitchButton isOn={isMyComments} onToggle={handleSwitch} />
-			<CommentSection isMyComments={isMyComments} />
+			{reviews.length > 0 ? (
+				<CommentSection isMyComments={isMyComments} reviews={reviews} />
+			) : (
+				<StyledText>Aucun commentaire</StyledText>
+			)}
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#0A1E38",
-		width: "100%"
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		padding: 20
-	},
-	CommentTitle: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 10,
-		color: "#fff"
-	}
-});
 
 export default CommentaryScreen;
