@@ -29,13 +29,6 @@ export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
-	const providers = [
-		"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-		"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-		"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
-		"/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
-		"/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg"
-	];
 
 	const { id } = useLocalSearchParams();
 	const [profileData, setProfileData] = useState(null);
@@ -70,6 +63,7 @@ export default function Index() {
 			setModalVisible(false);
 			setPlaylistTitle("");
 			setIsPrivate(false);
+			await fetchUserPlaylists(userId);
 		} else {
 			alert(
 				result.message ||
@@ -228,7 +222,7 @@ export default function Index() {
 									{playlist.title}
 								</Text>
 							</View>
-							<CarouselWatchList providers={userPlaylists} />
+							<CarouselWatchList providers={playlist} />
 						</View>
 					))
 				) : (
@@ -237,25 +231,6 @@ export default function Index() {
 					</Text>
 				)}
 			</View>
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>Historique Film</Text>
-				<CarouselWatchList providers={providers} />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>WatchList Séries</Text>
-				<CarouselWatchList providers={providers} />
-			</View>
-
-			<View style={styles.WatchList}>
-				<Text style={styles.TitleWatchList}>Historique Séries</Text>
-				<CarouselWatchList providers={providers} />
-			</View>
-
-			<TraitGradiant />
 
 			<Stats />
 		</ScrollView>
