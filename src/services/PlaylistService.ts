@@ -181,3 +181,43 @@ export async function getPlaylistById(playlistId: string) {
 		};
 	}
 }
+
+export async function deleteMediaFromPlaylist(
+	playlistId: string,
+	mediaId: number
+) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+
+	if (!mediaId || typeof mediaId !== "number") {
+		return {
+			success: false,
+			message: "ID du média invalide"
+		};
+	}
+
+	try {
+		const result = await ApiHelper.delete(
+			`/playlists/${playlistId}/media/${mediaId}`
+		);
+		return {
+			success: true,
+			message: "Média supprimé de la playlist avec succès"
+		};
+	} catch (error) {
+		console.error(
+			"Error in deleteMediaFromPlaylist:",
+			error.response?.data || error.message
+		);
+		return {
+			success: false,
+			message:
+				error.message ||
+				"Erreur lors de la suppression du média de la playlist"
+		};
+	}
+}

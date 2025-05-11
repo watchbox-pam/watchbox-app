@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View, Image, Text } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
 
 export default function CarouselWatchList({ providers }: { providers: any }) {
@@ -9,6 +9,7 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 	}
 
 	const [movies, setMovies] = useState<Movie[]>([]);
+	const router = useRouter();
 
 	useEffect(() => {
 		const fetchMoviesForPlaylist = async () => {
@@ -22,11 +23,11 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 							"Error fetching movies for playlist or invalid data format:",
 							result.message
 						);
-						setMovies([]); // Ensure movies is always an array
+						setMovies([]);
 					}
 				} catch (error) {
 					console.error("Error in fetchMoviesForPlaylist:", error);
-					setMovies([]); // Ensure movies is always an array
+					setMovies([]);
 				}
 			}
 		};
@@ -53,7 +54,10 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 						<Link
 							href={{
 								pathname: "/watchList/[id]",
-								params: { id: index.toString() }
+								params: {
+									id: providers.id,
+									movies: JSON.stringify(filteredMovies)
+								}
 							}}
 							style={styles.imageContainer}>
 							<Image
