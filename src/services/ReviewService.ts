@@ -1,9 +1,9 @@
 import { ApiHelper } from "@/src/utils/axios";
 import Review from "@/src/models/Review";
 
-const createReview = async (review: Review) => {
+export const createReview = async (review: Review) => {
 	try {
-		const response = await ApiHelper.post("/review/", {
+		const response = await ApiHelper.post("/reviews/", {
 			id: "",
 			rating: review.rating,
 			comment: review.comment,
@@ -12,7 +12,11 @@ const createReview = async (review: Review) => {
 			tv_id: null,
 			tv_episode_id: null,
 			user_id: review.userId,
-			created_at: Date.now()
+			created_at: Date.now(),
+			user: {
+				username: "",
+				picture: ""
+			}
 		});
 		if (response.success) {
 			return {
@@ -33,4 +37,24 @@ const createReview = async (review: Review) => {
 	}
 };
 
-export default createReview;
+export const getReviewsByMedia = async (mediaId: number) => {
+	try {
+		const response = await ApiHelper.get(`/reviews/movie/${mediaId}`);
+		if (response.success) {
+			return {
+				data: response.data,
+				success: true
+			};
+		} else {
+			return {
+				data: [],
+				success: false
+			};
+		}
+	} catch (error: any) {
+		return {
+			data: [],
+			success: false
+		};
+	}
+};

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 	},
 	addComment: {
 		backgroundColor: "#AC2128",
-		width: "75%",
+		width: "auto",
 		borderRadius: 12,
 		padding: 10,
 		alignItems: "center",
@@ -28,6 +28,36 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontWeight: "bold",
 		fontSize: 17
+	},
+	commentContainer: {
+		width: "100%",
+		paddingHorizontal: 20,
+		paddingVertical: 10
+	},
+	comment: {
+		fontSize: 16,
+		marginVertical: 5,
+		color: "#fff",
+		paddingVertical: 15
+	},
+	commentTop: {
+		flexDirection: "row",
+		width: "100%",
+		justifyContent: "space-between",
+		alignItems: "center"
+	},
+	userInfo: {
+		flexDirection: "row",
+		alignItems: "center"
+	},
+	userPicture: {
+		width: "30%",
+		aspectRatio: 1,
+		borderRadius: 100,
+		marginEnd: 10
+	},
+	userName: {
+		fontWeight: "bold"
 	}
 });
 

@@ -6,7 +6,7 @@ import { useState } from "react";
 import useSessionStore from "@/src/zustand/sessionStore";
 import Review from "@/src/models/Review";
 import { router, useLocalSearchParams } from "expo-router";
-import createReview from "@/src/services/ReviewService";
+import { createReview } from "@/src/services/ReviewService";
 export default function ReviewScreen() {
 	const { id } = useLocalSearchParams();
 	const currentUser = useSessionStore((state: any) => state.user);
@@ -34,6 +34,7 @@ export default function ReviewScreen() {
 	return (
 		<View style={styles.container}>
 			<StyledText style={styles.title}>Ajouter une review</StyledText>
+			<StyledText>{rating}</StyledText>
 			<Slider
 				step={1}
 				minimumValue={0}
