@@ -2,14 +2,15 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	headers: {
-		position: "absolute",
-		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		paddingHorizontal: 25,
-		zIndex: 100,
 		alignItems: "center",
-		paddingVertical: 10
+		paddingHorizontal: 25,
+		paddingVertical: 10,
+		zIndex: 100,
+		width: "100%",
+		position: "absolute",
+		top: 0
 	},
 	container: {
 		backgroundColor: "#0A1E38",
