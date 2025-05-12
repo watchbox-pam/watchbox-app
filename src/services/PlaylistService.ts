@@ -66,22 +66,47 @@ export async function updatePlaylist(playlist: Playlist) {
 	}
 
 	try {
-		const restrictedNames = ["watchlist", "historique", "favoris"];
-		const toLowerCaseTitle = playlist.title.toLowerCase();
-		if (restrictedNames.includes(toLowerCaseTitle)) {
-			return {
-				success: false,
-				message: "Veuillez choisir un autre nom de playlist",
-				element: "title"
-			};
+		let currentPlaylist: { title?: string; is_private?: boolean } = {};
+
+		if (
+			!playlist.title ||
+			playlist.is_private === undefined ||
+			playlist.is_private === null
+		) {
+			const currentDetails = await getPlaylistById(playlist.id);
+			console.log("Current playlist details fetched:", currentDetails);
+			if (currentDetails.success) {
+				currentPlaylist = currentDetails.data;
+			} else {
+				return {
+					success: false,
+					message:
+						"Impossible de récupérer les détails actuels de la playlist"
+				};
+			}
 		}
+
+		console.log("Data being sent to the backend:", {
+			id: playlist.id,
+			title: playlist.title || currentPlaylist.title,
+			is_private:
+				playlist.is_private !== undefined &&
+				playlist.is_private !== null
+					? playlist.is_private
+					: currentPlaylist.is_private
+		});
 
 		const result = await ApiHelper.put(`/playlists/${playlist.id}`, {
 			id: playlist.id,
-			user_id: playlist.user_id,
-			title: playlist.title,
-			is_private: playlist.is_private
+			title: playlist.title || currentPlaylist.title,
+			is_private:
+				playlist.is_private !== undefined &&
+				playlist.is_private !== null
+					? playlist.is_private
+					: currentPlaylist.is_private
 		});
+
+		console.log("Backend response:", result);
 
 		if (result.success) {
 			return {
@@ -97,46 +122,12 @@ export async function updatePlaylist(playlist: Playlist) {
 			};
 		}
 	} catch (error) {
-		const err = error as any;
+		const err = error as any; // Explicitly cast error to 'any'
 		console.error("Error during updatePlaylist:", err);
 		return {
 			success: false,
 			message:
 				err.message || "Erreur lors de la mise à jour de la playlist"
-		};
-	}
-}
-
-export async function deletePlaylist(playlistId: string) {
-	if (!playlistId || typeof playlistId !== "string") {
-		return {
-			success: false,
-			message: "ID de la playlist invalide"
-		};
-	}
-	try {
-		const stringPlaylistId = String(playlistId);
-		const result = await ApiHelper.delete(`/playlists/${stringPlaylistId}`);
-		if (result.success) {
-			return {
-				success: true,
-				message: "Playlist supprimée avec succès"
-			};
-		} else {
-			return {
-				success: false,
-				message:
-					result.data ||
-					"Erreur lors de la suppression de la playlist"
-			};
-		}
-	} catch (error) {
-		const err = error as any;
-		console.error("Error during deletePlaylist:", err);
-		return {
-			success: false,
-			message:
-				err.message || "Erreur lors de la suppression de la playlist"
 		};
 	}
 }
@@ -159,16 +150,12 @@ export async function getUserPlaylists(userId: string) {
 	} catch (error) {
 		console.error(
 			"Error in getUserPlaylists:",
-			(error as any).response?.data ||
-				(error as any).message(error as any).response?.data ||
-				(error as any).message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
 				(error as any).message ||
-				"Erreur lors de la récupération des playlists"(error as any)
-					.message ||
 				"Erreur lors de la récupération des playlists"
 		};
 	}
@@ -197,28 +184,20 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 				media_id: mediaId
 			}
 		);
-
-		if (result && result.success) {
-			return {
-				success: true,
-				message: "Média ajouté à la playlist avec succès"
-			};
-		} else {
-			return {
-				success: false,
-				message:
-					result?.data?.detail ||
-					"Film déjà existant dans la playlist"
-			};
-		}
-	} catch (error: any) {
-		console.error("Error in addMediaToPlaylist:", error);
+		return {
+			success: true,
+			message: "Média ajouté à la playlist avec succès"
+		};
+	} catch (error) {
+		console.error(
+			"Error in addMediaToPlaylist:",
+			(error as any).response?.data || (error as any).message
+		);
 		return {
 			success: false,
 			message:
-				error?.response?.data?.detail ||
-				error.message ||
-				"Erreur inconnue lors de l'ajout du média"
+				(error as any).message ||
+				"Erreur lors de l'ajout du média à la playlist"
 		};
 	}
 }
@@ -245,14 +224,11 @@ export async function getMediaInPlaylist(playlistId: string) {
 			"Error in getMediaInPlaylist:",
 			(error as any).response?.data ||
 				(error as any).message ||
-				"Unknown error"(error as any).response?.data ||
-				(error as any).message ||
 				"Unknown error"
 		);
 		return {
 			success: false,
 			message:
-				(error as any).message ||
 				(error as any).message ||
 				"Erreur lors de la récupération des médias de la playlist"
 		};
@@ -276,16 +252,12 @@ export async function getPlaylistById(playlistId: string) {
 	} catch (error) {
 		console.error(
 			"Error in getPlaylistById:",
-			(error as any).response?.data ||
-				(error as any).message(error as any).response?.data ||
-				(error as any).message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
 				(error as any).message ||
-				"Erreur lors de la récupération de la playlist"(error as any)
-					.message ||
 				"Erreur lors de la récupération de la playlist"
 		};
 	}
@@ -320,14 +292,11 @@ export async function deleteMediaFromPlaylist(
 	} catch (error) {
 		console.error(
 			"Error in deleteMediaFromPlaylist:",
-			(error as any).response?.data ||
-				(error as any).message(error as any).response?.data ||
-				(error as any).message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
-				(error as any).message ||
 				(error as any).message ||
 				"Erreur lors de la suppression du média de la playlist"
 		};
