@@ -66,47 +66,22 @@ export async function updatePlaylist(playlist: Playlist) {
 	}
 
 	try {
-		let currentPlaylist: { title?: string; is_private?: boolean } = {};
-
-		if (
-			!playlist.title ||
-			playlist.is_private === undefined ||
-			playlist.is_private === null
-		) {
-			const currentDetails = await getPlaylistById(playlist.id);
-			console.log("Current playlist details fetched:", currentDetails);
-			if (currentDetails.success) {
-				currentPlaylist = currentDetails.data;
-			} else {
-				return {
-					success: false,
-					message:
-						"Impossible de récupérer les détails actuels de la playlist"
-				};
-			}
+		const restrictedNames = ["watchlist", "historique", "favoris"];
+		const toLowerCaseTitle = playlist.title.toLowerCase();
+		if (restrictedNames.includes(toLowerCaseTitle)) {
+			return {
+				success: false,
+				message: "Veuillez choisir un autre nom de playlist",
+				element: "title"
+			};
 		}
-
-		console.log("Data being sent to the backend:", {
-			id: playlist.id,
-			title: playlist.title || currentPlaylist.title,
-			is_private:
-				playlist.is_private !== undefined &&
-				playlist.is_private !== null
-					? playlist.is_private
-					: currentPlaylist.is_private
-		});
 
 		const result = await ApiHelper.put(`/playlists/${playlist.id}`, {
 			id: playlist.id,
-			title: playlist.title || currentPlaylist.title,
-			is_private:
-				playlist.is_private !== undefined &&
-				playlist.is_private !== null
-					? playlist.is_private
-					: currentPlaylist.is_private
+			user_id: playlist.user_id,
+			title: playlist.title,
+			is_private: playlist.is_private
 		});
-
-		console.log("Backend response:", result);
 
 		if (result.success) {
 			return {
