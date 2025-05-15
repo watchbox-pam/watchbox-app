@@ -55,7 +55,6 @@ export default function Index() {
 			);
 	}, [playlistTitle]);
 
-	// Add logging to debug the data being sent to the backend
 	const handleUpdatePlaylist = async () => {
 		const userId = currentUser && currentUser.id;
 		const playlist: Playlist = {
@@ -67,8 +66,6 @@ export default function Index() {
 			is_private: isPrivate,
 			created_at: new Date()
 		};
-
-		console.log("Playlist to backend:", playlist); // Log the playlist object
 
 		const result = await updatePlaylist(playlist);
 
