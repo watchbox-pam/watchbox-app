@@ -97,7 +97,7 @@ export async function updatePlaylist(playlist: Playlist) {
 			};
 		}
 	} catch (error) {
-		const err = error as any; // Explicitly cast error to 'any'
+		const err = error as any;
 		console.error("Error during updatePlaylist:", err);
 		return {
 			success: false,
@@ -192,7 +192,7 @@ export async function getMediaInPlaylist(playlistId: string) {
 		);
 		return {
 			success: true,
-			data: Array.isArray(result.data) ? result.data : [] // Ensure data is always an array
+			data: Array.isArray(result.data) ? result.data : []
 		};
 	} catch (error) {
 		console.error(
