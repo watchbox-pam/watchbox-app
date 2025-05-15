@@ -8,15 +8,22 @@ import {
 	Image,
 	Text,
 	ScrollView,
-	TouchableOpacity
+	TouchableOpacity,
+	Modal,
+	TextInput,
+	Switch,
+	Button
 } from "react-native";
 import { fetchMovieDetails } from "../services/MovieDetailService";
 import StyledText from "../components/StyledText";
 import {
 	deleteMediaFromPlaylist,
-	getPlaylistById
+	getPlaylistById,
+	updatePlaylist
 } from "../services/PlaylistService";
 import { MaterialIcons } from "@expo/vector-icons";
+import Playlist from "../models/Playlist";
+import useSessionStore from "../zustand/sessionStore";
 
 export default function Index() {
 	const { id, movies } = useLocalSearchParams();
@@ -27,7 +34,55 @@ export default function Index() {
 	);
 	const [movieList, setMovieList] =
 		useState<{ id: number; [key: string]: any }[]>(parsedMovies);
+	const currentUser = useSessionStore((state) => state.user);
 	const [playlistTitle, setPlaylistTitle] = useState(id);
+	const [editModalVisible, setEditModalVisible] = useState(false);
+	const [editedTitle, setEditedTitle] = useState("");
+	const [isPrivate, setIsPrivate] = useState(false);
+
+	const restrictedNames = ["Watchlist", "Historique", "Favoris"];
+	const normalizedPlaylistTitle = Array.isArray(playlistTitle)
+		? playlistTitle[0]
+		: playlistTitle;
+	const shouldShowEditButton = !restrictedNames.includes(
+		normalizedPlaylistTitle
+	);
+
+	useEffect(() => {
+		if (playlistTitle)
+			setEditedTitle(
+				Array.isArray(playlistTitle) ? playlistTitle[0] : playlistTitle
+			);
+	}, [playlistTitle]);
+
+	// Add logging to debug the data being sent to the backend
+	const handleUpdatePlaylist = async () => {
+		const userId = currentUser && currentUser.id;
+		const playlist: Playlist = {
+			id: stringifiedId,
+			user_id: userId,
+			title: Array.isArray(editedTitle)
+				? editedTitle[0]
+				: editedTitle || playlistTitle,
+			is_private: isPrivate,
+			created_at: new Date()
+		};
+
+		console.log("Playlist to backend:", playlist); // Log the playlist object
+
+		const result = await updatePlaylist(playlist);
+
+		if (result.success) {
+			setPlaylistTitle(playlist.title);
+			setEditModalVisible(false);
+			alert("Playlist mise à jour avec succès");
+		} else {
+			alert(
+				result.message ||
+					"Erreur lors de la mise à jour de la playlist."
+			);
+		}
+	};
 
 	useEffect(() => {
 		const fetchMovies = async () => {
@@ -87,11 +142,61 @@ export default function Index() {
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
 			overScrollMode="never">
+			<Modal
+				visible={editModalVisible}
+				transparent={true}
+				animationType="slide"
+				onRequestClose={() => setEditModalVisible(false)}>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>
+							Modifier la playlist
+						</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Titre de la playlist"
+							placeholderTextColor="#888"
+							value={editedTitle}
+							onChangeText={setEditedTitle}
+						/>
+						<View style={styles.switchContainer}>
+							<Text style={styles.switchLabel}>Privée ?</Text>
+							<Switch
+								value={isPrivate}
+								onValueChange={setIsPrivate}
+								trackColor={{
+									false: "#767577",
+									true: "#81b0ff"
+								}}
+								thumbColor={isPrivate ? "#EBDDFF" : "#f4f3f4"}
+							/>
+						</View>
+						<View style={styles.modalButtons}>
+							<Button
+								title="Annuler"
+								onPress={() => setEditModalVisible(false)}
+							/>
+							<Button
+								title="Sauvegarder"
+								onPress={handleUpdatePlaylist}
+							/>
+						</View>
+					</View>
+				</View>
+			</Modal>
 			<View style={styles.headers}>
 				<BackButton />
 				<Text style={styles.playlistName}>{playlistTitle}</Text>
+				{shouldShowEditButton && (
+					<TouchableOpacity
+						style={styles.editButton}
+						onPress={() => setEditModalVisible(true)}>
+						<MaterialIcons name="edit" size={24} color="#EBDDFF" />
+					</TouchableOpacity>
+				)}
 				<LogoButton />
 			</View>
+
 			{movieList !== null && movieList?.length > 0 ? (
 				movieList.map((movie) => {
 					return (
@@ -155,6 +260,9 @@ const styles = StyleSheet.create({
 		zIndex: 100,
 		alignItems: "center",
 		paddingVertical: 10
+	},
+	editButton: {
+		top: -10
 	},
 	container: {
 		width: "100%",
@@ -225,5 +333,54 @@ const styles = StyleSheet.create({
 	deleteIcon: {
 		marginLeft: 10,
 		alignSelf: "center"
+	},
+	modalOverlay: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0,0,0,0.5)"
+	},
+
+	modalContent: {
+		backgroundColor: "#0A1E38",
+		borderRadius: 10,
+		padding: 20,
+		width: "80%",
+		alignItems: "center"
+	},
+
+	modalTitle: {
+		fontSize: 18,
+		color: "#FFFFFF",
+		fontWeight: "bold",
+		marginBottom: 15
+	},
+
+	input: {
+		backgroundColor: "#1E2D4F",
+		color: "#FFFFFF",
+		width: "100%",
+		padding: 10,
+		marginBottom: 15,
+		borderRadius: 5
+	},
+
+	switchContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		width: "100%",
+		marginBottom: 20
+	},
+
+	switchLabel: {
+		color: "#FFFFFF",
+		fontSize: 16
+	},
+
+	modalButtons: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%"
 	}
 });
