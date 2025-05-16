@@ -107,6 +107,40 @@ export async function updatePlaylist(playlist: Playlist) {
 	}
 }
 
+export async function deletePlaylist(playlistId: string) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+	try {
+		const stringPlaylistId = String(playlistId);
+		const result = await ApiHelper.delete(`/playlists/${stringPlaylistId}`);
+		if (result.success) {
+			return {
+				success: true,
+				message: "Playlist supprimée avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result.data ||
+					"Erreur lors de la suppression de la playlist"
+			};
+		}
+	} catch (error) {
+		const err = error as any;
+		console.error("Error during deletePlaylist:", err);
+		return {
+			success: false,
+			message:
+				err.message || "Erreur lors de la suppression de la playlist"
+		};
+	}
+}
+
 export async function getUserPlaylists(userId: string) {
 	if (!userId || typeof userId !== "string") {
 		return {
@@ -163,20 +197,28 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 				media_id: mediaId
 			}
 		);
-		return {
-			success: true,
-			message: "Média ajouté à la playlist avec succès"
-		};
-	} catch (error) {
-		console.error(
-			"Error in addMediaToPlaylist:",
-			(error as any).response?.data || (error as any).message
-		);
+
+		if (result && result.success) {
+			return {
+				success: true,
+				message: "Média ajouté à la playlist avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result?.data?.detail ||
+					"Film déjà existant dans la playlist"
+			};
+		}
+	} catch (error: any) {
+		console.error("Error in addMediaToPlaylist:", error);
 		return {
 			success: false,
 			message:
-				(error as any).message ||
-				"Erreur lors de l'ajout du média à la playlist"
+				error?.response?.data?.detail ||
+				error.message ||
+				"Erreur inconnue lors de l'ajout du média"
 		};
 	}
 }
