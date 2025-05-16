@@ -1,5 +1,4 @@
 import BackButton from "../components/BackButton";
-import LogoButton from "../components/Logo";
 import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -8,22 +7,16 @@ import {
 	Image,
 	Text,
 	ScrollView,
-	TouchableOpacity,
-	Modal,
-	TextInput,
-	Switch,
-	Button
+	TouchableOpacity
 } from "react-native";
 import { fetchMovieDetails } from "../services/MovieDetailService";
 import StyledText from "../components/StyledText";
 import {
 	deleteMediaFromPlaylist,
-	getPlaylistById,
-	updatePlaylist
+	getPlaylistById
 } from "../services/PlaylistService";
 import { MaterialIcons } from "@expo/vector-icons";
-import Playlist from "../models/Playlist";
-import useSessionStore from "../zustand/sessionStore";
+import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
 
 export default function Index() {
 	const { id, movies } = useLocalSearchParams();
@@ -34,9 +27,7 @@ export default function Index() {
 	);
 	const [movieList, setMovieList] =
 		useState<{ id: number; [key: string]: any }[]>(parsedMovies);
-	const currentUser = useSessionStore((state) => state.user);
 	const [playlistTitle, setPlaylistTitle] = useState(id);
-	const [editModalVisible, setEditModalVisible] = useState(false);
 	const [editedTitle, setEditedTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 
@@ -54,32 +45,6 @@ export default function Index() {
 				Array.isArray(playlistTitle) ? playlistTitle[0] : playlistTitle
 			);
 	}, [playlistTitle]);
-
-	const handleUpdatePlaylist = async () => {
-		const userId = currentUser && currentUser.id;
-		const playlist: Playlist = {
-			id: stringifiedId,
-			user_id: userId,
-			title: Array.isArray(editedTitle)
-				? editedTitle[0]
-				: editedTitle || playlistTitle,
-			is_private: isPrivate,
-			created_at: new Date()
-		};
-
-		const result = await updatePlaylist(playlist);
-
-		if (result.success) {
-			setPlaylistTitle(playlist.title);
-			setEditModalVisible(false);
-			alert("Playlist mise à jour avec succès");
-		} else {
-			alert(
-				result.message ||
-					"Erreur lors de la mise à jour de la playlist."
-			);
-		}
-	};
 
 	useEffect(() => {
 		const fetchMovies = async () => {
@@ -139,59 +104,20 @@ export default function Index() {
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
 			overScrollMode="never">
-			<Modal
-				visible={editModalVisible}
-				transparent={true}
-				animationType="slide"
-				onRequestClose={() => setEditModalVisible(false)}>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						<Text style={styles.modalTitle}>
-							Modifier la playlist
-						</Text>
-						<TextInput
-							style={styles.input}
-							placeholder="Titre de la playlist"
-							placeholderTextColor="#888"
-							value={editedTitle}
-							onChangeText={setEditedTitle}
-						/>
-						<View style={styles.switchContainer}>
-							<Text style={styles.switchLabel}>Privée ?</Text>
-							<Switch
-								value={isPrivate}
-								onValueChange={setIsPrivate}
-								trackColor={{
-									false: "#767577",
-									true: "#81b0ff"
-								}}
-								thumbColor={isPrivate ? "#EBDDFF" : "#f4f3f4"}
-							/>
-						</View>
-						<View style={styles.modalButtons}>
-							<Button
-								title="Annuler"
-								onPress={() => setEditModalVisible(false)}
-							/>
-							<Button
-								title="Sauvegarder"
-								onPress={handleUpdatePlaylist}
-							/>
-						</View>
-					</View>
-				</View>
-			</Modal>
 			<View style={styles.headers}>
 				<BackButton />
 				<Text style={styles.playlistName}>{playlistTitle}</Text>
 				{shouldShowEditButton && (
-					<TouchableOpacity
-						style={styles.editButton}
-						onPress={() => setEditModalVisible(true)}>
-						<MaterialIcons name="edit" size={24} color="#EBDDFF" />
-					</TouchableOpacity>
+					<DropDownModifyPlaylist
+						playlistId={stringifiedId}
+						initialTitle={normalizedPlaylistTitle}
+						initialIsPrivate={isPrivate}
+						onUpdate={({ title, is_private }) => {
+							setPlaylistTitle(title);
+							setIsPrivate(is_private);
+						}}
+					/>
 				)}
-				<LogoButton />
 			</View>
 
 			{movieList !== null && movieList?.length > 0 ? (
@@ -320,7 +246,8 @@ const styles = StyleSheet.create({
 		color: "#FFFFFF",
 		fontSize: 25,
 		fontWeight: "bold",
-		marginBottom: 30
+		marginBottom: 30,
+		marginLeft: 10
 	},
 	deleteIconContainer: {
 		justifyContent: "center",
