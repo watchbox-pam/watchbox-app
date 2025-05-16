@@ -43,13 +43,6 @@ const DropDownModifyPlaylist = ({
 	useEffect(() => {
 		setIsPrivate(initialIsPrivate);
 	}, [initialIsPrivate]);
-	useEffect(() => {
-		if (editModalVisible) {
-			setEditedTitle(initialTitle);
-			setIsPrivate(initialIsPrivate);
-		}
-	}, [editModalVisible, initialTitle, initialIsPrivate]);
-	console.log("initialIsPrivate", initialIsPrivate);
 
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
@@ -151,15 +144,19 @@ const DropDownModifyPlaylist = ({
 								value={editedTitle}
 								onChangeText={setEditedTitle}
 							/>
-							<View style={styles.checkboxContainer}>
-								<TouchableOpacity
-									style={[
-										styles.checkbox,
-										isPrivate && styles.checkboxChecked
-									]}
-									onPress={() => setIsPrivate(!isPrivate)}
+							<View style={styles.switchContainer}>
+								<Text style={styles.switchLabel}>Privée ?</Text>
+								<Switch
+									value={isPrivate}
+									onValueChange={setIsPrivate}
+									trackColor={{
+										false: "#767577",
+										true: "#81b0ff"
+									}}
+									thumbColor={
+										isPrivate ? "#EBDDFF" : "#f4f3f4"
+									}
 								/>
-								<Text style={styles.checkboxLabel}>Privée</Text>
 							</View>
 							<View style={styles.modalButtons}>
 								<Button
@@ -299,25 +296,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "rgba(0,0,0,0.5)"
-	},
-	checkboxContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 20
-	},
-	checkbox: {
-		width: 20,
-		height: 20,
-		borderWidth: 1,
-		borderColor: "#ccc",
-		marginRight: 10
-	},
-	checkboxChecked: {
-		backgroundColor: "#1E90FF"
-	},
-	checkboxLabel: {
-		fontSize: 16,
-		color: "#fff"
 	},
 	switchContainer: {
 		flexDirection: "row",
