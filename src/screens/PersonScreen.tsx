@@ -140,10 +140,15 @@ export default function PersonScreen() {
 						</StyledText>
 						{person?.birthday && (
 							<StyledText style={styles.birthPlaceLabel}>
-								lieu de naissance{" "}
-								<StyledText style={styles.birthPlaceValue}>
-									{person?.place_of_birth}
-								</StyledText>
+								{person?.place_of_birth && (
+									<StyledText>
+										lieu de naissance{" "}
+										<StyledText
+											style={styles.birthPlaceValue}>
+											{person?.place_of_birth}
+										</StyledText>
+									</StyledText>
+								)}
 							</StyledText>
 						)}
 						{person?.birthday && (
