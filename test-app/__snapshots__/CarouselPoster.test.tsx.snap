@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CarouselPoster Component rend un conteneur vide quand aucune donnée n'est fournie 1`] = `
+<View
+  style={
+    {
+      "height": 160,
+      "paddingLeft": 10,
+    }
+  }
+/>
+`;
+
+exports[`CarouselPoster Component rend un conteneur vide quand data est null ou undefined 1`] = `
+<View
+  style={
+    {
+      "height": 160,
+      "paddingLeft": 10,
+    }
+  }
+/>
+`;
+
+exports[`CarouselPoster Component rend un conteneur vide quand data est null ou undefined 2`] = `
+<View
+  style={
+    {
+      "height": 160,
+      "paddingLeft": 10,
+    }
+  }
+/>
+`;
