@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
 	container: {
 		marginVertical: 15, // Espacement du dessous
 		alignItems: "center",
-		width: "100%"
+		width: "100%",
+		zIndex: -1
 	},
 	gradientLine: {
 		width: "90%", // Largeur du trait
