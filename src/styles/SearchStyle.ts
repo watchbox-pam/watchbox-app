@@ -79,9 +79,12 @@ const styles = StyleSheet.create({
 		marginLeft: "5%"
 	},
 	resultTitle: {
+		flex: 1,
 		color: "#EBDDFF",
 		fontWeight: "bold",
-		fontSize: 20
+		fontSize: 20,
+		flexWrap: "wrap",
+		width: "90%"
 	},
 	resultYear: {
 		color: "#fff",
@@ -100,6 +103,17 @@ const styles = StyleSheet.create({
 		margin: "auto",
 		height: "100%",
 		fontSize: 30
+	},
+	sectionTitle: {
+		fontSize: 24,
+		color: "#fff",
+		marginVertical: 10,
+		fontWeight: "bold"
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
 	}
 });
 
