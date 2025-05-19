@@ -17,7 +17,6 @@ import StyledText from "../components/StyledText";
 export default function SearchScreen() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [results, setResults] = useState<Movie[]>([]);
-	const [category, setCategory] = useState("all");
 	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
 
 	const filters = [

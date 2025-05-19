@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, Animated } from "react-native";
+import { View, ScrollView } from "react-native";
 import EmotionCard from "./EmotionsCard";
 import styles from "@/src/styles/EmotionListStyle";
 import Emotion from "@/src/models/Emotion";

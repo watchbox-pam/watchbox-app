@@ -28,6 +28,7 @@ const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 
 	useEffect(() => {
 		fetchReviews();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

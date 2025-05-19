@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
-import { Text, View, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, ScrollView } from "react-native";
 
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
