@@ -56,6 +56,91 @@ export async function createPlaylist(playlist: Playlist) {
 	}
 }
 
+export async function updatePlaylist(playlist: Playlist) {
+	if (!playlist.id) {
+		return {
+			success: false,
+			message: "L'identifiant de la playlist est requis",
+			element: "id"
+		};
+	}
+
+	try {
+		const restrictedNames = ["watchlist", "historique", "favoris"];
+		const toLowerCaseTitle = playlist.title.toLowerCase();
+		if (restrictedNames.includes(toLowerCaseTitle)) {
+			return {
+				success: false,
+				message: "Veuillez choisir un autre nom de playlist",
+				element: "title"
+			};
+		}
+
+		const result = await ApiHelper.put(`/playlists/${playlist.id}`, {
+			id: playlist.id,
+			user_id: playlist.user_id,
+			title: playlist.title,
+			is_private: playlist.is_private
+		});
+
+		if (result.success) {
+			return {
+				success: true,
+				message: "Playlist mise à jour avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result.data ||
+					"Erreur lors de la mise à jour de la playlist"
+			};
+		}
+	} catch (error) {
+		const err = error as any;
+		console.error("Error during updatePlaylist:", err);
+		return {
+			success: false,
+			message:
+				err.message || "Erreur lors de la mise à jour de la playlist"
+		};
+	}
+}
+
+export async function deletePlaylist(playlistId: string) {
+	if (!playlistId || typeof playlistId !== "string") {
+		return {
+			success: false,
+			message: "ID de la playlist invalide"
+		};
+	}
+	try {
+		const stringPlaylistId = String(playlistId);
+		const result = await ApiHelper.delete(`/playlists/${stringPlaylistId}`);
+		if (result.success) {
+			return {
+				success: true,
+				message: "Playlist supprimée avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result.data ||
+					"Erreur lors de la suppression de la playlist"
+			};
+		}
+	} catch (error) {
+		const err = error as any;
+		console.error("Error during deletePlaylist:", err);
+		return {
+			success: false,
+			message:
+				err.message || "Erreur lors de la suppression de la playlist"
+		};
+	}
+}
+
 export async function getUserPlaylists(userId: string) {
 	if (!userId || typeof userId !== "string") {
 		return {
@@ -74,12 +159,13 @@ export async function getUserPlaylists(userId: string) {
 	} catch (error) {
 		console.error(
 			"Error in getUserPlaylists:",
-			error.response?.data || error.message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
-				error.message || "Erreur lors de la récupération des playlists"
+				(error as any).message ||
+				"Erreur lors de la récupération des playlists"
 		};
 	}
 }
@@ -107,19 +193,28 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 				media_id: mediaId
 			}
 		);
-		return {
-			success: true,
-			message: "Média ajouté à la playlist avec succès"
-		};
-	} catch (error) {
-		console.error(
-			"Error in addMediaToPlaylist:",
-			error.response?.data || error.message
-		);
+
+		if (result && result.success) {
+			return {
+				success: true,
+				message: "Média ajouté à la playlist avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result?.data?.detail ||
+					"Film déjà existant dans la playlist"
+			};
+		}
+	} catch (error: any) {
+		console.error("Error in addMediaToPlaylist:", error);
 		return {
 			success: false,
 			message:
-				error.message || "Erreur lors de l'ajout du média à la playlist"
+				error?.response?.data?.detail ||
+				error.message ||
+				"Erreur inconnue lors de l'ajout du média"
 		};
 	}
 }
@@ -139,17 +234,19 @@ export async function getMediaInPlaylist(playlistId: string) {
 		);
 		return {
 			success: true,
-			data: Array.isArray(result.data) ? result.data : [] // Ensure data is always an array
+			data: Array.isArray(result.data) ? result.data : []
 		};
 	} catch (error) {
 		console.error(
 			"Error in getMediaInPlaylist:",
-			error.response?.data || error.message || "Unknown error"
+			(error as any).response?.data ||
+				(error as any).message ||
+				"Unknown error"
 		);
 		return {
 			success: false,
 			message:
-				error.message ||
+				(error as any).message ||
 				"Erreur lors de la récupération des médias de la playlist"
 		};
 	}
@@ -172,12 +269,13 @@ export async function getPlaylistById(playlistId: string) {
 	} catch (error) {
 		console.error(
 			"Error in getPlaylistById:",
-			error.response?.data || error.message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
-				error.message || "Erreur lors de la récupération de la playlist"
+				(error as any).message ||
+				"Erreur lors de la récupération de la playlist"
 		};
 	}
 }
@@ -211,12 +309,12 @@ export async function deleteMediaFromPlaylist(
 	} catch (error) {
 		console.error(
 			"Error in deleteMediaFromPlaylist:",
-			error.response?.data || error.message
+			(error as any).response?.data || (error as any).message
 		);
 		return {
 			success: false,
 			message:
-				error.message ||
+				(error as any).message ||
 				"Erreur lors de la suppression du média de la playlist"
 		};
 	}

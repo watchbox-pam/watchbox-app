@@ -135,10 +135,10 @@ export default function Index() {
 				onRequestClose={() => setModalVisible(false)}>
 				<View style={styles.modalContainer}>
 					<View style={styles.modalContent}>
-						<Text style={styles.modalTitle}>Create Playlist</Text>
+						<Text style={styles.modalTitle}>Créer un playlist</Text>
 						<TextInput
 							style={styles.input}
-							placeholder="Playlist Title"
+							placeholder="Titre de la playlist"
 							placeholderTextColor="#ccc"
 							value={playlistTitle}
 							onChangeText={setPlaylistTitle}
@@ -376,13 +376,14 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		width: "80%",
-		backgroundColor: "#fff",
+		backgroundColor: "#0A1E38",
 		borderRadius: 10,
 		padding: 20,
 		alignItems: "center"
 	},
 	modalTitle: {
 		fontSize: 20,
+		color: "#FFFFFF",
 		fontWeight: "bold",
 		marginBottom: 20
 	},
@@ -393,7 +394,7 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 		padding: 10,
 		marginBottom: 20,
-		color: "#000"
+		color: "#fff"
 	},
 	checkboxContainer: {
 		flexDirection: "row",
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
 	},
 	checkboxLabel: {
 		fontSize: 16,
-		color: "#000"
+		color: "#fff"
 	},
 	modalButtons: {
 		flexDirection: "row",
