@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, Platform } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as SecureStore from "expo-secure-store";
+import styles from "../styles/DropDownButton";
 
 const DropDownButton = () => {
 	const [visible, setVisible] = useState(false);
@@ -11,11 +12,13 @@ const DropDownButton = () => {
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
 
+	// Navigate and close the menu
 	const handleNavigate = (screen: string) => {
-		//navigation.navigate(screen);
+		router.replace(`/${screen.toLowerCase()}`);
 		closeMenu();
 	};
 
+	// Logout and clear stored user session
 	const handleLogout = async () => {
 		if (Platform.OS === "ios" || Platform.OS === "android") {
 			await SecureStore.deleteItemAsync("currentUser");
@@ -30,7 +33,6 @@ const DropDownButton = () => {
 	return (
 		<Provider>
 			<View style={styles.container}>
-				{/* Bouton déclencheur */}
 				<IconButton
 					icon="dots-vertical"
 					size={24}
@@ -45,22 +47,22 @@ const DropDownButton = () => {
 						anchor={{ x: 50, y: 50 }}
 						style={styles.menu}>
 						<Menu.Item
-							onPress={() => handleNavigate("Commentary")}
+							onPress={() => handleNavigate("commentary")}
 							title="Commentaires"
 							leadingIcon="comment"
 						/>
 						<Menu.Item
-							onPress={() => handleNavigate("Notifications")}
+							onPress={() => handleNavigate("notifs")}
 							title="Notifications"
 							leadingIcon="bell"
 						/>
 						<Menu.Item
-							onPress={() => handleNavigate("Amis")}
+							onPress={() => handleNavigate("friends")}
 							title="Amis"
 							leadingIcon="account-group"
 						/>
 						<Menu.Item
-							onPress={() => handleNavigate("Parametre")}
+							onPress={() => handleNavigate("param")}
 							title="Paramètres"
 							leadingIcon="cog"
 						/>
@@ -76,24 +78,5 @@ const DropDownButton = () => {
 		</Provider>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		position: "absolute",
-		top: 20,
-		left: 40,
-		zIndex: 2
-	},
-	menu: {
-		position: "absolute",
-		backgroundColor: "#313131",
-		top: 10,
-		left: -110,
-		zIndex: 5
-	},
-	logoutText: {
-		color: "#FF6B6B"
-	}
-});
 
 export default DropDownButton;

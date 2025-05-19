@@ -1,5 +1,4 @@
 import BackButton from "../components/BackButton";
-import LogoButton from "../components/Logo";
 import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,6 +16,7 @@ import {
 	getPlaylistById
 } from "../services/PlaylistService";
 import { MaterialIcons } from "@expo/vector-icons";
+import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
 
 export default function Index() {
 	const { id, movies } = useLocalSearchParams();
@@ -28,6 +28,23 @@ export default function Index() {
 	const [movieList, setMovieList] =
 		useState<{ id: number; [key: string]: any }[]>(parsedMovies);
 	const [playlistTitle, setPlaylistTitle] = useState(id);
+	const [editedTitle, setEditedTitle] = useState("");
+	const [isPrivate, setIsPrivate] = useState(false);
+
+	const restrictedNames = ["Watchlist", "Historique", "Favoris"];
+	const normalizedPlaylistTitle = Array.isArray(playlistTitle)
+		? playlistTitle[0]
+		: playlistTitle;
+	const shouldShowEditButton = !restrictedNames.includes(
+		normalizedPlaylistTitle
+	);
+
+	useEffect(() => {
+		if (playlistTitle)
+			setEditedTitle(
+				Array.isArray(playlistTitle) ? playlistTitle[0] : playlistTitle
+			);
+	}, [playlistTitle]);
 
 	useEffect(() => {
 		const fetchMovies = async () => {
@@ -90,8 +107,19 @@ export default function Index() {
 			<View style={styles.headers}>
 				<BackButton />
 				<Text style={styles.playlistName}>{playlistTitle}</Text>
-				<LogoButton />
+				{shouldShowEditButton && (
+					<DropDownModifyPlaylist
+						playlistId={stringifiedId}
+						initialTitle={normalizedPlaylistTitle}
+						initialIsPrivate={isPrivate}
+						onUpdate={({ title, is_private }) => {
+							setPlaylistTitle(title);
+							setIsPrivate(is_private);
+						}}
+					/>
+				)}
 			</View>
+
 			{movieList !== null && movieList?.length > 0 ? (
 				movieList.map((movie) => {
 					return (
@@ -156,6 +184,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingVertical: 10
 	},
+	editButton: {
+		top: -10
+	},
 	container: {
 		width: "100%",
 		backgroundColor: "#0A1E38",
@@ -215,7 +246,8 @@ const styles = StyleSheet.create({
 		color: "#FFFFFF",
 		fontSize: 25,
 		fontWeight: "bold",
-		marginBottom: 30
+		marginBottom: 30,
+		marginLeft: 10
 	},
 	deleteIconContainer: {
 		justifyContent: "center",
@@ -225,5 +257,54 @@ const styles = StyleSheet.create({
 	deleteIcon: {
 		marginLeft: 10,
 		alignSelf: "center"
+	},
+	modalOverlay: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0,0,0,0.5)"
+	},
+
+	modalContent: {
+		backgroundColor: "#0A1E38",
+		borderRadius: 10,
+		padding: 20,
+		width: "80%",
+		alignItems: "center"
+	},
+
+	modalTitle: {
+		fontSize: 18,
+		color: "#FFFFFF",
+		fontWeight: "bold",
+		marginBottom: 15
+	},
+
+	input: {
+		backgroundColor: "#1E2D4F",
+		color: "#FFFFFF",
+		width: "100%",
+		padding: 10,
+		marginBottom: 15,
+		borderRadius: 5
+	},
+
+	switchContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		width: "100%",
+		marginBottom: 20
+	},
+
+	switchLabel: {
+		color: "#FFFFFF",
+		fontSize: 16
+	},
+
+	modalButtons: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%"
 	}
 });
