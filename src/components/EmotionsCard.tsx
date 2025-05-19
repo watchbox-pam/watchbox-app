@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import styles from "@/src/styles/EmotionCardStyle";
 import Emotion from "@/src/models/Emotion";
 
