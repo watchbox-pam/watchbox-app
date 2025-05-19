@@ -25,8 +25,11 @@ import styles from "@/src/styles/MovieDetailStyle";
 import { ActivityIndicator } from "react-native-paper";
 import CommentaryScreen from "@/src/screens/CommentaryScreen";
 import { fetchMovieDetails } from "@/src/services/MovieDetailService";
+import {
+	addMediaToPlaylist,
+	getUserPlaylists
+} from "@/src/services/PlaylistService";
 import useSessionStore from "../zustand/sessionStore";
-import DropDownPlaylist from "../components/DropDownPlaylist";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -36,6 +39,60 @@ export default function MovieScreen() {
 	const [media, setMedia] = useState<undefined | MovieProps>();
 
 	const currentUser = useSessionStore((state: any) => state.user);
+
+	const [menuVisible, setMenuVisible] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [userPlaylists, setUserPlaylists] = useState<
+		{ id: string; title: string }[]
+	>([]);
+	const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+
+	const openMenu = () => setMenuVisible(true);
+	const closeMenu = () => setMenuVisible(false);
+
+	const fetchUserPlaylists = async (userId: string) => {
+		const response = await getUserPlaylists(userId);
+		if (response.success) {
+			setUserPlaylists(response.data || []); // Ensure userPlaylists is always an array
+		} else {
+			console.error("Error fetching user playlists:", response.message);
+			setUserPlaylists([]); // Fallback to an empty array in case of error
+		}
+	};
+
+	const openModal = async () => {
+		const userId = currentUser && currentUser.id;
+		setModalVisible(true);
+		if (userId) {
+			await fetchUserPlaylists(userId);
+		}
+	};
+
+	const closeModal = () => {
+		setModalVisible(false);
+	};
+
+	const handleAddToPlaylist = async () => {
+		if (!selectedPlaylistId) {
+			alert("Please select a playlist before adding the movie.");
+			return;
+		}
+
+		if (id) {
+			const response = await addMediaToPlaylist(
+				String(selectedPlaylistId),
+				Number(id)
+			);
+			if (response.success) {
+				alert("Movie added to playlist successfully!");
+				closeModal();
+			} else {
+				alert(response.message || "Failed to add movie to playlist.");
+			}
+		} else {
+			alert("Invalid movie ID. Please try again.");
+		}
+	};
 
 	const fetchData = async () => {
 		try {
@@ -58,6 +115,7 @@ export default function MovieScreen() {
 
 		if (userId && typeof userId === "string") {
 			fetchData();
+			fetchUserPlaylists(userId);
 		} else {
 			setError(true);
 			setLoading(false);
@@ -97,7 +155,22 @@ export default function MovieScreen() {
 				overScrollMode="never">
 				<View style={styles.headers}>
 					<BackButton />
-					<DropDownPlaylist movieId={Number(id)} />
+					<Menu
+						visible={menuVisible}
+						onDismiss={closeMenu}
+						anchor={
+							<TouchableOpacity onPress={openMenu}>
+								<Text style={styles.menuButton}>⋮</Text>
+							</TouchableOpacity>
+						}>
+						<Menu.Item
+							onPress={() => {
+								closeMenu();
+								openModal();
+							}}
+							title="Add to Playlist"
+						/>
+					</Menu>
 				</View>
 
 				<View style={styles.imageBannerContainer}>
@@ -185,7 +258,10 @@ export default function MovieScreen() {
 				)}
 
 				<View testID="movie-overview">
-					<StyledText style={styles.description} ellipsizeMode="tail">
+					<StyledText
+						style={styles.description}
+						numberOfLines={4}
+						ellipsizeMode="tail">
 						{media?.overview
 							? media.overview
 							: "Aucune description disponible pour ce film."}
@@ -232,8 +308,50 @@ export default function MovieScreen() {
 						)}
 					</View>
 				</View>
-				<CommentaryScreen mediaId={Array.isArray(id) ? id[0] : id} />
+				<CommentaryScreen mediaId={id} />
 			</ScrollView>
+
+			<Modal
+				visible={modalVisible}
+				transparent={true}
+				animationType="slide"
+				onRequestClose={closeModal}>
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>Select a Playlist</Text>
+						<View style={styles.selectContainer}>
+							<Picker
+								selectedValue={selectedPlaylistId}
+								onValueChange={(itemValue) =>
+									setSelectedPlaylistId(itemValue)
+								}>
+								<Picker.Item
+									label="--Please choose a playlist--"
+									value=""
+								/>
+								{userPlaylists.length > 0 ? (
+									userPlaylists.map((playlist) => (
+										<Picker.Item
+											key={playlist.id}
+											label={playlist.title}
+											value={playlist.id}
+										/>
+									))
+								) : (
+									<Picker.Item
+										label="Error loading playlists. Please try again later."
+										value=""
+									/>
+								)}
+							</Picker>
+						</View>
+						<View style={styles.modalButtons}>
+							<Button title="Cancel" onPress={closeModal} />
+							<Button title="Add" onPress={handleAddToPlaylist} />
+						</View>
+					</View>
+				</View>
+			</Modal>
 		</Provider>
 	);
 }
