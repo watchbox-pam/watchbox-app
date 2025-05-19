@@ -1,4 +1,5 @@
 import BackButton from "../components/BackButton";
+import LogoButton from "../components/Logo";
 import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
