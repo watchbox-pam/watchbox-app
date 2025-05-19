@@ -191,10 +191,7 @@ export default function MovieScreen() {
 				)}
 
 				<View testID="movie-overview">
-					<StyledText
-						style={styles.description}
-						numberOfLines={4}
-						ellipsizeMode="tail">
+					<StyledText style={styles.description} ellipsizeMode="tail">
 						{media?.overview
 							? media.overview
 							: "Aucune description disponible pour ce film."}
