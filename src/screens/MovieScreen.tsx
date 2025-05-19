@@ -34,7 +34,7 @@ import useSessionStore from "../zustand/sessionStore";
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
-	const { id } = useLocalSearchParams();
+	const { id }: { id: string } = useLocalSearchParams();
 
 	const [media, setMedia] = useState<undefined | MovieProps>();
 
@@ -211,7 +211,11 @@ export default function MovieScreen() {
 							</Tag>
 						)}
 
-						<StyledText style={styles.title}>
+						<StyledText
+							style={styles.title}
+							numberOfLines={2}
+							ellipsizeMode="tail"
+							adjustsFontSizeToFit>
 							{media?.title}
 						</StyledText>
 
@@ -254,23 +258,28 @@ export default function MovieScreen() {
 				)}
 
 				<View testID="movie-overview">
-					<StyledText style={styles.description}>
+					<StyledText
+						style={styles.description}
+						numberOfLines={4}
+						ellipsizeMode="tail">
 						{media?.overview
 							? media.overview
 							: "Aucune description disponible pour ce film."}
 					</StyledText>
 				</View>
 
-				<View style={styles.videoContainer} testID="movie-video">
-					<StyledText style={styles.textCasting}>
-						Bande annonce
-					</StyledText>
-					<YoutubePlayer
-						height={275}
-						play={false}
-						videoId={media?.video_key}
-					/>
-				</View>
+				{media?.video_key ? (
+					<View style={styles.videoContainer} testID="movie-video">
+						<StyledText style={styles.textCasting}>
+							Bande annonce
+						</StyledText>
+						<YoutubePlayer
+							height={275}
+							play={false}
+							videoId={media?.video_key}
+						/>
+					</View>
+				) : null}
 
 				<View style={styles.castingContainer}>
 					<StyledText style={styles.textCasting}>Casting</StyledText>

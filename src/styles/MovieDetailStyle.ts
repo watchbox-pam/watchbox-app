@@ -43,7 +43,9 @@ const styles = StyleSheet.create({
 		aspectRatio: 2 / 3
 	},
 	title: {
-		fontSize: 40
+		fontSize: 40,
+		maxWidth: "100%",
+		zIndex: 1
 	},
 	text: {
 		fontSize: 14
@@ -66,7 +68,8 @@ const styles = StyleSheet.create({
 	},
 	infoDiv: {
 		flexDirection: "column",
-		alignSelf: "flex-end"
+		alignSelf: "flex-end",
+		flex: 1
 	},
 	tagContainer: {
 		marginBottom: -10
