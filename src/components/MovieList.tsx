@@ -9,6 +9,7 @@ import {
 	TouchableOpacity,
 	ActivityIndicator
 } from "react-native";
+import StyledText from "./StyledText";
 
 interface Movie {
 	id: number;
@@ -51,24 +52,26 @@ const MovieList: React.FC<MovieListProps> = ({
 				params: { id: item.id }
 			}}
 			style={styles.movieCard}>
-			{item.poster_path ? (
-				<Image
-					source={{
-						uri: `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
-					}}
-					style={styles.poster}
-				/>
-			) : (
-				<View style={styles.noPoster}>
-					<Text style={styles.noPosterText}>Pas d'image</Text>
-				</View>
-			)}
-			<Text
+			<View style={styles.imagePosterContainer}>
+				{item.poster_path ? (
+					<Image
+						source={{
+							uri: `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
+						}}
+						style={styles.poster}
+					/>
+				) : (
+					<View style={styles.noPoster}>
+						<Text style={styles.noPosterText}>Pas d'image</Text>
+					</View>
+				)}
+			</View>
+			<StyledText
 				style={styles.movieTitle}
 				numberOfLines={2}
 				testID="movie-title">
 				{item.title}
-			</Text>
+			</StyledText>
 		</Link>
 	);
 
@@ -213,15 +216,20 @@ const styles = StyleSheet.create({
 	movieCard: {
 		flex: 1,
 		margin: 8,
-		backgroundColor: "#143b6f",
 		borderRadius: 8,
 		overflow: "hidden",
-		maxWidth: "47%"
+		maxWidth: "47%",
+		display: "flex",
+		flexDirection: "column"
+	},
+	imagePosterContainer: {
+		width: "100%",
+		aspectRatio: 2 / 3,
+		overflow: "hidden",
+		borderRadius: 8
 	},
 	poster: {
-		width: "100%",
-		height: 200,
-		resizeMode: "cover"
+		aspectRatio: 2 / 3
 	},
 	noPoster: {
 		width: "100%",
