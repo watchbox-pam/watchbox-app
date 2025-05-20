@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Platform } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
-import { router } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as SecureStore from "expo-secure-store";
 import styles from "../styles/DropDownButton";

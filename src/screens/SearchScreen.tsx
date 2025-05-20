@@ -19,12 +19,8 @@ import Person from "@/src/models/Person";
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [movies, setMovies] = useState<Movie[]>([]);
-	const [actors, setActors] = useState<Person[]>([]);
-	const [selectedFilter, setSelectedFilter] = useState("all");
+	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
 
-	// Available search filters
 	const filters = [
 		{ key: "all", label: "Tous" },
 		{ key: "films", label: "Films" },
