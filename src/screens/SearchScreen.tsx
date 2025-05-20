@@ -22,6 +22,9 @@ export default function SearchScreen() {
 	const [results, setResults] = useState<Movie[]>([]);
 	const [category, setCategory] = useState("all");
 	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
+	const [isLoading, setIsLoading] = useState(false);
+	const [movies, setMovies] = useState<Movie[]>([]);
+	const [actors, setActors] = useState<Person[]>([]);
 
 	const filters = [
 		{ key: "all", label: "Tous" },
