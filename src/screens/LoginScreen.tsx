@@ -18,7 +18,7 @@ export default function LoginScreen() {
 	const handleSubmit = async () => {
 		const result = await loginUser({ identifier, password });
 		if (result.success) {
-			signIn(result.message, identifier);
+			signIn(result.message.id, identifier, result.message.token);
 			router.replace("/");
 			return;
 		} else {

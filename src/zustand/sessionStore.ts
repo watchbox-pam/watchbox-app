@@ -4,11 +4,13 @@ const useSessionStore = create((set) => ({
 	isLoggedIn: false,
 	user: {
 		id: "",
-		username: ""
+		identifier: "",
+		token: ""
 	},
-	signIn: (id: string, username: string) =>
-		set({ isLoggedIn: true, user: { id: id, username: username } }),
-	signOut: () => set({ isLoggedIn: false, userId: "", username: "" })
+	signIn: (id: string, identifier: string, token: string) =>
+		set({ isLoggedIn: true, user: { id, identifier, token } }),
+	signOut: () =>
+		set({ isLoggedIn: false, user: { id: "", identifier: "", token: "" } })
 }));
 
 export default useSessionStore;

@@ -101,7 +101,7 @@ export default function HomeScreen() {
 			showsVerticalScrollIndicator={false}>
 			<View style={styles.header}>
 				<StyledText style={styles.TitleHeader}>
-					Hello there, {currentUser.username}
+					Hello there, {currentUser.identifier}
 				</StyledText>
 				<LogoButton />
 			</View>

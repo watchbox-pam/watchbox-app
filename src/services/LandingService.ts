@@ -3,14 +3,24 @@ import { Platform } from "react-native";
 
 export async function checkLogin() {
 	try {
-		let currentUser: string | null;
+		let id: string | null;
+		let identifier: string | null;
+		let token: string | null;
 		if (Platform.OS === "ios" || Platform.OS === "android") {
-			currentUser = await SecureStore.getItemAsync("currentUser");
+			id = await SecureStore.getItemAsync("id");
+			identifier = await SecureStore.getItemAsync("identifier");
+			token = await SecureStore.getItemAsync("token");
 		} else {
-			currentUser = localStorage.getItem("currentUser");
+			id = localStorage.getItem("id");
+			identifier = localStorage.getItem("identifier");
+			token = localStorage.getItem("token");
 		}
-		if (currentUser !== null) {
-			return JSON.parse(currentUser);
+		if (token !== null) {
+			return {
+				id,
+				identifier,
+				token
+			};
 		}
 		return null;
 	} catch (error) {

@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import StyledText from "../components/StyledText";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
 import DropDownButton from "../components/DropDownButton";
 import TraitGradiant from "../components/TraitGradiant";
 import Stats from "../components/Stats";
@@ -30,7 +29,6 @@ export default function Index() {
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 
-	const { id } = useLocalSearchParams();
 	const [profileData, setProfileData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -42,7 +40,7 @@ export default function Index() {
 	};
 
 	const handleSavePlaylist = async () => {
-		const userId = id || (currentUser && currentUser.id);
+		const userId = currentUser && currentUser.id;
 		if (!userId) {
 			alert("User is not logged in.");
 			return;
@@ -73,7 +71,7 @@ export default function Index() {
 	};
 
 	useEffect(() => {
-		const userId = id || (currentUser && currentUser.id);
+		const userId = currentUser && currentUser.id;
 
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
@@ -82,7 +80,7 @@ export default function Index() {
 			setError("ID utilisateur invalide");
 			setLoading(false);
 		}
-	}, [id, currentUser]);
+	}, [currentUser]);
 
 	const fetchProfileData = async (userId: string) => {
 		setLoading(true);

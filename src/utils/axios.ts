@@ -18,9 +18,9 @@ export abstract class ApiHelper {
 		try {
 			let userToken: string | null;
 			if (Platform.OS === "ios" || Platform.OS === "android") {
-				userToken = await SecureStore.getItemAsync("currentUser");
+				userToken = await SecureStore.getItemAsync("token");
 			} else {
-				userToken = localStorage.getItem("currentUser");
+				userToken = localStorage.getItem("token");
 			}
 			const response = await this.instance.get(url, {
 				...options,

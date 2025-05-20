@@ -66,19 +66,26 @@ export async function registerUser(user: UserSignup) {
 		});
 		if (result.success) {
 			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync("id", result.data.user_id);
+				await SecureStore.setItemAsync("identifier", user.username);
 				await SecureStore.setItemAsync(
-					"currentUser",
+					"token",
 					JSON.stringify(result.data.token)
 				);
 			} else {
+				localStorage.setItem("id", result.data.user_id);
+				localStorage.setItem("identifier", user.username);
 				localStorage.setItem(
-					"currentUser",
+					"token",
 					JSON.stringify(result.data.token)
 				);
 			}
 			return {
 				success: true,
-				message: result.data.user_id
+				message: {
+					id: result.data.user_id,
+					token: result.data.token
+				}
 			};
 		} else {
 			return {
