@@ -26,10 +26,10 @@ export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
 	// State variables for search input, loading state, results and filter
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [selectedFilter, setSelectedFilter] = useState("all"); // État pour suivre l'élément sélectionné
+	const [isLoading, setIsLoading] = useState(false);
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [actors, setActors] = useState<Person[]>([]);
-	const [selectedFilter, setSelectedFilter] = useState("all");
 
 	// Available search filters
 	const filters = [
