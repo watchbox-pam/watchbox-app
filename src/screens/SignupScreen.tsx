@@ -52,7 +52,7 @@ export default function SignupScreen() {
 		};
 		const result = await registerUser(userToInsert);
 		if (result.success) {
-			signIn(result.message, username);
+			signIn(result.message.id, username, result.message.token);
 			router.replace("/");
 			return;
 		} else {

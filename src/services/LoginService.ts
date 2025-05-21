@@ -32,20 +32,32 @@ export async function loginUser({
 			password: hashedPassword
 		});
 		if (result.success) {
+			// Store all necessary credentials persistently
 			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.setItemAsync("id", result.data.user_id);
 				await SecureStore.setItemAsync(
-					"currentUser",
+					"identifier",
+					result.data.username
+				);
+				await SecureStore.setItemAsync(
+					"token",
 					JSON.stringify(result.data.token)
 				);
 			} else {
+				localStorage.setItem("id", result.data.user_id);
+				localStorage.setItem("identifier", result.data.username);
 				localStorage.setItem(
-					"currentUser",
+					"token",
 					JSON.stringify(result.data.token)
 				);
 			}
 			return {
 				success: true,
-				message: result.data.user_id
+				message: {
+					id: result.data.user_id,
+					token: result.data.token,
+					username: result.data.username
+				}
 			};
 		} else {
 			return {

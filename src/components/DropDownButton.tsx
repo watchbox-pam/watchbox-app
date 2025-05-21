@@ -21,9 +21,13 @@ const DropDownButton = () => {
 	// Logout and clear stored user session
 	const handleLogout = async () => {
 		if (Platform.OS === "ios" || Platform.OS === "android") {
-			await SecureStore.deleteItemAsync("currentUser");
+			await SecureStore.deleteItemAsync("id");
+			await SecureStore.deleteItemAsync("identifier");
+			await SecureStore.deleteItemAsync("token");
 		} else {
-			localStorage.removeItem("currentUser");
+			localStorage.removeItem("id");
+			localStorage.removeItem("identifier");
+			localStorage.removeItem("token");
 		}
 
 		signOut();
