@@ -41,6 +41,29 @@ const styles = StyleSheet.create({
 	SubTitleWatchList: {
 		color: "#ffffff",
 		fontSize: 18
+	},
+	loading: {
+		backgroundColor: "#0A1E38",
+		height: "100%",
+		width: "100%",
+		justifyContent: "center"
+	},
+	errorContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20
+	},
+	errorText: {
+		color: "#ff6b6b",
+		textAlign: "center",
+		marginBottom: 20
+	},
+	button: {
+		backgroundColor: "#4a69bd",
+		padding: 10,
+		borderRadius: 5,
+		marginTop: 10
 	}
 });
 

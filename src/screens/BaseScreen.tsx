@@ -19,7 +19,7 @@ export default function BaseScreen() {
 	const checkUserLogin = async () => {
 		const result = await checkLogin();
 		if (result !== null) {
-			signIn(result.id, result.identifier);
+			signIn(result?.id, result?.identifier, result?.token);
 			router.replace("/");
 			return;
 		}
