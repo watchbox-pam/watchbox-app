@@ -77,25 +77,21 @@ export default function App() {
 		outputRange: ["-10deg", "0deg", "10deg"],
 		extrapolate: "clamp"
 	});
-
 	const likeOpacity = position.x.interpolate({
 		inputRange: [0, SCREEN_WIDTH / 4],
 		outputRange: [0, 1],
 		extrapolate: "clamp"
 	});
-
 	const dislikeOpacity = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 4, 0],
 		outputRange: [1, 0],
 		extrapolate: "clamp"
 	});
-
 	const nextCardOpacity = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
 		outputRange: [1, 0.5, 1],
 		extrapolate: "clamp"
 	});
-
 	const nextCardScale = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
 		outputRange: [1, 0.8, 1],
@@ -276,7 +272,6 @@ export default function App() {
 					onPress={() => handleButtonPress("left")}>
 					<Text style={styles.buttonText}>✗</Text>
 				</TouchableOpacity>
-
 				<TouchableOpacity
 					style={styles.likeButton}
 					onPress={() => handleButtonPress("right")}>
@@ -286,7 +281,6 @@ export default function App() {
 		</View>
 	);
 }
-
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,

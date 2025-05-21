@@ -3,16 +3,16 @@ import Review from "@/src/models/Review";
 
 export const createReview = async (review: Review) => {
 	try {
-		const response = await ApiHelper.post("/reviews/", {
+		const response = await ApiHelper.post("/reviews", {
 			id: "",
 			rating: review.rating,
 			comment: review.comment,
-			has_spoiler: review.isSpoiler,
-			movie_id: review.mediaId,
-			tv_id: null,
-			tv_episode_id: null,
-			user_id: review.userId,
-			created_at: Date.now(),
+			isSpoiler: review.isSpoiler,
+			movieId: review.mediaId,
+			tvId: null,
+			tvEpisodeId: null,
+			userId: review.userId,
+			createdAt: Date.now(),
 			user: {
 				username: "",
 				picture: ""

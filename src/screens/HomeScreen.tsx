@@ -8,6 +8,7 @@ import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { ActivityIndicator } from "react-native-paper";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function HomeScreen() {
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
@@ -77,13 +78,7 @@ export default function HomeScreen() {
 	}, []);
 
 	if (error) {
-		return (
-			<View style={styles.errorContainer} testID="error">
-				<StyledText style={styles.errorText}>
-					Erreur lors du chargement des données.
-				</StyledText>
-			</View>
-		);
+		return <ErrorMessage />;
 	}
 
 	if (loading) {

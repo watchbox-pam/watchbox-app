@@ -8,6 +8,7 @@ import StyledText from "../components/StyledText";
 import ReadMore from "../components/ReadMore";
 import PersonMediaList from "../components/PersonMediaList";
 import { fetchPerson } from "@/src/services/PersonService";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function PersonScreen() {
 	const [loading, setLoading] = useState(true);
@@ -104,13 +105,7 @@ export default function PersonScreen() {
 	}
 
 	if (!checkData()) {
-		return (
-			<View style={styles.loading}>
-				<StyledText style={styles.noDataText}>
-					Aucune donnée trouvée
-				</StyledText>
-			</View>
-		);
+		return <ErrorMessage />;
 	}
 
 	return (
