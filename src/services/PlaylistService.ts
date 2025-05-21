@@ -325,7 +325,6 @@ export async function getMovieRuntime(userId: string, title: string) {
 		const result = await ApiHelper.get(
 			`/playlists/${userId}/${title}/runtime`
 		);
-		console.log("getMovieRuntime result", result);
 		return {
 			success: true,
 			data: result.data
