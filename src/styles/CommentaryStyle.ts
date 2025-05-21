@@ -58,6 +58,19 @@ const styles = StyleSheet.create({
 	},
 	userName: {
 		fontWeight: "bold"
+	},
+	commentText: {
+		filter: "blur(3)"
+	},
+	spoilerWarning: {
+		zIndex: 1,
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		alignItems: "center",
+		paddingHorizontal: 16,
+		borderRadius: 5
 	}
 });
 

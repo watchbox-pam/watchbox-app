@@ -49,7 +49,6 @@ const DropDownModifyPlaylist = ({
 			setIsPrivate(initialIsPrivate);
 		}
 	}, [editModalVisible, initialTitle, initialIsPrivate]);
-	console.log("initialIsPrivate", initialIsPrivate);
 
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);

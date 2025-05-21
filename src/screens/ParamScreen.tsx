@@ -11,8 +11,8 @@ import {
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import { providerService } from "../services/ProviderService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import styles from "../styles/ParamStyle";
+/* import AsyncStorage from "@react-native-async-storage/async-storage";
+ */ import styles from "../styles/ParamStyle";
 
 // Type for providers
 type Provider = {
@@ -63,11 +63,11 @@ const ParamScreen: React.FC = () => {
 	// Load selected providers from AsyncStorage
 	const loadSelectedProviders = async () => {
 		try {
-			const savedProviders =
+			/* const savedProviders =
 				await AsyncStorage.getItem("selectedProviders");
 			if (savedProviders) {
 				setSelectedProviders(JSON.parse(savedProviders));
-			}
+			} */
 		} catch (error) {
 			console.error("Error loading saved providers:", error);
 		}
@@ -76,10 +76,10 @@ const ParamScreen: React.FC = () => {
 	// Save selected providers to AsyncStorage
 	const saveSelectedProviders = async () => {
 		try {
-			await AsyncStorage.setItem(
+			/* await AsyncStorage.setItem(
 				"selectedProviders",
 				JSON.stringify(selectedProviders)
-			);
+			); */
 		} catch (error) {
 			console.error("Error saving providers:", error);
 		}
