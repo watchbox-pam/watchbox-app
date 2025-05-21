@@ -1,12 +1,7 @@
 import { useFonts } from "expo-font";
 import React from "react";
-import {
-	StyleSheet,
-	Text,
-	StyleProp,
-	TextStyle,
-	TextProps
-} from "react-native";
+import { Text, StyleProp, TextStyle, TextProps } from "react-native";
+import styles from "@/src/styles/StyledTextStyle";
 
 export default function StyledText({
 	children,
@@ -32,11 +27,3 @@ export default function StyledText({
 		</Text>
 	);
 }
-
-const styles = StyleSheet.create({
-	text: {
-		fontFamily: "Oswald",
-		color: "#FFFFFF",
-		fontSize: 16
-	}
-});

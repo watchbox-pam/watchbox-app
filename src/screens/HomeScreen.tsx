@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
 import { View, ScrollView } from "react-native";
-
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
@@ -10,14 +9,17 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import { ActivityIndicator } from "react-native-paper";
 
 export default function HomeScreen() {
+	// State for grouped movie sections (e.g., popular, genres)
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
 		[]
 	);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 
+	// Retrieve current user from session store
 	const currentUser = useSessionStore((state: any) => state.user);
 
+	// Fetch movie data from multiple endpoints
 	const fetchMovies = async () => {
 		try {
 			const list = [];
@@ -27,6 +29,7 @@ export default function HomeScreen() {
 			const comedyGenre = await fetchGenre("35");
 			const dramaGenre = await fetchGenre("18");
 
+			// If any fetch fails, show error state
 			if (
 				!popularDay.success ||
 				!popularWeek.success ||
@@ -38,6 +41,7 @@ export default function HomeScreen() {
 				return;
 			}
 
+			// Build the movie sections
 			list.push(
 				{
 					title: "Populaires aujourd'hui",

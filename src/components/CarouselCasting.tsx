@@ -1,12 +1,7 @@
-import {
-	FlatList,
-	Image,
-	StyleSheet,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { FlatList, Image, TouchableOpacity, View } from "react-native";
 import StyledText from "./StyledText";
 import { Link } from "expo-router";
+import styles from "@/src/styles/CarouselCastingStyle";
 
 export default function CarouselCasting({
 	cast,
@@ -58,28 +53,3 @@ export default function CarouselCasting({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: 100
-	},
-	noImage: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: 100,
-		backgroundColor: "#ccc"
-	},
-	name: {
-		textAlign: "center",
-		fontWeight: "bold",
-		flexWrap: "wrap",
-		width: 100
-	},
-	character: {
-		textAlign: "center",
-		flexWrap: "wrap",
-		width: 100
-	}
-});

@@ -1,5 +1,6 @@
-import { FlatList, StyleSheet, View, Image } from "react-native";
+import { FlatList, View, Image } from "react-native";
 import { Link } from "expo-router";
+import styles from "@/src/styles/CarouselPosterStyle";
 
 export default function CarouselPoster({ data }: any) {
 	// Vérifier si les données sont disponibles
@@ -34,19 +35,3 @@ export default function CarouselPoster({ data }: any) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		width: 100,
-		height: 150,
-		borderRadius: 5
-	},
-	imageContainer: {
-		marginRight: 5,
-		alignItems: "center"
-	},
-	container: {
-		height: 160,
-		paddingLeft: 10
-	}
-});

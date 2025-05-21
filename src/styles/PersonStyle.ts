@@ -1,7 +1,3 @@
-/* style={styles.container}
-			contentContainerStyle={styles.contentContainer}
-			overScrollMode="never" */
-
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({

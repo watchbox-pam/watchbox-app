@@ -15,9 +15,11 @@ export default function LoginScreen() {
 	// @ts-ignore
 	const signIn = useSessionStore((state) => state.signIn);
 
+	// Handle form submission and login logic
 	const handleSubmit = async () => {
 		const result = await loginUser({ identifier, password });
 		if (result.success) {
+			// Save session and redirect to home
 			signIn(
 				result.message.id,
 				result.message.username,

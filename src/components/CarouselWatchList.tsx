@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, Image } from "react-native";
+import { FlatList, View, Image } from "react-native";
 import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
+import styles from "@/src/styles/CarouselWatchListStyle";
 
 export default function CarouselWatchList({ providers }: { providers: any }) {
 	interface Movie {
@@ -85,29 +86,3 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		width: 100,
-		height: 150,
-		borderRadius: 10
-	},
-	imageContainer: {
-		marginRight: 10,
-		height: 160,
-		alignItems: "center"
-	},
-	container: {
-		height: 160,
-		paddingLeft: 10
-	},
-	emptyContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	emptyImage: {
-		width: 100,
-		height: 100
-	}
-});

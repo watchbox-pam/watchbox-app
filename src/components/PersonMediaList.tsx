@@ -1,16 +1,9 @@
 import { useState } from "react";
-import {
-	Image,
-	StyleSheet,
-	View,
-	FlatList,
-	Dimensions,
-	TouchableOpacity,
-	Text
-} from "react-native";
+import { Image, View, FlatList, TouchableOpacity, Text } from "react-native";
 import { Media } from "../screens/PersonScreen";
 import StyledText from "./StyledText";
 import { Link } from "expo-router";
+import styles from "@/src/styles/PersonMediaListStyle";
 
 export default function PersonMediaList({
 	data
@@ -76,49 +69,3 @@ export default function PersonMediaList({
 		</View>
 	);
 }
-
-const { width } = Dimensions.get("window");
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		width: "100%"
-	},
-	image: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: "100%"
-	},
-	emptyImage: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: "100%",
-		backgroundColor: "#ccc",
-		justifyContent: "center"
-	},
-	emptyImageText: {
-		fontSize: 12,
-		textAlign: "center",
-		color: "black",
-		alignItems: "center"
-	},
-	imageContainer: {
-		flex: 1,
-		maxWidth: width / 4,
-		padding: 2,
-		alignItems: "center"
-	},
-	row: {
-		justifyContent: "space-between",
-		width: "100%"
-	},
-	readMoreButton: {
-		alignItems: "center",
-		marginTop: 5
-	},
-	readMoreText: {
-		color: "#3498db",
-		fontSize: 16,
-		fontWeight: "bold"
-	}
-});
