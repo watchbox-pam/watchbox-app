@@ -23,6 +23,7 @@ import {
 	createPlaylist,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
@@ -32,7 +33,7 @@ export default function Index() {
 	const [profileData, setProfileData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const currentUser = useSessionStore((state) => state.user);
+	const currentUser = useSessionStore((state: any) => state.user);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
 	const handleCreateWatchlist = () => {
@@ -115,6 +116,14 @@ export default function Index() {
 			console.error("Error fetching user playlists:", response.message);
 		}
 	};
+
+	if (loading) {
+		return (
+			<View style={styles.loading} testID="loading">
+				<ActivityIndicator size="large" color="#fff" />
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView
@@ -437,5 +446,11 @@ const styles = StyleSheet.create({
 		color: "#ffffff",
 		fontSize: 16,
 		textAlign: "center"
+	},
+	loading: {
+		backgroundColor: "#0A1E38",
+		height: "100%",
+		width: "100%",
+		justifyContent: "center"
 	}
 });

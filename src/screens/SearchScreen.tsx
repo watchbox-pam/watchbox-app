@@ -18,6 +18,7 @@ import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
 import * as SecureStore from "expo-secure-store";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -26,6 +27,8 @@ export default function SearchScreen() {
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [actors, setActors] = useState<Person[]>([]);
 	const [selectedFilter, setSelectedFilter] = useState("all");
+	const [error, setError] = useState(false);
+	const [searchError, setSearchError] = useState(false);
 
 	// State variables for providers
 	const [allProviders, setAllProviders] = useState<Provider[]>([]);
@@ -54,6 +57,7 @@ export default function SearchScreen() {
 				setAllProviders(response.data);
 			}
 		} catch (error) {
+			setError(true);
 			console.error("Error fetching providers:", error);
 		}
 	};
@@ -115,6 +119,7 @@ export default function SearchScreen() {
 						break;
 				}
 			} catch (error) {
+				setSearchError(true);
 				console.error("Search error:", error);
 			} finally {
 				setIsLoading(false);
@@ -158,6 +163,7 @@ export default function SearchScreen() {
 		if (searchTerm.trim()) {
 			search();
 		}
+		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedFilter]);
 
 	// Render single movie item
@@ -222,6 +228,10 @@ export default function SearchScreen() {
 	const handleFilterSelect = (filterKey: string) => {
 		setSelectedFilter(filterKey);
 	};
+
+	if (error) {
+		return <ErrorMessage />;
+	}
 
 	return (
 		<View style={styles.container}>
@@ -336,6 +346,18 @@ export default function SearchScreen() {
 				</View>
 			)}
 
+			{/* Error message */}
+			{searchError && (
+				<ErrorMessage message="Erreur lors du chargement des résultats de recherche." />
+			)}
+
+			{/* No search term message */}
+			{!searchTerm.trim() && (
+				<StyledText style={styles.NoResult}>
+					Veuillez entrer un terme de recherche
+				</StyledText>
+			)}
+
 			{/* Loading indicator */}
 			{isLoading && (
 				<View style={styles.loadingContainer}>
@@ -344,7 +366,7 @@ export default function SearchScreen() {
 			)}
 
 			{/* Search results display */}
-			{!isLoading && (
+			{!isLoading && !searchError && (
 				<ScrollView>
 					{movies.length > 0 && (
 						<View>
