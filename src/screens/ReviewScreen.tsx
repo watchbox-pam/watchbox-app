@@ -7,6 +7,7 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import Review from "@/src/models/Review";
 import { router, useLocalSearchParams } from "expo-router";
 import { createReview } from "@/src/services/ReviewService";
+import BackButton from "@/src/components/BackButton";
 export default function ReviewScreen() {
 	const { id } = useLocalSearchParams();
 	const currentUser = useSessionStore((state: any) => state.user);
@@ -27,30 +28,43 @@ export default function ReviewScreen() {
 		if (result.success) {
 			router.back();
 		} else {
-			alert("Wrong review bitch");
+			alert("Echec de la publication de la review");
 		}
 	};
 
 	return (
 		<View style={styles.container}>
+			<BackButton />
 			<StyledText style={styles.title}>Ajouter une review</StyledText>
-			<StyledText>{rating}</StyledText>
-			<Slider
-				step={1}
-				minimumValue={0}
-				maximumValue={10}
-				onValueChange={(value: number) => setRating(value)}
-			/>
 			<TextInput
+				editable
+				multiline
+				numberOfLines={10}
 				placeholder={"Entrez votre commentaire"}
 				placeholderTextColor={"#fff"}
 				style={styles.comment}
 				onChangeText={(text: string) => setComment(text)}
+				textAlignVertical={"top"}
 			/>
-			<Switch
-				value={isSpoiler}
-				onValueChange={() => setIsSpoiler((isSpoiler) => !isSpoiler)}
-			/>
+			<StyledText>Ajouter une note au film</StyledText>
+			<View>
+				<StyledText>{rating}</StyledText>
+				<Slider
+					step={1}
+					minimumValue={0}
+					maximumValue={10}
+					onValueChange={(value: number) => setRating(value)}
+				/>
+			</View>
+			<View style={styles.spoilerView}>
+				<StyledText>Ajouter un spoiler warning</StyledText>
+				<Switch
+					value={isSpoiler}
+					onValueChange={() =>
+						setIsSpoiler((isSpoiler) => !isSpoiler)
+					}
+				/>
+			</View>
 			<TouchableOpacity style={styles.button} onPress={addReview}>
 				<Text style={styles.buttonText}>Publier</Text>
 			</TouchableOpacity>
