@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { fetchMovies } from "../services/SwipeService";
 import { useLocalSearchParams } from "expo-router";
-import { MovieProps } from "./MovieScreen";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 120;

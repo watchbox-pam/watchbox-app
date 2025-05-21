@@ -2,6 +2,12 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import RecommendationScreen from "./RecommendationScreen";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 
+// Mock expo-font
+jest.mock("expo-font", () => ({
+	useFonts: () => [true],
+	loadAsync: jest.fn().mockResolvedValue(true)
+}));
+
 // Mock the animated API bs
 jest.mock("react-native", () => {
 	const RN = jest.requireActual("react-native");

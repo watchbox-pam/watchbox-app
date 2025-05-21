@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-	StyleSheet,
-	Animated,
-	StatusBar,
-	SafeAreaView,
-	Dimensions
-} from "react-native";
+import { Animated, StatusBar, SafeAreaView } from "react-native";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
 import Emotion from "@/src/models/Emotion";

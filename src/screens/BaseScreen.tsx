@@ -27,6 +27,7 @@ export default function BaseScreen() {
 
 	useEffect(() => {
 		checkUserLogin();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, Image, Text } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { FlatList, StyleSheet, View, Image } from "react-native";
+import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
 
 export default function CarouselWatchList({ providers }: { providers: any }) {
@@ -9,7 +9,6 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 	}
 
 	const [movies, setMovies] = useState<Movie[]>([]);
-	const router = useRouter();
 
 	useEffect(() => {
 		const fetchMoviesForPlaylist = async () => {
