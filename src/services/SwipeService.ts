@@ -1,33 +1,24 @@
 import { ApiHelper } from "@/src/utils/axios";
 
 export type Movie = {
-	id: string;
+	id: number; // ou string, selon ta base
 	title: string;
-	posterUrl: string;
-	// Ajoute d'autres propriétés selon ta base de données
+	poster_path: string | null; // doit correspondre à ce que ton API renvoie
+	// Ajoute d'autres propriétés si besoin
 };
 
-type FetchMoviesResponse = {
-	success: boolean;
-	data: Movie[] | string;
-};
-
-export const fetchMovies = async (
-	count: number = 200
-): Promise<FetchMoviesResponse> => {
+export const fetchMovies = async (count: number = 10): Promise<Movie[]> => {
 	try {
-		const response = await ApiHelper.get(
-			`/movies/popular-random?count=${count}`
-		);
-		return {
-			success: true,
-			data: response.data
-		};
+		const response = await ApiHelper.get(`/movies/random?count=${count}`);
+		console.log("Réponse brute de l'API :", response.data);
+
+		if (!Array.isArray(response.data)) {
+			throw new Error("Données de films invalides");
+		}
+
+		return response.data as Movie[];
 	} catch (error: any) {
 		if (__DEV__) console.error("Erreur fetchMovies :", error);
-		return {
-			success: false,
-			data: "Impossible de récupérer les films pour le swipe"
-		};
+		return []; // retourne un tableau vide en cas d'erreur
 	}
 };
