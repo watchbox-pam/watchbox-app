@@ -22,7 +22,6 @@ import Playlist from "../models/Playlist";
 import {
 	createPlaylist,
 	getMovieRuntime,
-	getMovieRuntime,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 
@@ -75,7 +74,7 @@ export default function Index() {
 	};
 
 	useEffect(() => {
-		const userId = id || (currentUser && currentUser.id);
+		const userId = currentUser && currentUser.id;
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
 			fetchUserPlaylists(userId);
