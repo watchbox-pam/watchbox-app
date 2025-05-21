@@ -1,55 +1,140 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Pressable,
+	ScrollView,
+	Image,
+	ActivityIndicator
+} from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
+import { providerService } from "../services/ProviderService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import styles from "../styles/ParamStyle";
+
+// Type for providers
+type Provider = {
+	id: number;
+	name: string;
+	logo_path: string;
+};
 
 const ParamScreen: React.FC = () => {
-	const [accueil, setAccueil] = useState(false);
+	const [homeOption, setHomeOption] = useState(false);
 	const [notifications, setNotifications] = useState(false);
 	const [darkMode, setDarkMode] = useState(true);
-	const [profilpublic, setProfilpublic] = useState(false);
-	const [historique, setHistorique] = useState(false);
-	const [adulte, setAdulte] = useState(false);
+	const [publicProfile, setPublicProfile] = useState(false);
+	const [history, setHistory] = useState(false);
+	const [adultContent, setAdultContent] = useState(false);
+
+	// State for providers
+	const [providers, setProviders] = useState<Provider[]>([]);
+	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+
+	// Load providers on component mount
+	useEffect(() => {
+		fetchProviders();
+		loadSelectedProviders();
+	}, []);
+
+	// Save selected providers when changed
+	useEffect(() => {
+		saveSelectedProviders();
+	}, [selectedProviders]);
+
+	// Fetch providers from API
+	const fetchProviders = async () => {
+		setIsLoading(true);
+		try {
+			const response = await providerService.getProviders();
+			if (response.success) {
+				setProviders(response.data);
+			}
+		} catch (error) {
+			console.error("Error loading providers:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// Load selected providers from AsyncStorage
+	const loadSelectedProviders = async () => {
+		try {
+			const savedProviders =
+				await AsyncStorage.getItem("selectedProviders");
+			if (savedProviders) {
+				setSelectedProviders(JSON.parse(savedProviders));
+			}
+		} catch (error) {
+			console.error("Error loading saved providers:", error);
+		}
+	};
+
+	// Save selected providers to AsyncStorage
+	const saveSelectedProviders = async () => {
+		try {
+			await AsyncStorage.setItem(
+				"selectedProviders",
+				JSON.stringify(selectedProviders)
+			);
+		} catch (error) {
+			console.error("Error saving providers:", error);
+		}
+	};
+
+	// Toggle provider selection
+	const toggleProvider = (providerId: number) => {
+		setSelectedProviders((prev) => {
+			if (prev.includes(providerId)) {
+				return prev.filter((id) => id !== providerId);
+			} else {
+				return [...prev, providerId];
+			}
+		});
+	};
 
 	return (
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
 				<BackButton />
-				<Text style={styles.paramTitle}>Paramètres</Text>
+				<Text style={styles.paramTitle}>Settings</Text>
 				<Logo />
 			</View>
 
-			{/* Paramètre 1 : Accueil */}
+			{/* Setting: Home Option */}
 			<View style={styles.item}>
 				<View>
-					<Text style={styles.text}>Accueil</Text>
+					<Text style={styles.text}>Home Option</Text>
 					<Text style={styles.desc}>Home - Swipe</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
-						onPress={() => setAccueil(true)}
+						onPress={() => setHomeOption(true)}
 						style={[
 							styles.toggleButton,
-							accueil ? styles.active : styles.inactive
+							homeOption ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								accueil && styles.activeText
+								homeOption && styles.activeText
 							]}>
 							Home
 						</Text>
 					</Pressable>
 					<Pressable
-						onPress={() => setAccueil(false)}
+						onPress={() => setHomeOption(false)}
 						style={[
 							styles.toggleButton,
-							!accueil ? styles.active : styles.inactive
+							!homeOption ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								!accueil && styles.activeText
+								!homeOption && styles.activeText
 							]}>
 							Swipe
 						</Text>
@@ -57,22 +142,66 @@ const ParamScreen: React.FC = () => {
 				</View>
 			</View>
 
-			{/* Paramètre 2 : Plateforme */}
-			<View style={styles.item}>
-				<View>
-					<Text style={styles.text}>Plateforme</Text>
-					<Text style={styles.desc}>
-						Plateformes que vous utilisez
-					</Text>
+			{/* Setting: Platforms (Providers) */}
+			<View
+				style={[
+					styles.item,
+					{
+						height: "auto",
+						flexDirection: "column",
+						alignItems: "flex-start",
+						paddingVertical: 15
+					}
+				]}>
+				<View
+					style={{
+						width: "100%",
+						flexDirection: "row",
+						justifyContent: "space-between",
+						marginBottom: 10
+					}}>
+					<View>
+						<Text style={styles.text}>Platforms</Text>
+						<Text style={styles.desc}>Platforms you use</Text>
+					</View>
 				</View>
-				<View style={styles.toggleContainer}></View>
+
+				{isLoading ? (
+					<ActivityIndicator size="small" color="#fff" />
+				) : (
+					<View style={styles.providersContainer}>
+						{providers.map((provider) => (
+							<Pressable
+								key={provider.id}
+								style={[
+									styles.providerButton,
+									selectedProviders.includes(provider.id) &&
+										styles.selectedProvider
+								]}
+								onPress={() => toggleProvider(provider.id)}>
+								{provider.logo_path ? (
+									<Image
+										source={{
+											uri: `https://image.tmdb.org/t/p/original${provider.logo_path}`
+										}}
+										style={styles.providerLogo}
+									/>
+								) : (
+									<Text style={styles.providerText}>
+										{provider.name}
+									</Text>
+								)}
+							</Pressable>
+						))}
+					</View>
+				)}
 			</View>
 
-			{/* Paramètre 3 : Notifications */}
+			{/* Setting: Notifications */}
 			<View style={styles.item}>
 				<View>
 					<Text style={styles.text}>Notifications</Text>
-					<Text style={styles.desc}>Recevoir des notifications</Text>
+					<Text style={styles.desc}>Receive notifications</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
@@ -106,11 +235,11 @@ const ParamScreen: React.FC = () => {
 				</View>
 			</View>
 
-			{/* Paramètre 4 : Mode Sombre */}
+			{/* Setting: Dark Mode */}
 			<View style={styles.item}>
 				<View>
-					<Text style={styles.text}>Mode Sombre</Text>
-					<Text style={styles.desc}>Activer le mode sombre</Text>
+					<Text style={styles.text}>Dark Mode</Text>
+					<Text style={styles.desc}>Enable dark theme</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
@@ -144,113 +273,115 @@ const ParamScreen: React.FC = () => {
 				</View>
 			</View>
 
-			{/* Paramètre 5 : Profil Public */}
+			{/* Setting: Public Profile */}
 			<View style={styles.item}>
 				<View>
-					<Text style={styles.text}>Profil Public</Text>
-					<Text style={styles.desc}>Profil visible par tous</Text>
+					<Text style={styles.text}>Public Profile</Text>
+					<Text style={styles.desc}>Profile visible to everyone</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
-						onPress={() => setProfilpublic(true)}
+						onPress={() => setPublicProfile(true)}
 						style={[
 							styles.toggleButton,
-							profilpublic ? styles.active : styles.inactive
+							publicProfile ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								profilpublic && styles.activeText
+								publicProfile && styles.activeText
 							]}>
 							Public
 						</Text>
 					</Pressable>
 					<Pressable
-						onPress={() => setProfilpublic(false)}
+						onPress={() => setPublicProfile(false)}
 						style={[
 							styles.toggleButton,
-							!profilpublic ? styles.active : styles.inactive
+							!publicProfile ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								!profilpublic && styles.activeText
+								!publicProfile && styles.activeText
 							]}>
-							Privé
+							Private
 						</Text>
 					</Pressable>
 				</View>
 			</View>
-			{/* Paramètre 6 : Historique */}
+
+			{/* Setting: History */}
 			<View style={styles.item}>
 				<View>
-					<Text style={styles.text}>Historique</Text>
-					<Text style={styles.desc}>Historique visible par tous</Text>
+					<Text style={styles.text}>History</Text>
+					<Text style={styles.desc}>History visible to others</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
-						onPress={() => setHistorique(true)}
+						onPress={() => setHistory(true)}
 						style={[
 							styles.toggleButton,
-							historique ? styles.active : styles.inactive
+							history ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								historique && styles.activeText
+								history && styles.activeText
 							]}>
 							Public
 						</Text>
 					</Pressable>
 					<Pressable
-						onPress={() => setHistorique(false)}
+						onPress={() => setHistory(false)}
 						style={[
 							styles.toggleButton,
-							!historique ? styles.active : styles.inactive
+							!history ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								!historique && styles.activeText
+								!history && styles.activeText
 							]}>
-							Privé
+							Private
 						</Text>
 					</Pressable>
 				</View>
 			</View>
-			{/* Paramètre 7 : Adulte */}
+
+			{/* Setting: Adult Content */}
 			<View style={styles.item}>
 				<View>
-					<Text style={styles.text}>Contenu Adulte</Text>
-					<Text style={styles.desc}>Contenu +18</Text>
+					<Text style={styles.text}>Adult Content</Text>
+					<Text style={styles.desc}>+18 content</Text>
 				</View>
 				<View style={styles.toggleContainer}>
 					<Pressable
-						onPress={() => setAdulte(true)}
+						onPress={() => setAdultContent(true)}
 						style={[
 							styles.toggleButton,
-							adulte ? styles.active : styles.inactive
+							adultContent ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								adulte && styles.activeText
+								adultContent && styles.activeText
 							]}>
-							activé
+							Enabled
 						</Text>
 					</Pressable>
 					<Pressable
-						onPress={() => setAdulte(false)}
+						onPress={() => setAdultContent(false)}
 						style={[
 							styles.toggleButton,
-							!adulte ? styles.active : styles.inactive
+							!adultContent ? styles.active : styles.inactive
 						]}>
 						<Text
 							style={[
 								styles.toggleText,
-								!adulte && styles.activeText
+								!adultContent && styles.activeText
 							]}>
-							desactivé
+							Disabled
 						</Text>
 					</Pressable>
 				</View>
@@ -258,71 +389,5 @@ const ParamScreen: React.FC = () => {
 		</ScrollView>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 20,
-		backgroundColor: "#0A1E38",
-		width: "100%"
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between"
-	},
-	paramTitle: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 10,
-		color: "#fff"
-	},
-	item: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		paddingHorizontal: 15,
-		//marginVertical: 10,
-		backgroundColor: "#143b71",
-		borderRadius: 8,
-		width: "100%",
-		height: 70,
-		marginHorizontal: "auto",
-		marginBottom: 30
-	},
-	text: { fontSize: 18, color: "#fff" },
-	desc: { fontSize: 12, color: "#fff" },
-	toggleContainer: {
-		flexDirection: "row",
-		borderRadius: 8,
-		overflow: "hidden",
-		backgroundColor: "#0A1E38",
-		height: "80%",
-		alignItems: "center"
-	},
-	toggleButton: {
-		paddingVertical: 10,
-		padding: 15,
-		width: 68,
-		alignItems: "center"
-	},
-	active: {
-		backgroundColor: "#143b71",
-		height: "80%",
-		marginHorizontal: 10,
-		borderRadius: 8
-	},
-	inactive: {
-		backgroundColor: "#0A1E38"
-	},
-	toggleText: {
-		color: "#fff",
-		fontSize: 16,
-		fontWeight: "bold"
-	},
-	activeText: {
-		color: "#fff"
-	}
-});
 
 export default ParamScreen;

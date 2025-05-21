@@ -7,12 +7,23 @@ export const searchService = {
 	/**
 	 * Search all media types (movies, actors, etc)
 	 * @param searchTerm The term to search for
+	 * @param providers Optional list of provider IDs to filter by
 	 * @returns Search results object
 	 */
-	searchAll: async (searchTerm: string) => {
+	searchAll: async (searchTerm: string, providers?: number[]) => {
 		try {
 			const validSearchTerm = searchTerm.trim();
-			const response = await ApiHelper.get(`/search/${validSearchTerm}`);
+			let url = `/search/${validSearchTerm}`;
+
+			// Add provider query params if they exist
+			if (providers && providers.length > 0) {
+				const providerParams = providers
+					.map((id) => `providers=${id}`)
+					.join("&");
+				url += `?${providerParams}`;
+			}
+
+			const response = await ApiHelper.get(url);
 			return response;
 		} catch (error) {
 			return {
@@ -25,14 +36,23 @@ export const searchService = {
 	/**
 	 * Search only movies
 	 * @param searchTerm The term to search for
+	 * @param providers Optional list of provider IDs to filter by
 	 * @returns Movies search results
 	 */
-	searchMovies: async (searchTerm: string) => {
+	searchMovies: async (searchTerm: string, providers?: number[]) => {
 		try {
 			const validSearchTerm = searchTerm.trim();
-			const response = await ApiHelper.get(
-				`/search/movie/${validSearchTerm}`
-			);
+			let url = `/search/movie/${validSearchTerm}`;
+
+			// Add provider query params if they exist
+			if (providers && providers.length > 0) {
+				const providerParams = providers
+					.map((id) => `providers=${id}`)
+					.join("&");
+				url += `?${providerParams}`;
+			}
+
+			const response = await ApiHelper.get(url);
 			return response;
 		} catch (error) {
 			return {
@@ -53,23 +73,6 @@ export const searchService = {
 			const response = await ApiHelper.get(
 				`/search/person/${validSearchTerm}`
 			);
-			return response;
-		} catch (error) {
-			return {
-				success: false,
-				data: []
-			};
-		}
-	},
-
-	/**
-	 * Search movies by release year
-	 * @param year The year to search for
-	 * @returns Movies from the specified year
-	 */
-	searchByYear: async (year: number) => {
-		try {
-			const response = await ApiHelper.get(`/search/year/${year}`);
 			return response;
 		} catch (error) {
 			return {

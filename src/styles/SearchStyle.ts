@@ -30,6 +30,12 @@ const styles = StyleSheet.create({
 		color: "#000",
 		margin: "auto"
 	},
+	filterSection: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginVertical: 5
+	},
 	listFilters: {
 		flexDirection: "row",
 		marginBottom: 10
@@ -114,6 +120,90 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center"
+	},
+	// Provider filter button styles
+	providerFilterButton: {
+		backgroundColor: "transparent",
+		paddingHorizontal: 15,
+		paddingVertical: 8,
+		borderRadius: 5,
+		borderWidth: 0.5,
+		borderColor: "#AC2821",
+		height: 35
+	},
+	activeProviderFilterButton: {
+		backgroundColor: "#AC2821",
+		borderColor: "#AC2821"
+	},
+	providerFilterText: {
+		color: "#fff",
+		fontSize: 16
+	},
+	// Provider filter modal styles
+	providerFilterContainer: {
+		backgroundColor: "#192841",
+		borderRadius: 10,
+		padding: 15,
+		marginBottom: 10
+	},
+	providerFilterHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 15
+	},
+	providerFilterTitle: {
+		color: "#fff",
+		fontSize: 18,
+		fontWeight: "bold"
+	},
+	clearText: {
+		color: "#AC2821",
+		fontSize: 14
+	},
+	providerList: {
+		flexDirection: "row",
+		marginBottom: 15
+	},
+	providerItem: {
+		width: 80,
+		height: 80,
+		borderRadius: 10,
+		marginRight: 10,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#0F1C2E",
+		borderWidth: 1,
+		borderColor: "transparent"
+	},
+	selectedProviderItem: {
+		borderColor: "#AC2821",
+		borderWidth: 2
+	},
+	providerLogo: {
+		width: 60,
+		height: 60,
+		borderRadius: 5
+	},
+	providerName: {
+		color: "#fff",
+		textAlign: "center",
+		fontSize: 12,
+		padding: 5
+	},
+	providerFilterActions: {
+		flexDirection: "row",
+		justifyContent: "flex-end"
+	},
+	providerFilterApplyButton: {
+		backgroundColor: "#AC2821",
+		paddingHorizontal: 20,
+		paddingVertical: 10,
+		borderRadius: 5
+	},
+	providerFilterApplyText: {
+		color: "#fff",
+		fontWeight: "bold"
 	}
 });
 
