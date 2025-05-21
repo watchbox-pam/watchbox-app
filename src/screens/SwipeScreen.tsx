@@ -202,8 +202,8 @@ export default function SwipeScreen() {
 							{
 								opacity: nextCardOpacity,
 								transform: [{ scale: nextCardScale }],
-								top: 10 * i, // légère translation verticale
-								zIndex: 3 - i
+								zIndex: 3 - i,
+								shadowOpacity: 0
 							}
 						]}>
 						<Image
@@ -272,14 +272,19 @@ const styles = StyleSheet.create({
 		overflow: "hidden"
 	},
 	posterImage: {
-		width: "100%",
-		height: "85%"
+		width: "90%",
+		height: "85%",
+		marginHorizontal: "auto",
+		marginTop: 10,
+		borderRadius: 20
 	},
 	movieTitle: {
-		fontSize: 24,
+		fontSize: 20,
 		color: "white",
 		padding: 10,
-		textAlign: "center"
+		textAlign: "center",
+		height: "30%",
+		fontFamily: "oswald"
 	},
 	likeLabel: {
 		position: "absolute",
