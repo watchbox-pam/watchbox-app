@@ -10,11 +10,14 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { searchService } from "@/src/services/SearchService";
+import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
 import { router } from "expo-router";
 import StyledText from "../components/StyledText";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
+import Provider from "@/src/models/Provider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -24,6 +27,12 @@ export default function SearchScreen() {
 	const [actors, setActors] = useState<Person[]>([]);
 	const [selectedFilter, setSelectedFilter] = useState("all");
 
+	// State variables for providers
+	const [allProviders, setAllProviders] = useState<Provider[]>([]);
+	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
+	const [showProviderFilter, setShowProviderFilter] =
+		useState<boolean>(false);
+
 	// Available search filters
 	const filters = [
 		{ key: "all", label: "Tous" },
@@ -31,15 +40,51 @@ export default function SearchScreen() {
 		{ key: "actors", label: "Acteurs" }
 	];
 
-	// Perform search based on current filter and search term
+	// Load providers and selected providers when component mounts
+	useEffect(() => {
+		fetchProviders();
+		loadSelectedProviders();
+	}, []);
+
+	// Fetch all providers from API
+	const fetchProviders = async () => {
+		try {
+			const response = await providerService.getProviders();
+			if (response.success) {
+				setAllProviders(response.data);
+			}
+		} catch (error) {
+			console.error("Error fetching providers:", error);
+		}
+	};
+
+	// Load selected providers from AsyncStorage
+	const loadSelectedProviders = async () => {
+		try {
+			const savedProviders =
+				await AsyncStorage.getItem("selectedProviders");
+			if (savedProviders) {
+				const parsedProviders = JSON.parse(savedProviders);
+				setSelectedProviders(parsedProviders);
+			}
+		} catch (error) {
+			console.error("Error loading selected providers:", error);
+		}
+	};
+
+	// Perform search based on current filter, search term, and selected providers
 	const search = async () => {
 		if (searchTerm.trim()) {
 			setIsLoading(true);
 			try {
 				switch (selectedFilter) {
 					case "films":
-						const movieResults =
-							await searchService.searchMovies(searchTerm);
+						const movieResults = await searchService.searchMovies(
+							searchTerm,
+							selectedProviders.length > 0
+								? selectedProviders
+								: undefined
+						);
 						if (movieResults.success) {
 							setMovies(movieResults.data);
 							setActors([]); // Clear actors when filtering movies
@@ -57,8 +102,12 @@ export default function SearchScreen() {
 
 					case "all":
 					default:
-						const allResults =
-							await searchService.searchAll(searchTerm);
+						const allResults = await searchService.searchAll(
+							searchTerm,
+							selectedProviders.length > 0
+								? selectedProviders
+								: undefined
+						);
 						if (allResults.success) {
 							setMovies(allResults.data.movies || []);
 							setActors(allResults.data.people || []);
@@ -71,6 +120,39 @@ export default function SearchScreen() {
 				setIsLoading(false);
 			}
 		}
+	};
+
+	// Toggle provider selection
+	const toggleProvider = (providerId: number) => {
+		setSelectedProviders((prev) => {
+			if (prev.includes(providerId)) {
+				return prev.filter((id) => id !== providerId);
+			} else {
+				return [...prev, providerId];
+			}
+		});
+	};
+
+	// Save selected providers to AsyncStorage
+	const saveSelectedProviders = async () => {
+		try {
+			await AsyncStorage.setItem(
+				"selectedProviders",
+				JSON.stringify(selectedProviders)
+			);
+			setShowProviderFilter(false);
+			// Trigger search again with new providers
+			if (searchTerm.trim()) {
+				search();
+			}
+		} catch (error) {
+			console.error("Error saving selected providers:", error);
+		}
+	};
+
+	// Clear all selected providers
+	const clearSelectedProviders = () => {
+		setSelectedProviders([]);
 	};
 
 	// Trigger search when the filter changes and searchTerm is not empty
@@ -160,7 +242,7 @@ export default function SearchScreen() {
 			</View>
 
 			{/* Filter selection horizontal list */}
-			<View>
+			<View style={styles.filterSection}>
 				<FlatList
 					horizontal
 					showsHorizontalScrollIndicator={false}
@@ -186,7 +268,75 @@ export default function SearchScreen() {
 						</TouchableOpacity>
 					)}
 				/>
+
+				{/* Provider filter button */}
+				<TouchableOpacity
+					style={[
+						styles.providerFilterButton,
+						selectedProviders.length > 0 &&
+							styles.activeProviderFilterButton
+					]}
+					onPress={() => setShowProviderFilter(!showProviderFilter)}>
+					<Text style={styles.providerFilterText}>
+						{selectedProviders.length > 0
+							? `Filtres (${selectedProviders.length})`
+							: "Filtres"}
+					</Text>
+				</TouchableOpacity>
 			</View>
+
+			{/* Provider filter modal */}
+			{showProviderFilter && (
+				<View style={styles.providerFilterContainer}>
+					<View style={styles.providerFilterHeader}>
+						<Text style={styles.providerFilterTitle}>
+							Plateformes
+						</Text>
+						<TouchableOpacity onPress={clearSelectedProviders}>
+							<Text style={styles.clearText}>Effacer tout</Text>
+						</TouchableOpacity>
+					</View>
+
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						style={styles.providerList}>
+						{allProviders.map((provider) => (
+							<TouchableOpacity
+								key={provider.id}
+								style={[
+									styles.providerItem,
+									selectedProviders.includes(provider.id) &&
+										styles.selectedProviderItem
+								]}
+								onPress={() => toggleProvider(provider.id)}>
+								{provider.logo_path ? (
+									<Image
+										source={{
+											uri: `https://image.tmdb.org/t/p/original${provider.logo_path}`
+										}}
+										style={styles.providerLogo}
+									/>
+								) : (
+									<Text style={styles.providerName}>
+										{provider.name}
+									</Text>
+								)}
+							</TouchableOpacity>
+						))}
+					</ScrollView>
+
+					<View style={styles.providerFilterActions}>
+						<TouchableOpacity
+							style={styles.providerFilterApplyButton}
+							onPress={saveSelectedProviders}>
+							<Text style={styles.providerFilterApplyText}>
+								Appliquer
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			)}
 
 			{/* Loading indicator */}
 			{isLoading && (
