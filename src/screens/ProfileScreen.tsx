@@ -22,6 +22,7 @@ import useSessionStore from "../zustand/sessionStore";
 import Playlist from "../models/Playlist";
 import {
 	createPlaylist,
+	getMovieRuntime,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 
@@ -29,6 +30,8 @@ export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
+	const [totalMovies, setTotalMovies] = useState(0);
+	const [totalRuntime, setTotalRuntime] = useState(0);
 
 	const { id } = useLocalSearchParams();
 	const [profileData, setProfileData] = useState(null);
@@ -74,15 +77,31 @@ export default function Index() {
 
 	useEffect(() => {
 		const userId = id || (currentUser && currentUser.id);
-
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
 			fetchUserPlaylists(userId);
 		} else {
-			setError("ID utilisateur invalide");
+			setError("ID utilisateur invalide" as any);
 			setLoading(false);
 		}
 	}, [id, currentUser]);
+
+	useEffect(() => {
+		const userId = id || (currentUser && currentUser.id);
+		if (userId && typeof userId === "string" && userPlaylists.length > 0) {
+			const historique = userPlaylists.find(
+				(p) => p.title === "Historique"
+			);
+			if (historique) {
+				getMovieRuntime(userId, historique.title).then((result) => {
+					if (result.success && result.data) {
+						setTotalMovies(result.data.movie_count);
+						setTotalRuntime(result.data.total_runtime);
+					}
+				});
+			}
+		}
+	}, [userPlaylists, id, currentUser]);
 
 	const fetchProfileData = async (userId: string) => {
 		setLoading(true);
@@ -222,7 +241,7 @@ export default function Index() {
 				)}
 			</View>
 
-			<Stats />
+			<Stats totalMovies={totalMovies} total_runtime={totalRuntime} />
 		</ScrollView>
 	);
 }
