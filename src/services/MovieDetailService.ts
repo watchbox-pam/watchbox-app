@@ -3,7 +3,7 @@ import { ApiHelper } from "@/src/utils/axios";
 export const fetchMovieDetails = async (movieId: number) => {
 	try {
 		const data: { success: boolean; data: any } = await ApiHelper.get(
-			`/movies/id/${movieId}`
+			`/movies/${movieId}`
 		);
 		return data;
 	} catch (error: any) {
