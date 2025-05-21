@@ -46,9 +46,9 @@ export abstract class ApiHelper {
 		try {
 			let userToken: string | null;
 			if (Platform.OS === "ios" || Platform.OS === "android") {
-				userToken = await SecureStore.getItemAsync("currentUser");
+				userToken = await SecureStore.getItemAsync("token");
 			} else {
-				userToken = localStorage.getItem("currentUser");
+				userToken = localStorage.getItem("token");
 			}
 			const jsonData: string = JSON.stringify(data);
 			const response = await ApiHelper.instance.post(url, jsonData, {
@@ -79,9 +79,9 @@ export abstract class ApiHelper {
 		try {
 			let userToken: string | null;
 			if (Platform.OS === "ios" || Platform.OS === "android") {
-				userToken = await SecureStore.getItemAsync("currentUser");
+				userToken = await SecureStore.getItemAsync("token");
 			} else {
-				userToken = localStorage.getItem("currentUser");
+				userToken = localStorage.getItem("token");
 			}
 			const jsonData: string = JSON.stringify(data);
 			const response = await this.instance.put(url, jsonData, {
@@ -108,9 +108,9 @@ export abstract class ApiHelper {
 		try {
 			let userToken: string | null;
 			if (Platform.OS === "ios" || Platform.OS === "android") {
-				userToken = await SecureStore.getItemAsync("currentUser");
+				userToken = await SecureStore.getItemAsync("token");
 			} else {
-				userToken = localStorage.getItem("currentUser");
+				userToken = localStorage.getItem("token");
 			}
 			const response = await this.instance.delete(url, {
 				...options,

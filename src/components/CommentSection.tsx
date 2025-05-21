@@ -1,9 +1,8 @@
-import { View, FlatList, Image } from "react-native";
-import Stars from "@/src/components/Stars";
+import { View, FlatList } from "react-native";
 import Review from "@/src/models/Review";
 import styles from "@/src/styles/CommentaryStyle";
 import React from "react";
-import StyledText from "./StyledText";
+import MovieReview from "@/src/components/MovieReview";
 
 interface CommentSectionProps {
 	isMyComments: boolean;
@@ -19,26 +18,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 			<FlatList
 				scrollEnabled={false}
 				data={reviews}
-				renderItem={({ item }) => (
-					<View style={styles.comment} key={item.id}>
-						<View style={styles.commentTop}>
-							<View style={styles.userInfo}>
-								<Image
-									source={require("../assets/images/Interstellar-film1.png")}
-									style={styles.userPicture}
-								/>
-								<StyledText style={styles.userName}>
-									{item.user?.username}
-								</StyledText>
-							</View>
-							{item.rating !== null &&
-								item.rating !== undefined && (
-									<Stars rating={item.rating} />
-								)}
-						</View>
-						<StyledText>{item.comment}</StyledText>
-					</View>
-				)}
+				renderItem={({ item }) => <MovieReview review={item} />}
 			/>
 		</View>
 	);

@@ -47,3 +47,6 @@ yarn.lock
 
 #exceptions
 .swp
+
+android/
+ios/
