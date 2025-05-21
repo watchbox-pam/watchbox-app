@@ -10,67 +10,34 @@ import {
 	Dimensions
 } from "react-native";
 import { fetchMovies } from "../services/SwipeService";
-import { useLocalSearchParams } from "expo-router";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 120;
 
-export default function App() {
-	// Liste de films exemple
-	const [movies, setMovies] = useState([
-		{
-			id: "1",
-			title: "Inception",
-			image: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg"
-		},
-		{
-			id: "2",
-			title: "The Dark Knight",
-			image: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg"
-		},
-		{
-			id: "3",
-			title: "Interstellar",
-			image: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg"
-		},
-		{
-			id: "4",
-			title: "Pulp Fiction",
-			image: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
-		},
-		{
-			id: "5",
-			title: "The Godfather",
-			image: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
-		}
-	]);
+interface Movie {
+	id: number;
+	title: string;
+	poster_path: string | null;
+}
 
+export default function SwipeScreen() {
+	const [movies, setMovies] = useState<Movie[]>([]);
 	const [loading, setLoading] = useState(true);
-	const { id } = useLocalSearchParams();
-
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const response = await fetchMovies(+id);
-			if (response.success) {
-				setMovies(response.data);
-			}
-			setLoading(false);
-		} catch (e) {
-			console.error(e);
-		}
-	};
 
 	useEffect(() => {
-		setLoading(true);
-		fetchData();
-	}, [id]);
+		const loadMovies = async () => {
+			const res = await fetchMovies();
+			setMovies(res);
+			setLoading(false);
+		};
+
+		loadMovies();
+	}, []);
 
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [likedMovies, setLikedMovies] = useState([]);
-	const [dislikedMovies, setDislikedMovies] = useState([]);
+	const [likedMovies, setLikedMovies] = useState<Movie[]>([]);
+	const [dislikedMovies, setDislikedMovies] = useState<Movie[]>([]);
 
-	// Animation pour le swipe
 	const position = useRef(new Animated.ValueXY()).current;
 	const rotate = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
@@ -102,9 +69,11 @@ export default function App() {
 		extrapolate: "clamp"
 	});
 
-	// Gérer le résultat d'un swipe
 	const handleSwipeComplete = (direction: string) => {
-		const item = movies[currentIndex];
+		if (movies.length === 0) return;
+
+		const item = movies[currentIndex % movies.length];
+		if (!item) return;
 
 		if (direction === "right") {
 			setLikedMovies((prev) => [...prev, item]);
@@ -112,11 +81,10 @@ export default function App() {
 			setDislikedMovies((prev) => [...prev, item]);
 		}
 
-		setCurrentIndex((prev) => prev + 1);
+		setCurrentIndex((prev) => (prev + 1) % movies.length);
 		position.setValue({ x: 0, y: 0 });
 	};
 
-	// Configuration du PanResponder pour gérer les mouvements
 	const panResponder = useRef(
 		PanResponder.create({
 			onStartShouldSetPanResponder: () => true,
@@ -149,7 +117,6 @@ export default function App() {
 		})
 	).current;
 
-	// Fonction pour liker ou disliker via les boutons
 	const handleButtonPress = (direction: string) => {
 		Animated.spring(position, {
 			toValue: {
@@ -165,110 +132,103 @@ export default function App() {
 		});
 	};
 
-	// Rendu des cartes
 	const renderCards = () => {
-		if (currentIndex >= movies.length) {
+		if (movies.length === 0) {
 			return (
 				<View style={styles.endContainer}>
-					<Text style={styles.endText}>
-						Vous avez parcouru tous les films!
-					</Text>
-					<Text style={styles.endSubText}>
-						Films aimés: {likedMovies.length}
-					</Text>
-					<Text style={styles.endSubText}>
-						Films non aimés: {dislikedMovies.length}
-					</Text>
-					<TouchableOpacity
-						style={styles.resetButton}
-						onPress={() => {
-							setCurrentIndex(0);
-							setLikedMovies([]);
-							setDislikedMovies([]);
-						}}>
-						<Text style={styles.resetButtonText}>Recommencer</Text>
-					</TouchableOpacity>
+					<Text style={styles.endText}>Aucun film disponible.</Text>
 				</View>
 			);
 		}
 
-		return movies
-			.map((movie, index) => {
-				if (index < currentIndex) {
-					return null;
-				}
+		// Affiche 3 cartes à la fois : current, next et next +1, en boucle
+		const cards = [];
+		for (let i = 0; i < movies.length; i++) {
+			const index = (currentIndex + i) % movies.length;
+			const movie = movies[index];
+			const posterUri = movie.poster_path
+				? movie.poster_path.startsWith("http")
+					? movie.poster_path
+					: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+				: "https://via.placeholder.com/300x450?text=Pas+d'image";
 
-				if (index === currentIndex) {
-					return (
+			if (i === 0) {
+				// carte active (swipe)
+				cards.push(
+					<Animated.View
+						key={movie.id}
+						style={[
+							styles.card,
+							{
+								transform: [
+									{ translateX: position.x },
+									{ translateY: position.y },
+									{ rotate: rotate }
+								],
+								zIndex: 3
+							}
+						]}
+						{...panResponder.panHandlers}>
+						<Image
+							source={{ uri: posterUri }}
+							style={styles.posterImage}
+						/>
+						<Text style={styles.movieTitle}>{movie.title}</Text>
+
 						<Animated.View
-							key={movie.id}
 							style={[
-								styles.card,
-								{
-									transform: [
-										{ translateX: position.x },
-										{ translateY: position.y },
-										{ rotate: rotate }
-									]
-								}
-							]}
-							{...panResponder.panHandlers}>
-							<Image
-								source={{ uri: movie.image }}
-								style={styles.posterImage}
-							/>
-							<Text style={styles.movieTitle}>{movie.title}</Text>
-
-							<Animated.View
-								style={[
-									styles.likeLabel,
-									{ opacity: likeOpacity }
-								]}>
-								<Text style={styles.likeLabelText}>LIKE</Text>
-							</Animated.View>
-
-							<Animated.View
-								style={[
-									styles.dislikeLabel,
-									{ opacity: dislikeOpacity }
-								]}>
-								<Text style={styles.dislikeLabelText}>
-									NOPE
-								</Text>
-							</Animated.View>
-						</Animated.View>
-					);
-				}
-
-				if (index === currentIndex + 1) {
-					return (
-						<Animated.View
-							key={movie.id}
-							style={[
-								styles.card,
-								{
-									opacity: nextCardOpacity,
-									transform: [{ scale: nextCardScale }],
-									zIndex: -1
-								}
+								styles.likeLabel,
+								{ opacity: likeOpacity }
 							]}>
-							<Image
-								source={{ uri: movie.image }}
-								style={styles.posterImage}
-							/>
-							<Text style={styles.movieTitle}>{movie.title}</Text>
+							<Text style={styles.likeLabelText}>LIKE</Text>
 						</Animated.View>
-					);
-				}
 
-				return null;
-			})
-			.reverse();
+						<Animated.View
+							style={[
+								styles.dislikeLabel,
+								{ opacity: dislikeOpacity }
+							]}>
+							<Text style={styles.dislikeLabelText}>NOPE</Text>
+						</Animated.View>
+					</Animated.View>
+				);
+			} else {
+				// cartes suivantes, derrière avec opacité et scale
+				cards.push(
+					<Animated.View
+						key={movie.id}
+						style={[
+							styles.card,
+							{
+								opacity: nextCardOpacity,
+								transform: [{ scale: nextCardScale }],
+								top: 10 * i, // légère translation verticale
+								zIndex: 3 - i
+							}
+						]}>
+						<Image
+							source={{ uri: posterUri }}
+							style={styles.posterImage}
+						/>
+						<Text style={styles.movieTitle}>{movie.title}</Text>
+					</Animated.View>
+				);
+			}
+		}
+
+		// Inverse l'ordre pour que la carte active soit au-dessus
+		return cards.reverse();
 	};
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.cardContainer}>{renderCards()}</View>
+			<View style={styles.cardContainer}>
+				{loading ? (
+					<Text style={{ color: "white" }}>Chargement...</Text>
+				) : (
+					renderCards()
+				)}
+			</View>
 
 			<View style={styles.buttonsContainer}>
 				<TouchableOpacity
@@ -305,120 +265,86 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 		backgroundColor: "#143b71",
 		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: 10 },
 		shadowOpacity: 0.3,
-		shadowRadius: 4,
+		shadowRadius: 10,
 		elevation: 5,
-		alignItems: "center",
-		padding: 10
+		overflow: "hidden"
 	},
 	posterImage: {
 		width: "100%",
-		height: "85%",
-		borderRadius: 15,
-		resizeMode: "cover"
+		height: "85%"
 	},
 	movieTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		marginTop: 15,
-		color: "#fff"
+		fontSize: 24,
+		color: "white",
+		padding: 10,
+		textAlign: "center"
+	},
+	likeLabel: {
+		position: "absolute",
+		top: 40,
+		left: 40,
+		borderWidth: 3,
+		borderColor: "green",
+		padding: 10,
+		borderRadius: 5,
+		backgroundColor: "rgba(0,255,0,0.2)",
+		transform: [{ rotate: "-20deg" }]
+	},
+	likeLabelText: {
+		color: "green",
+		fontWeight: "800",
+		fontSize: 32
+	},
+	dislikeLabel: {
+		position: "absolute",
+		top: 40,
+		right: 40,
+		borderWidth: 3,
+		borderColor: "red",
+		padding: 10,
+		borderRadius: 5,
+		backgroundColor: "rgba(255,0,0,0.2)",
+		transform: [{ rotate: "20deg" }]
+	},
+	dislikeLabelText: {
+		color: "red",
+		fontWeight: "800",
+		fontSize: 32
 	},
 	buttonsContainer: {
 		flexDirection: "row",
 		justifyContent: "space-around",
-		marginBottom: 30,
-		width: "80%",
-		alignSelf: "center"
+		paddingBottom: 30
 	},
 	likeButton: {
-		width: 70,
-		height: 70,
-		borderRadius: 35,
-		backgroundColor: "#4caf50",
+		backgroundColor: "green",
+		width: 80,
+		height: 80,
+		borderRadius: 40,
 		justifyContent: "center",
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 5
+		alignItems: "center"
 	},
 	dislikeButton: {
-		width: 70,
-		height: 70,
-		borderRadius: 35,
-		backgroundColor: "#ff5252",
+		backgroundColor: "red",
+		width: 80,
+		height: 80,
+		borderRadius: 40,
 		justifyContent: "center",
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 5
+		alignItems: "center"
 	},
 	buttonText: {
-		fontSize: 30,
+		fontSize: 32,
 		color: "white"
-	},
-	likeLabel: {
-		position: "absolute",
-		top: 50,
-		right: 40,
-		transform: [{ rotate: "20deg" }],
-		borderWidth: 4,
-		borderColor: "#4caf50",
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 5
-	},
-	likeLabelText: {
-		fontSize: 32,
-		fontWeight: "bold",
-		color: "#4caf50"
-	},
-	dislikeLabel: {
-		position: "absolute",
-		top: 50,
-		left: 40,
-		transform: [{ rotate: "-20deg" }],
-		borderWidth: 4,
-		borderColor: "#ff5252",
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 5
-	},
-	dislikeLabelText: {
-		fontSize: 32,
-		fontWeight: "bold",
-		color: "#ff5252"
 	},
 	endContainer: {
-		alignItems: "center",
+		flex: 1,
 		justifyContent: "center",
-		color: "white"
+		alignItems: "center"
 	},
 	endText: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 20,
-		color: "#fff"
-	},
-	endSubText: {
-		fontSize: 18,
-		marginBottom: 5,
-		color: "#fff"
-	},
-	resetButton: {
-		marginTop: 30,
-		backgroundColor: "#143b71",
-		paddingVertical: 12,
-		paddingHorizontal: 30,
-		borderRadius: 8
-	},
-	resetButtonText: {
 		color: "white",
-		fontSize: 18,
-		fontWeight: "bold"
+		fontSize: 22
 	}
 });
