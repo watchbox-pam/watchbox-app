@@ -17,7 +17,7 @@ import StyledText from "../components/StyledText";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -62,7 +62,7 @@ export default function SearchScreen() {
 	const loadSelectedProviders = async () => {
 		try {
 			const savedProviders =
-				await AsyncStorage.getItem("selectedProviders");
+				await SecureStore.getItemAsync("selectedProviders");
 			if (savedProviders) {
 				const parsedProviders = JSON.parse(savedProviders);
 				setSelectedProviders(parsedProviders);
@@ -124,19 +124,17 @@ export default function SearchScreen() {
 
 	// Toggle provider selection
 	const toggleProvider = (providerId: number) => {
-		setSelectedProviders((prev) => {
-			if (prev.includes(providerId)) {
-				return prev.filter((id) => id !== providerId);
-			} else {
-				return [...prev, providerId];
-			}
-		});
+		setSelectedProviders((prev) =>
+			prev.includes(providerId)
+				? prev.filter((id) => id !== providerId)
+				: [...prev, providerId]
+		);
 	};
 
 	// Save selected providers to AsyncStorage
 	const saveSelectedProviders = async () => {
 		try {
-			await AsyncStorage.setItem(
+			await SecureStore.setItemAsync(
 				"selectedProviders",
 				JSON.stringify(selectedProviders)
 			);
