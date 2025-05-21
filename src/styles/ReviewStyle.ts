@@ -9,13 +9,19 @@ const styles = StyleSheet.create({
 		fontSize: 36
 	},
 	comment: {
-		height: 40,
+		flex: 1,
 		borderWidth: 1,
 		borderRadius: 4,
 		borderColor: "#6B737A",
 		marginBottom: 15,
 		color: "#fff",
 		padding: 5
+	},
+	ratingView: {
+		alignItems: "center"
+	},
+	spoilerView: {
+		alignItems: "flex-start"
 	},
 	button: {
 		backgroundColor: "#AC2128",

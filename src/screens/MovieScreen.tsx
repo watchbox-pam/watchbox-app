@@ -27,6 +27,7 @@ import CommentaryScreen from "@/src/screens/CommentaryScreen";
 import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 import useSessionStore from "../zustand/sessionStore";
 import DropDownPlaylist from "../components/DropDownPlaylist";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -72,13 +73,7 @@ export default function MovieScreen() {
 	};
 
 	if (error) {
-		return (
-			<View style={styles.errorContainer} testID="error">
-				<StyledText style={styles.errorText}>
-					Erreur lors du chargement des données.
-				</StyledText>
-			</View>
-		);
+		return <ErrorMessage />;
 	}
 
 	if (loading) {

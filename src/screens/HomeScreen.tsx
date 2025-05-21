@@ -7,6 +7,7 @@ import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { ActivityIndicator } from "react-native-paper";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function HomeScreen() {
 	// State for grouped movie sections (e.g., popular, genres)
@@ -81,13 +82,7 @@ export default function HomeScreen() {
 	}, []);
 
 	if (error) {
-		return (
-			<View style={styles.errorContainer} testID="error">
-				<StyledText style={styles.errorText}>
-					Erreur lors du chargement des données.
-				</StyledText>
-			</View>
-		);
+		return <ErrorMessage />;
 	}
 
 	if (loading) {
