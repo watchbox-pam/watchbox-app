@@ -21,6 +21,7 @@ import useSessionStore from "../zustand/sessionStore";
 import Playlist from "../models/Playlist";
 import {
 	createPlaylist,
+	getMovieRuntime,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 import { ActivityIndicator } from "react-native-paper";
@@ -29,6 +30,8 @@ export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
+	const [totalMovies, setTotalMovies] = useState(0);
+	const [totalRuntime, setTotalRuntime] = useState(0);
 
 	const [profileData, setProfileData] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -73,15 +76,31 @@ export default function Index() {
 
 	useEffect(() => {
 		const userId = currentUser && currentUser.id;
-
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
 			fetchUserPlaylists(userId);
 		} else {
-			setError("ID utilisateur invalide");
+			setError("ID utilisateur invalide" as any);
 			setLoading(false);
 		}
 	}, [currentUser]);
+
+	useEffect(() => {
+		const userId = currentUser && currentUser.id;
+		if (userId && typeof userId === "string" && userPlaylists.length > 0) {
+			const historique = userPlaylists.find(
+				(p) => p.title === "Historique"
+			);
+			if (historique) {
+				getMovieRuntime(userId, historique.title).then((result) => {
+					if (result.success && result.data) {
+						setTotalMovies(result.data.movie_count);
+						setTotalRuntime(result.data.total_runtime);
+					}
+				});
+			}
+		}
+	}, [userPlaylists, currentUser]);
 
 	const fetchProfileData = async (userId: string) => {
 		setLoading(true);
@@ -180,7 +199,7 @@ export default function Index() {
 					style={styles.shadowBottom}
 				/>
 				<Image
-					source={require("../assets/images/banner-interstellar.png")}
+					source={require("../assets/images/banniere default.png")}
 					style={styles.imageBanner}
 				/>
 			</View>
@@ -188,7 +207,7 @@ export default function Index() {
 			<View style={styles.infoContainer}>
 				<View style={styles.imagePosterContainer}>
 					<Image
-						source={require("../assets/images/Interstellar-film1.png")}
+						source={require("../assets/images/default-user.png")}
 						style={styles.ProfilPicture}
 					/>
 					<Text style={styles.title}>
@@ -198,16 +217,6 @@ export default function Index() {
 					</Text>
 				</View>
 				<DropDownButton />
-			</View>
-
-			<View>
-				<StyledText style={styles.description}>
-					Dans un futur proche, face à une Terre qui se meurt, un
-					groupe d'explorateurs utilise un vaisseau interstellaire
-					pour franchir un trou de ver permettant de parcourir des
-					distances jusque‐là infranchissables. Leur but : trouver un
-					nouveau foyer pour l'humanité.
-				</StyledText>
 			</View>
 
 			<TraitGradiant />
@@ -239,7 +248,7 @@ export default function Index() {
 				)}
 			</View>
 
-			<Stats />
+			<Stats totalMovies={totalMovies} total_runtime={totalRuntime} />
 		</ScrollView>
 	);
 }
@@ -290,11 +299,12 @@ const styles = StyleSheet.create({
 		zIndex: 1
 	},
 	title: {
-		fontSize: 40,
+		fontSize: 30,
 		color: "#ffffff",
 		paddingTop: 10,
 		paddingLeft: 10,
-		marginTop: 15
+		paddingRight: 10,
+		width: "90%"
 	},
 	text: {
 		fontSize: 15
@@ -333,7 +343,8 @@ const styles = StyleSheet.create({
 	},
 	WatchList: {
 		width: 350,
-		marginBottom: 10
+		marginBottom: 10,
+		zIndex: -10
 	},
 	TitleWatchList: {
 		color: "#ffffff",
@@ -366,14 +377,16 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		width: 30,
-		height: 30
+		height: 30,
+		zIndex: -1
 	},
 	createWatchlistButtonText: {
 		color: "#ffffff",
 		fontSize: 20,
 		fontWeight: "bold",
 		textAlign: "center",
-		lineHeight: 22
+		lineHeight: 22,
+		zIndex: -1
 	},
 	modalContainer: {
 		flex: 1,

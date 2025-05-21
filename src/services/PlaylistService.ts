@@ -368,3 +368,26 @@ export async function deleteMediaFromPlaylist(
 		};
 	}
 }
+
+export async function getMovieRuntime(userId: string, title: string) {
+	try {
+		const result = await ApiHelper.get(
+			`/playlists/${userId}/${title}/runtime`
+		);
+		return {
+			success: true,
+			data: result.data
+		};
+	} catch (error) {
+		console.error(
+			"Error in getMovieRuntime:",
+			(error as any).response?.data || (error as any).message
+		);
+		return {
+			success: false,
+			message:
+				(error as any).message ||
+				"Erreur lors de la récupération de la playlist"
+		};
+	}
+}
