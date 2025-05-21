@@ -3,7 +3,7 @@ import { View, Platform } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as SecureStore from "expo-secure-store";
-import styles from "../styles/DropDownButton";
+import styles from "@/src/styles/DropDownButton";
 
 const DropDownButton = () => {
 	const [visible, setVisible] = useState(false);
@@ -82,24 +82,5 @@ const DropDownButton = () => {
 		</Provider>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		position: "absolute",
-		top: 20,
-		left: 40,
-		zIndex: 200
-	},
-	menu: {
-		position: "absolute",
-		backgroundColor: "#313131",
-		top: 10,
-		left: -110,
-		zIndex: 500
-	},
-	logoutText: {
-		color: "#FF6B6B"
-	}
-});
 
 export default DropDownButton;

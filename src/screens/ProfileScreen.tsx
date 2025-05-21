@@ -74,7 +74,7 @@ export default function Index() {
 	};
 
 	useEffect(() => {
-		const userId = id || (currentUser && currentUser.id);
+		const userId = currentUser && currentUser.id;
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
 			fetchUserPlaylists(userId);
@@ -82,10 +82,10 @@ export default function Index() {
 			setError("ID utilisateur invalide" as any);
 			setLoading(false);
 		}
-	}, [id, currentUser]);
+	}, [currentUser]);
 
 	useEffect(() => {
-		const userId = id || (currentUser && currentUser.id);
+		const userId = currentUser && currentUser.id;
 		if (userId && typeof userId === "string" && userPlaylists.length > 0) {
 			const historique = userPlaylists.find(
 				(p) => p.title === "Historique"
@@ -99,7 +99,7 @@ export default function Index() {
 				});
 			}
 		}
-	}, [userPlaylists, id, currentUser]);
+	}, [userPlaylists, currentUser]);
 
 	const fetchProfileData = async (userId: string) => {
 		setLoading(true);
