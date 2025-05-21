@@ -3,12 +3,14 @@ import { View, TouchableOpacity, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "@/src/styles/CarouselSelectionStyle";
 
+// Radial animated menu with icon buttons
 const RadialMenu = () => {
 	const [open, setOpen] = useState(false);
 	const animations = [0, 1, 2, 3, 4, 5, 6, 7].map(
 		() => new Animated.Value(0)
 	);
 
+	// Toggle menu open/close with staggered animations
 	const toggleMenu = () => {
 		const toValue = open ? 0 : 1;
 		Animated.stagger(
@@ -24,14 +26,16 @@ const RadialMenu = () => {
 		setOpen(!open);
 	};
 
+	// Button positions around the center (in a circle shape)
 	const positions = [
-		{ x: 0, y: -80 }, // Haut
-		{ x: 70, y: -40 }, // Haut droite
-		{ x: 70, y: 40 }, // Bas droite
-		{ x: 0, y: 80 }, // Bas
-		{ x: -70, y: 0 } // Gauche
+		{ x: 0, y: -80 },
+		{ x: 70, y: -40 },
+		{ x: 70, y: 40 },
+		{ x: 0, y: 80 },
+		{ x: -70, y: 0 }
 	];
 
+	// Icon names (intended to be emotion labels or icons)
 	const icons = [
 		"Frisson",
 		"Excitation",
@@ -51,6 +55,7 @@ const RadialMenu = () => {
 				alignItems: "center",
 				backgroundColor: "#000"
 			}}>
+			{/* Render animated buttons */}
 			{animations.map((anim, index) => {
 				const translateX = anim.interpolate({
 					inputRange: [0, 1],
@@ -69,8 +74,7 @@ const RadialMenu = () => {
 						}}>
 						<TouchableOpacity style={styles.button}>
 							<Ionicons
-								na
-								me={icons[index]}
+								name={icons[index]}
 								size={24}
 								color="#fff"
 							/>

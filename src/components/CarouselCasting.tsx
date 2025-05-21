@@ -3,6 +3,7 @@ import StyledText from "./StyledText";
 import { Link } from "expo-router";
 import styles from "@/src/styles/CarouselCastingStyle";
 
+// Horizontal scrollable cast list component
 export default function CarouselCasting({
 	cast,
 	testID
@@ -10,6 +11,7 @@ export default function CarouselCasting({
 	cast: any;
 	testID?: string;
 }) {
+	// Return nothing if cast is undefined, empty, or only contains nulls
 	if (!cast || cast.length === 0 || cast.every((item: any) => item === null))
 		return null;
 	return (

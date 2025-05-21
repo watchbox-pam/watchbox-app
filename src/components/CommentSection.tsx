@@ -10,6 +10,7 @@ interface CommentSectionProps {
 	reviews: Review[];
 }
 
+// Displays a list of user reviews with rating stars and comments
 const CommentSection: React.FC<CommentSectionProps> = ({
 	isMyComments,
 	reviews

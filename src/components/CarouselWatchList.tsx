@@ -4,6 +4,7 @@ import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
 import styles from "@/src/styles/CarouselWatchListStyle";
 
+// Component displaying a horizontal carousel of movies from a playlist
 export default function CarouselWatchList({ providers }: { providers: any }) {
 	interface Movie {
 		image?: string;
@@ -12,6 +13,7 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 	const [movies, setMovies] = useState<Movie[]>([]);
 
 	useEffect(() => {
+		// Fetch movies for the given playlist (providers.id)
 		const fetchMoviesForPlaylist = async () => {
 			if (providers && providers.id) {
 				try {
@@ -34,6 +36,7 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 		fetchMoviesForPlaylist();
 	}, [providers]);
 
+	// Filter out movies without images
 	const filteredMovies = movies.filter((movie) => movie && movie.image);
 
 	return (

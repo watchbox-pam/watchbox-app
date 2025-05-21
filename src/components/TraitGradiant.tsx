@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "@/src/styles/TraitGradiantStyles";
 
+// Component that renders a horizontal gradient divider
 const GradientDivider = () => {
 	return (
 		<View style={styles.container}>

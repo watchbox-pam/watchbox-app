@@ -21,6 +21,7 @@ interface DropDownModifyPlaylistProps {
 	onUpdate?: (updated: { title: string; is_private: boolean }) => void;
 }
 
+// Component for dropdown menu to modify or delete a playlist
 const DropDownModifyPlaylist = ({
 	playlistId,
 	initialTitle,
@@ -35,6 +36,7 @@ const DropDownModifyPlaylist = ({
 	const currentUser = useSessionStore((state: any) => state.user);
 	const router = useRouter();
 
+	// Update state if props change
 	useEffect(() => {
 		setEditedTitle(initialTitle);
 	}, [initialTitle]);
@@ -52,6 +54,7 @@ const DropDownModifyPlaylist = ({
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
 
+	// Handle playlist update API call
 	const handleUpdatePlaylist = async () => {
 		const userId = currentUser && currentUser.id;
 		const playlist: Playlist = {
@@ -77,6 +80,7 @@ const DropDownModifyPlaylist = ({
 		}
 	};
 
+	// Handle playlist deletion API call
 	const handleDeletePlaylist = async () => {
 		const result = await deletePlaylist(playlistId);
 

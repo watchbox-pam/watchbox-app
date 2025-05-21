@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import styles from "@/src/styles/BackButtonStyle";
 
+// Component that renders a back navigation button
 const BackButton = () => {
 	return (
 		<View style={styles.container}>

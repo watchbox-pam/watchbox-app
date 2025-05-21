@@ -2,8 +2,9 @@ import { FlatList, View, Image } from "react-native";
 import { Link } from "expo-router";
 import styles from "@/src/styles/CarouselPosterStyle";
 
+// Horizontal poster carousel component
 export default function CarouselPoster({ data }: any) {
-	// Vérifier si les données sont disponibles
+	// Return empty container if there's no data
 	if (!data || data.length === 0) {
 		return <View style={styles.container} />;
 	}
