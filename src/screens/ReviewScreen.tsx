@@ -28,7 +28,6 @@ export default function ReviewScreen() {
 		if (result.success) {
 			router.back();
 		} else {
-			console.log(result.message);
 			alert("Echec de la publication de la review");
 		}
 	};
