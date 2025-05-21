@@ -35,14 +35,17 @@ export async function loginUser({
 			// Store all necessary credentials persistently
 			if (Platform.OS === "ios" || Platform.OS === "android") {
 				await SecureStore.setItemAsync("id", result.data.user_id);
-				await SecureStore.setItemAsync("identifier", identifier);
+				await SecureStore.setItemAsync(
+					"identifier",
+					result.data.username
+				);
 				await SecureStore.setItemAsync(
 					"token",
 					JSON.stringify(result.data.token)
 				);
 			} else {
 				localStorage.setItem("id", result.data.user_id);
-				localStorage.setItem("identifier", identifier);
+				localStorage.setItem("identifier", result.data.username);
 				localStorage.setItem(
 					"token",
 					JSON.stringify(result.data.token)
@@ -52,7 +55,8 @@ export async function loginUser({
 				success: true,
 				message: {
 					id: result.data.user_id,
-					token: result.data.token
+					token: result.data.token,
+					username: result.data.username
 				}
 			};
 		} else {
