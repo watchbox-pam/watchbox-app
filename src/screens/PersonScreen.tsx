@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import { Image, ScrollView, View } from "react-native";
-import { styles } from "../styles/PersonStyle";
+import styles from "@/src/styles/PersonStyle";
 import BackButton from "../components/BackButton";
 import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native-paper";
