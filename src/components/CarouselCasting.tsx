@@ -1,13 +1,9 @@
-import {
-	FlatList,
-	Image,
-	StyleSheet,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { FlatList, Image, TouchableOpacity, View } from "react-native";
 import StyledText from "./StyledText";
 import { Link } from "expo-router";
+import styles from "@/src/styles/CarouselCastingStyle";
 
+// Horizontal scrollable cast list component
 export default function CarouselCasting({
 	cast,
 	testID
@@ -15,6 +11,7 @@ export default function CarouselCasting({
 	cast: any;
 	testID?: string;
 }) {
+	// Return nothing if cast is undefined, empty, or only contains nulls
 	if (!cast || cast.length === 0 || cast.every((item: any) => item === null))
 		return null;
 	return (
@@ -58,28 +55,3 @@ export default function CarouselCasting({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: 100
-	},
-	noImage: {
-		aspectRatio: 3 / 4,
-		borderRadius: 5,
-		width: 100,
-		backgroundColor: "#ccc"
-	},
-	name: {
-		textAlign: "center",
-		fontWeight: "bold",
-		flexWrap: "wrap",
-		width: 100
-	},
-	character: {
-		textAlign: "center",
-		flexWrap: "wrap",
-		width: 100
-	}
-});

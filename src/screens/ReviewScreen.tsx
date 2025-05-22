@@ -9,13 +9,18 @@ import { router, useLocalSearchParams } from "expo-router";
 import { createReview } from "@/src/services/ReviewService";
 import BackButton from "@/src/components/BackButton";
 export default function ReviewScreen() {
+	// Get the media ID from the route params
 	const { id } = useLocalSearchParams();
+
+	// Get the current logged-in user from the global state (Zustand)
 	const currentUser = useSessionStore((state: any) => state.user);
 
+	// Local state for form inputs
 	const [rating, setRating] = useState<number | null>(null);
 	const [comment, setComment] = useState<string | null>(null);
 	const [isSpoiler, setIsSpoiler] = useState<boolean>(false);
 
+	// Function to submit a new review
 	const addReview = async () => {
 		const review: Review = {
 			userId: currentUser.id,

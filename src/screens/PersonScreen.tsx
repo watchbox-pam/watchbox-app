@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import { Image, ScrollView, View } from "react-native";
-import { styles } from "../styles/PersonStyle";
+import styles from "@/src/styles/PersonStyle";
 import BackButton from "../components/BackButton";
 import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native-paper";
@@ -21,8 +21,11 @@ export default function PersonScreen() {
 		undefined
 	);
 	const [tvCrew, setTvCrew] = useState<Media[] | undefined>(undefined);
+
+	// Get person ID from route parameters
 	const { id }: { id: string } = useLocalSearchParams();
 
+	// Removes duplicate entries based on movie/show title
 	const removeDuplicates = (arr: Media[]) => {
 		return arr.filter(
 			(item: Media, index: number, self: Media[]) =>
@@ -30,6 +33,7 @@ export default function PersonScreen() {
 		);
 	};
 
+	// Fetch person data and credits on mount
 	useEffect(() => {
 		(async () => {
 			setLoading(true);
@@ -42,6 +46,7 @@ export default function PersonScreen() {
 
 			setPerson(response.data.person);
 
+			// Separate cast and crew by media type
 			setMoviesCast(
 				removeDuplicates(
 					response.data.combined_credits.cast.filter(
@@ -74,12 +79,14 @@ export default function PersonScreen() {
 		})();
 	}, [id]);
 
+	// Ensure all required data is present
 	const checkData = () => {
 		return person && moviesCast && tvCast && moviesCrew && tvCrew
 			? true
 			: false;
 	};
 
+	// Convert birthday to age
 	const convertDateToAge = (date: string) => {
 		const today = new Date();
 		const birthDate = new Date(date);
@@ -88,7 +95,6 @@ export default function PersonScreen() {
 		const monthDiff = today.getMonth() - birthDate.getMonth();
 		const dayDiff = today.getDate() - birthDate.getDate();
 
-		// Adjust if the birthday hasn't occurred yet this year
 		if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
 			age--;
 		}
@@ -203,6 +209,7 @@ export default function PersonScreen() {
 	);
 }
 
+// Types for person and media items
 export type Media = {
 	id: string;
 	poster_path: string;

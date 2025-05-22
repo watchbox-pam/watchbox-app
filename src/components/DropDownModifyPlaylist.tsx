@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import {
 	View,
-	StyleSheet,
 	Modal,
 	Button,
 	Text,
 	TouchableOpacity,
-	FlatList,
-	TextInput,
-	Switch
+	TextInput
 } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
-import styles from "@/src/styles/DropDownModifyPlaylistStyle";
 import { deletePlaylist, updatePlaylist } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { useRouter } from "expo-router";
 import Playlist from "../models/Playlist";
+import styles from "@/src/styles/DropDownModifyPlaylistStyle";
 
 interface DropDownModifyPlaylistProps {
 	playlistId: string;
@@ -24,6 +21,7 @@ interface DropDownModifyPlaylistProps {
 	onUpdate?: (updated: { title: string; is_private: boolean }) => void;
 }
 
+// Component for dropdown menu to modify or delete a playlist
 const DropDownModifyPlaylist = ({
 	playlistId,
 	initialTitle,
@@ -38,6 +36,7 @@ const DropDownModifyPlaylist = ({
 	const currentUser = useSessionStore((state: any) => state.user);
 	const router = useRouter();
 
+	// Update state if props change
 	useEffect(() => {
 		setEditedTitle(initialTitle);
 	}, [initialTitle]);
@@ -54,6 +53,7 @@ const DropDownModifyPlaylist = ({
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
 
+	// Handle playlist update API call
 	const handleUpdatePlaylist = async () => {
 		const userId = currentUser && currentUser.id;
 		const playlist: Playlist = {
@@ -79,6 +79,7 @@ const DropDownModifyPlaylist = ({
 		}
 	};
 
+	// Handle playlist deletion API call
 	const handleDeletePlaylist = async () => {
 		const result = await deletePlaylist(playlistId);
 

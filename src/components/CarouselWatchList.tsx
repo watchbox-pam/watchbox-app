@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, Image } from "react-native";
+import { FlatList, View, Image } from "react-native";
 import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
+import styles from "@/src/styles/CarouselWatchListStyle";
 
+// Component displaying a horizontal carousel of movies from a playlist
 export default function CarouselWatchList({ providers }: { providers: any }) {
 	interface Movie {
 		image?: string;
@@ -11,6 +13,7 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 	const [movies, setMovies] = useState<Movie[]>([]);
 
 	useEffect(() => {
+		// Fetch movies for the given playlist (providers.id)
 		const fetchMoviesForPlaylist = async () => {
 			if (providers && providers.id) {
 				try {
@@ -33,6 +36,7 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 		fetchMoviesForPlaylist();
 	}, [providers]);
 
+	// Filter out movies without images
 	const filteredMovies = movies.filter((movie) => movie && movie.image);
 
 	return (
@@ -85,29 +89,3 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		width: 100,
-		height: 150,
-		borderRadius: 10
-	},
-	imageContainer: {
-		marginRight: 10,
-		height: 160,
-		alignItems: "center"
-	},
-	container: {
-		height: 160,
-		paddingLeft: 10
-	},
-	emptyContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	emptyImage: {
-		width: 100,
-		height: 100
-	}
-});

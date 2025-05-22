@@ -3,7 +3,7 @@ import { View, Platform } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as SecureStore from "expo-secure-store";
-import styles from "@/src/styles/DropDownButton";
+import styles from "../styles/DropDownButtonStyle";
 
 const DropDownButton = () => {
 	const [visible, setVisible] = useState(false);

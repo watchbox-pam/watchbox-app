@@ -1,29 +1,17 @@
 import React from "react";
-import { Image, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Image, View } from "react-native";
+import styles from "@/src/styles/LogoStyle";
 
 const LogoButton = () => {
 	return (
 		<View style={styles.container}>
-			<TouchableOpacity
-			// onPress={() =>
-			// 	navigation.navigate("../screens/HomeScreen.tsx")}
-			>
-				<Image
-					source={require("@/src/assets/images/watchbox-logo.png")} // Assurez-vous que le chemin est correct
-					style={{ width: 50, height: 50 }}
-					resizeMode="contain"
-				/>
-			</TouchableOpacity>
+			<Image
+				source={require("@/src/assets/images/watchbox-logo.png")}
+				style={{ width: 50, height: 50 }}
+				resizeMode="contain"
+			/>
 		</View>
 	);
 };
 
 export default LogoButton;
-
-const styles = StyleSheet.create({
-	container: {
-		alignSelf: "flex-end",
-		marginBottom: 20,
-		marginRight: 5
-	}
-});

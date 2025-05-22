@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import StyledText from "./StyledText";
+import styles from "@/src/styles/ReadMoreStyle";
 
 export default function ReadMore({ data }: { data: any }) {
 	const [showFullBio, setShowFullBio] = useState(false);
@@ -26,19 +27,3 @@ export default function ReadMore({ data }: { data: any }) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	biographyContainer: {
-		marginTop: 20,
-		marginBottom: 20
-	},
-	readMoreButton: {
-		marginTop: 8,
-		alignSelf: "flex-start"
-	},
-	readMoreText: {
-		color: "#4E9BF5",
-		fontWeight: "bold",
-		textDecorationLine: "underline"
-	}
-});

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import styles from "@/src/styles/DropDownPlaylistStyle";
 import {
 	View,
-	StyleSheet,
 	Modal,
 	Button,
 	Text,
@@ -15,6 +13,7 @@ import {
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
+import styles from "@/src/styles/DropDownPlaylistStyle";
 
 const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 	const [visible, setVisible] = useState(false);
@@ -24,13 +23,14 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 	>([]);
 	const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(
 		null
-	);
+	); // Currently selected playlist ID
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
 
+	// Fetch user playlists from API
 	const fetchUserPlaylists = async (userId: string) => {
 		const response = await getUserPlaylists(userId);
 		if (response.success) {
@@ -41,6 +41,7 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 		}
 	};
 
+	// Open modal and load playlists for the current user
 	const openModal = async () => {
 		const userId = currentUser && currentUser.id;
 		setModalVisible(true);
@@ -51,8 +52,10 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 
 	const closeModal = () => {
 		setModalVisible(false);
+		setSelectedPlaylistId(null); // Reset selected playlist when modal closes
 	};
 
+	// Add the movie to the selected playlist via API
 	const handleAddToPlaylist = async () => {
 		if (!selectedPlaylistId) {
 			alert("Please select a playlist before adding the movie.");

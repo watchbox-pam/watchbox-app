@@ -3,13 +3,11 @@ import {
 	ScrollView,
 	View,
 	Text,
-	StyleSheet,
 	Image,
 	Modal,
 	TextInput,
 	Button
 } from "react-native";
-import StyledText from "../components/StyledText";
 import styles from "../styles/ProfileScreenStyle";
 import { LinearGradient } from "expo-linear-gradient";
 import DropDownButton from "../components/DropDownButton";

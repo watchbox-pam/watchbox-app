@@ -1,7 +1,9 @@
-import { TouchableOpacity, StyleSheet, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import styles from "@/src/styles/BackButtonStyle";
 
+// Component that renders a back navigation button
 const BackButton = () => {
 	return (
 		<View style={styles.container}>
@@ -13,19 +15,5 @@ const BackButton = () => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		alignSelf: "flex-start",
-		marginBottom: 20,
-		marginLeft: 5
-	},
-	button: {
-		alignItems: "center",
-		backgroundColor: "#13396A",
-		padding: 10,
-		borderRadius: 50
-	}
-});
 
 export default BackButton;

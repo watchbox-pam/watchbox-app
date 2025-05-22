@@ -1,15 +1,7 @@
 import BackButton from "../components/BackButton";
 import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import styles from "../styles/WatchListScreenStyle";
-import {
-	View,
-	StyleSheet,
-	Image,
-	Text,
-	ScrollView,
-	TouchableOpacity
-} from "react-native";
+import { View, Image, Text, ScrollView, TouchableOpacity } from "react-native";
 import { fetchMovieDetails } from "../services/MovieDetailService";
 import StyledText from "../components/StyledText";
 import {
@@ -18,6 +10,7 @@ import {
 } from "../services/PlaylistService";
 import { MaterialIcons } from "@expo/vector-icons";
 import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
+import styles from "@/src/styles/WatchListScreenStyle";
 
 export default function Index() {
 	const { id, movies } = useLocalSearchParams();
