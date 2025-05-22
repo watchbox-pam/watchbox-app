@@ -2,79 +2,58 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		flexGrow: 1,
 		width: "90%",
-		marginVertical: 30,
-		paddingHorizontal: 20,
 		backgroundColor: "#0D1321",
-		borderRadius: 12
+		borderRadius: 12,
+		paddingVertical: 25,
+		paddingHorizontal: 20,
+		marginVertical: 15
 	},
 	title: {
-		fontSize: 40,
+		fontSize: 24,
 		fontWeight: "bold",
 		color: "#FFF",
+		textAlign: "center",
 		marginBottom: 20,
-		textDecorationLine: "underline"
+		letterSpacing: 1
 	},
-	statBlockLeft: {
+	statsGrid: {
 		flexDirection: "row",
-		alignItems: "flex-end",
-		marginVertical: "auto"
+		alignItems: "center",
+		justifyContent: "space-between"
 	},
-	labelLeft: {
-		width: "51%",
-		fontSize: 14,
-		color: "#FFF",
-		textAlign: "right",
-		paddingTop: 15
+	statItem: {
+		flex: 1,
+		alignItems: "center"
 	},
-	valueLeft: {
-		width: "49%",
-		fontSize: 50,
-		fontWeight: "bold",
-		color: "#D0BFFF"
+	statDivider: {
+		width: 2,
+		height: 60,
+		backgroundColor: "#D0BFFF",
+		marginHorizontal: 15,
+		opacity: 0.3
 	},
-	statBlockRight: {
-		flexDirection: "row",
-		alignItems: "flex-end",
-		marginBottom: 20,
-		marginVertical: "auto"
-	},
-	labelRight: {
-		width: "51%",
-		fontSize: 14,
-		color: "#FFF",
-		textAlign: "left",
-		paddingTop: 15
-	},
-	valueRight: {
-		width: "49%",
-		fontSize: 50,
-		fontWeight: "bold",
+	statNumber: {
+		fontSize: 36,
+		fontWeight: "900",
 		color: "#D0BFFF",
-		textAlign: "right"
+		marginBottom: 5
 	},
-	statBlockTime: {
-		flexDirection: "row",
-		alignItems: "flex-start",
-		marginBottom: 20
-	},
-	label: {
-		width: "50%",
-		fontSize: 14,
-		color: "#FFF",
+	statTime: {
+		fontSize: 18,
+		fontWeight: "700",
+		color: "#FF4A4A",
+		marginBottom: 5,
 		textAlign: "center"
 	},
-	value: {
-		width: "50%",
-		fontSize: 50,
-		fontWeight: "bold",
-		color: "#D0BFFF"
+	statLabel: {
+		fontSize: 14,
+		color: "#FFF",
+		opacity: 0.8,
+		textAlign: "center",
+		fontWeight: "500"
 	},
-	timeValue: {
-		fontSize: 20,
-		color: "#FFF"
-	},
+
 	highlight: {
 		fontSize: 24,
 		fontWeight: "bold",

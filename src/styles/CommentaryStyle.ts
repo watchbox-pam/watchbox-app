@@ -69,8 +69,12 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		alignItems: "center",
-		paddingHorizontal: 16,
 		borderRadius: 5
+	},
+	coms: {
+		fontSize: 20,
+		marginBottom: 30,
+		textAlign: "center"
 	}
 });
 

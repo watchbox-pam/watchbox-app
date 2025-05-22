@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View } from "react-native";
 import Tag from "./Tag";
 import StyledText from "./StyledText";
-import styles from "@/src/styles/TagList";
+import styles from "@/src/styles/TagListStyle";
 
 export default function TagList({
 	tags,

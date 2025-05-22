@@ -73,10 +73,13 @@ const styles = StyleSheet.create({
 		fontSize: 16
 	},
 	selectedItem: {
-		backgroundColor: "#1F4E89"
+		backgroundColor: "#4A90E2",
+		borderColor: "#FFFFFF",
+		borderWidth: 2
 	},
 	selectedText: {
-		fontWeight: "bold"
+		fontWeight: "bold",
+		color: "#FFFFFF"
 	},
 	modalButtons: {
 		flexDirection: "row",

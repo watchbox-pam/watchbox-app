@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
 	},
 	listFilters: {
 		flexDirection: "row",
-		marginBottom: 10
+		marginBottom: 0
 	},
 	filterContainer: {
 		flex: 1,
@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
 	providerFilterButton: {
 		backgroundColor: "transparent",
 		paddingHorizontal: 15,
-		paddingVertical: 8,
 		borderRadius: 5,
 		borderWidth: 0.5,
 		borderColor: "#AC2821",
@@ -137,7 +136,8 @@ const styles = StyleSheet.create({
 	},
 	providerFilterText: {
 		color: "#fff",
-		fontSize: 16
+		fontSize: 16,
+		margin: "auto"
 	},
 	// Provider filter modal styles
 	providerFilterContainer: {

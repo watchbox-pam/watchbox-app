@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text } from "react-native";
 import styles from "@/src/styles/StatsStyle";
 
 type StatsProps = {
@@ -13,6 +13,11 @@ const Stats = ({ totalMovies, total_runtime }: StatsProps) => {
 		const HOURS_IN_DAY = 24;
 		const DAYS_IN_MONTH = 30;
 
+		// Si pas de temps, retourner "0min"
+		if (!totalMinutes || totalMinutes === 0) {
+			return ["0min"];
+		}
+
 		const totalHours = Math.floor(totalMinutes / MINUTES_IN_HOUR);
 		const months = Math.floor(totalHours / (HOURS_IN_DAY * DAYS_IN_MONTH));
 		const days = Math.floor(
@@ -22,36 +27,40 @@ const Stats = ({ totalMovies, total_runtime }: StatsProps) => {
 		const minutes = totalMinutes % MINUTES_IN_HOUR;
 
 		const parts = [];
-		if (months > 0) parts.push(`${months} mois`);
-		if (days > 0) parts.push(`${days} jour${days > 1 ? "s" : ""}`);
-		if (hours > 0) parts.push(`${hours} h`);
-		if (minutes > 0) parts.push(`${minutes} min`);
+		if (months > 0) parts.push(`${months}m`);
+		if (days > 0) parts.push(`${days}j`);
+		if (hours > 0) parts.push(`${hours}h`);
+		if (minutes > 0) parts.push(`${minutes}min`);
 
 		return parts;
 	};
 
-	const runtimeParts = formatRuntime(total_runtime || 0);
+	// S'assurer que totalMovies est au moins 0
+	const safeMovieCount = totalMovies || 0;
+
+	// S'assurer que total_runtime est au moins 0
+	const safeRuntime = total_runtime || 0;
+
+	const formattedTime = formatRuntime(safeRuntime);
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
+		<View style={styles.container}>
 			<Text style={styles.title}>STATS</Text>
 
-			<View style={styles.statBlockRight}>
-				<Text style={styles.valueRight}>{totalMovies}</Text>
-				<Text style={styles.labelRight}>Films regardés au total</Text>
-			</View>
+			<View style={styles.statsGrid}>
+				<View style={styles.statItem}>
+					<Text style={styles.statNumber}>{safeMovieCount}</Text>
+					<Text style={styles.statLabel}>Films</Text>
+				</View>
 
-			<View style={styles.statBlockTime}>
-				<Text style={styles.label}>Temps passé devant des films</Text>
-				<Text style={styles.timeValue}>
-					{runtimeParts.map((part, index) => (
-						<Text key={index} style={styles.highlight}>
-							{part}{" "}
-						</Text>
-					))}
-				</Text>
+				<View style={styles.statDivider} />
+
+				<View style={styles.statItem}>
+					<Text style={styles.statTime}>{formattedTime}</Text>
+					<Text style={styles.statLabel}>Temps total</Text>
+				</View>
 			</View>
-		</ScrollView>
+		</View>
 	);
 };
 

@@ -115,8 +115,14 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 					transparent={true}
 					animationType="slide"
 					onRequestClose={closeModal}>
-					<View style={styles.modalContainer}>
-						<View style={styles.modalContent}>
+					<TouchableOpacity
+						style={styles.modalContainer}
+						activeOpacity={1}
+						onPress={closeModal}>
+						<TouchableOpacity
+							style={styles.modalContent}
+							activeOpacity={1}
+							onPress={(e) => e.stopPropagation()}>
 							<Text style={styles.modalTitle}>
 								Choisis une playlist
 							</Text>
@@ -158,8 +164,8 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 									onPress={handleAddToPlaylist}
 								/>
 							</View>
-						</View>
-					</View>
+						</TouchableOpacity>
+					</TouchableOpacity>
 				</Modal>
 			</View>
 		</Provider>
