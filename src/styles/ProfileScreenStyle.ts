@@ -206,6 +206,13 @@ const styles = StyleSheet.create({
 		color: "#ffffff",
 		fontSize: 16,
 		textAlign: "center"
+	},
+
+	loading: {
+		backgroundColor: "#0A1E38",
+		height: "100%",
+		width: "100%",
+		justifyContent: "center"
 	}
 });
 
