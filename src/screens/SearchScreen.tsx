@@ -6,9 +6,10 @@ import {
 	TextInput,
 	TouchableOpacity,
 	View,
-	ActivityIndicator
+	ActivityIndicator,
+	RefreshControl
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { searchService } from "@/src/services/SearchService";
 import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
@@ -36,6 +37,11 @@ export default function SearchScreen() {
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
 
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+
 	// Available search filters
 	const filters = [
 		{ key: "all", label: "Tous" },
@@ -47,7 +53,10 @@ export default function SearchScreen() {
 	useEffect(() => {
 		fetchProviders();
 		loadSelectedProviders();
-	}, []);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [refreshing]);
 
 	// Fetch all providers from API
 	const fetchProviders = async () => {
@@ -345,64 +354,71 @@ export default function SearchScreen() {
 					</View>
 				</View>
 			)}
+			<ScrollView
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>
+				}>
+				{/* Error message */}
+				{searchError && (
+					<ErrorMessage message="Erreur lors du chargement des résultats de recherche." />
+				)}
 
-			{/* Error message */}
-			{searchError && (
-				<ErrorMessage message="Erreur lors du chargement des résultats de recherche." />
-			)}
+				{/* No search term message */}
+				{!searchTerm.trim() && (
+					<StyledText style={styles.NoResult}>
+						Veuillez entrer un terme de recherche
+					</StyledText>
+				)}
 
-			{/* No search term message */}
-			{!searchTerm.trim() && (
-				<StyledText style={styles.NoResult}>
-					Veuillez entrer un terme de recherche
-				</StyledText>
-			)}
+				{/* Loading indicator */}
+				{isLoading && (
+					<View style={styles.loadingContainer}>
+						<ActivityIndicator size="large" color="#fff" />
+					</View>
+				)}
 
-			{/* Loading indicator */}
-			{isLoading && (
-				<View style={styles.loadingContainer}>
-					<ActivityIndicator size="large" color="#fff" />
-				</View>
-			)}
-
-			{/* Search results display */}
-			{!isLoading && !searchError && (
-				<ScrollView>
-					{movies.length > 0 && (
-						<View>
-							{/* Show section title only if filter is not strictly movies */}
-							{selectedFilter !== "films" && (
-								<StyledText style={styles.sectionTitle}>
-									Films
-								</StyledText>
-							)}
-							{movies.map(renderMovieItem)}
-						</View>
-					)}
-
-					{actors.length > 0 && (
-						<View>
-							{/* Show section title only if filter is not strictly actors */}
-							{selectedFilter !== "actors" && (
-								<StyledText style={styles.sectionTitle}>
-									Acteurs
-								</StyledText>
-							)}
-							{actors.map(renderActorItem)}
-						</View>
-					)}
-
-					{/* No results message */}
-					{!isLoading &&
-						searchTerm.trim() &&
-						movies.length === 0 &&
-						actors.length === 0 && (
-							<StyledText style={styles.NoResult}>
-								Aucun résultat
-							</StyledText>
+				{/* Search results display */}
+				{!isLoading && !searchError && (
+					<View>
+						{movies.length > 0 && (
+							<View>
+								{/* Show section title only if filter is not strictly movies */}
+								{selectedFilter !== "films" && (
+									<StyledText style={styles.sectionTitle}>
+										Films
+									</StyledText>
+								)}
+								{movies.map(renderMovieItem)}
+							</View>
 						)}
-				</ScrollView>
-			)}
+
+						{actors.length > 0 && (
+							<View>
+								{/* Show section title only if filter is not strictly actors */}
+								{selectedFilter !== "actors" && (
+									<StyledText style={styles.sectionTitle}>
+										Acteurs
+									</StyledText>
+								)}
+								{actors.map(renderActorItem)}
+							</View>
+						)}
+
+						{/* No results message */}
+						{!isLoading &&
+							searchTerm.trim() &&
+							movies.length === 0 &&
+							actors.length === 0 && (
+								<StyledText style={styles.NoResult}>
+									Aucun résultat
+								</StyledText>
+							)}
+					</View>
+				)}
+			</ScrollView>
 		</View>
 	);
 }

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
+
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
@@ -17,7 +18,11 @@ export default function HomeScreen() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 
-	// Retrieve current user from session store
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+
 	const currentUser = useSessionStore((state: any) => state.user);
 
 	// Fetch movie data from multiple endpoints
@@ -78,8 +83,13 @@ export default function HomeScreen() {
 	};
 
 	useEffect(() => {
+		setLoading(true);
+
 		fetchMovies();
-	}, []);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [refreshing]);
 
 	if (error) {
 		return <ErrorMessage />;
@@ -97,7 +107,10 @@ export default function HomeScreen() {
 		<ScrollView
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
-			showsVerticalScrollIndicator={false}>
+			showsVerticalScrollIndicator={false}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}>
 			<View style={styles.header}>
 				<StyledText style={styles.TitleHeader}>
 					Hello there, {currentUser.identifier}

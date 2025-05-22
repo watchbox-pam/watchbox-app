@@ -1,5 +1,11 @@
-import { useState, useEffect } from "react";
-import { Animated, StatusBar, SafeAreaView } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import {
+	Animated,
+	StatusBar,
+	SafeAreaView,
+	ScrollView,
+	RefreshControl
+} from "react-native";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
 import Emotion from "@/src/models/Emotion";
@@ -97,6 +103,10 @@ export default function RecommendationScreen() {
 	const [error, setError] = useState<string | null>(null);
 	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
 
 	useEffect(() => {
 		/**
@@ -109,7 +119,10 @@ export default function RecommendationScreen() {
 			fetchMoviesByEmotion();
 			animateTransition();
 		}
-	}, [selectedEmotion]);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [selectedEmotion, refreshing]);
 
 	/**
 	 * 	Animation function for the transition between the list of emotions and the results
@@ -206,6 +219,8 @@ export default function RecommendationScreen() {
 					selectedEmotion={selectedEmotion}
 					onRetry={fetchMoviesByEmotion}
 					onBack={resetAnimation}
+					refreshing={refreshing}
+					onRefresh={onRefresh}
 				/>
 			</Animated.View>
 		</SafeAreaView>

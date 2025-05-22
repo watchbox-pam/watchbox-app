@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	Image,
 	ScrollView,
@@ -7,7 +7,8 @@ import {
 	TouchableOpacity,
 	Modal,
 	Button,
-	Text
+	Text,
+	RefreshControl
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -38,8 +39,15 @@ export default function MovieScreen() {
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+
 	const fetchData = async () => {
 		try {
+			setLoading(true);
+
 			const response = await fetchMovieDetails(+id);
 			if (response.success && response.data) {
 				setMedia(response.data);
@@ -63,8 +71,11 @@ export default function MovieScreen() {
 			setError(true);
 			setLoading(false);
 		}
+		if (refreshing) {
+			setRefreshing(false);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [id, currentUser]);
+	}, [id, currentUser, refreshing]);
 
 	const convertMinutesToHours = (minutes: number) => {
 		const hours = Math.floor(minutes / 60);
@@ -89,7 +100,13 @@ export default function MovieScreen() {
 			<ScrollView
 				style={styles.container}
 				contentContainerStyle={styles.contentContainer}
-				overScrollMode="never">
+				overScrollMode="never"
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>
+				}>
 				<View style={styles.headers}>
 					<BackButton />
 					<DropDownPlaylist movieId={Number(id)} />

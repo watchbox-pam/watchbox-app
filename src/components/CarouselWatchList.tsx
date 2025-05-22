@@ -46,14 +46,8 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 					data={filteredMovies}
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					keyExtractor={(item, index) => index.toString()}
-					renderItem={({
-						item,
-						index
-					}: {
-						item: Movie;
-						index: number;
-					}) => (
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item }: { item: Movie }) => (
 						<Link
 							href={{
 								pathname: "/watchList/[id]",
