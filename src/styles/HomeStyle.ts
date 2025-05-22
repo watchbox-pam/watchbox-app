@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		width: "100%",
+		alignItems: "center",
 		flexDirection: "row",
 		justifyContent: "space-between",
 		paddingHorizontal: 25,
@@ -20,8 +21,8 @@ const styles = StyleSheet.create({
 	},
 	TitleHeader: {
 		color: "#ffffff",
-		fontSize: 28,
-		marginTop: 10
+		marginBottom: 20,
+		fontSize: 28
 	},
 	WatchList: {
 		width: "99%",

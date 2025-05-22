@@ -53,15 +53,15 @@ export default function HomeScreen() {
 					movies: popularWeek.data["results"]
 				},
 				{
-					title: "action",
+					title: "Action",
 					movies: actionGenre.data["results"]
 				},
 				{
-					title: "comédie",
+					title: "Comédie",
 					movies: comedyGenre.data["results"]
 				},
 				{
-					title: "drama",
+					title: "Drama",
 					movies: dramaGenre.data["results"]
 				}
 			);

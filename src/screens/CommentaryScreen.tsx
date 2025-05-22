@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import CommentSection from "../components/CommentSection";
-import SwitchButton from "../components/SwitchButton";
 import styles from "@/src/styles/CommentaryStyle";
 import { Link } from "expo-router";
 import { getReviewsByMedia } from "@/src/services/ReviewService";
@@ -45,11 +44,10 @@ const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 					Ajouter une review
 				</Link>
 			</View>
-			<SwitchButton isOn={isMyComments} onToggle={handleSwitch} />
 			{reviews.length > 0 ? (
 				<CommentSection isMyComments={isMyComments} reviews={reviews} />
 			) : (
-				<StyledText>Aucun commentaire</StyledText>
+				<StyledText style={styles.coms}>Aucun commentaire</StyledText>
 			)}
 		</View>
 	);
