@@ -204,6 +204,12 @@ const styles = StyleSheet.create({
 	providerFilterApplyText: {
 		color: "#fff",
 		fontWeight: "bold"
+	},
+	headers: {
+		position: "fixed",
+		top: 0,
+		zIndex: 1,
+		backgroundColor: "#0A1E38"
 	}
 });
 

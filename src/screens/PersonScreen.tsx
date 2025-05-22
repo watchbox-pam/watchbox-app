@@ -1,8 +1,8 @@
 import { useLocalSearchParams } from "expo-router";
-import { Image, ScrollView, View } from "react-native";
+import { Image, RefreshControl, ScrollView, View } from "react-native";
 import styles from "@/src/styles/PersonStyle";
 import BackButton from "../components/BackButton";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native-paper";
 import StyledText from "../components/StyledText";
 import ReadMore from "../components/ReadMore";
@@ -25,7 +25,11 @@ export default function PersonScreen() {
 	// Get person ID from route parameters
 	const { id }: { id: string } = useLocalSearchParams();
 
-	// Removes duplicate entries based on movie/show title
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+
 	const removeDuplicates = (arr: Media[]) => {
 		return arr.filter(
 			(item: Media, index: number, self: Media[]) =>
@@ -35,6 +39,7 @@ export default function PersonScreen() {
 
 	// Fetch person data and credits on mount
 	useEffect(() => {
+		setLoading(true);
 		(async () => {
 			setLoading(true);
 			let response = await fetchPerson(id);
@@ -77,7 +82,10 @@ export default function PersonScreen() {
 			);
 			setLoading(false);
 		})();
-	}, [id]);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [id, refreshing]);
 
 	// Ensure all required data is present
 	const checkData = () => {
@@ -115,7 +123,12 @@ export default function PersonScreen() {
 	}
 
 	return (
-		<ScrollView style={styles.container} overScrollMode="never">
+		<ScrollView
+			style={styles.container}
+			overScrollMode="never"
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}>
 			<View style={styles.headers}>
 				<BackButton />
 			</View>

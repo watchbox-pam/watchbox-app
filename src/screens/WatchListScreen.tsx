@@ -10,10 +10,11 @@ import {
 } from "../services/PlaylistService";
 import { MaterialIcons } from "@expo/vector-icons";
 import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
+import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
 
 export default function Index() {
-	const { id, movies } = useLocalSearchParams();
+	const { id, movies }: { id: string; movies: any } = useLocalSearchParams();
 	const stringifiedId = id ? String(id) : "";
 	const parsedMovies = React.useMemo<{ id: number; [key: string]: any }[]>(
 		() => (movies ? JSON.parse(movies) : []),
@@ -32,6 +33,7 @@ export default function Index() {
 	const shouldShowEditButton = !restrictedNames.includes(
 		normalizedPlaylistTitle
 	);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		if (playlistTitle)
@@ -41,36 +43,38 @@ export default function Index() {
 	}, [playlistTitle]);
 
 	useEffect(() => {
-		const fetchMovies = async () => {
-			if (parsedMovies.length > 0) {
-				const detailedMovies = await Promise.all(
-					parsedMovies.map(async (movie) => {
-						const details = await fetchMovieDetails(movie.id);
-						return details.data;
-					})
-				);
-				setMovieList(detailedMovies);
-			}
-		};
-		fetchMovies();
-	}, [parsedMovies]);
+		setLoading(true);
 
-	useEffect(() => {
-		const fetchPlaylistTitle = async () => {
-			if (id) {
-				const result = await getPlaylistById(stringifiedId);
-				if (result.success) {
-					setPlaylistTitle(result.data.title);
-				} else {
-					console.error(
-						"Failed to fetch playlist title:",
-						result.message
-					);
+		const fetchData = async () => {
+			try {
+				if (id) {
+					const result = await getPlaylistById(stringifiedId);
+					if (result.success) {
+						setPlaylistTitle(result.data.title);
+					} else {
+						console.error(
+							"Failed to fetch playlist title:",
+							result.message
+						);
+					}
 				}
+				if (parsedMovies.length > 0) {
+					const detailedMovies = await Promise.all(
+						parsedMovies.map(async (movie) => {
+							const details = await fetchMovieDetails(movie.id);
+							return details.data;
+						})
+					);
+					setMovieList(detailedMovies);
+				}
+			} catch (error) {
+				console.error("Error fetching playlist data:", error);
+			} finally {
+				setLoading(false);
 			}
 		};
-		fetchPlaylistTitle();
-	}, [id]);
+		fetchData();
+	}, [parsedMovies, id]);
 
 	const handleDeleteMedia = async (movieId: number) => {
 		try {
@@ -92,6 +96,14 @@ export default function Index() {
 			console.error("Error deleting media from playlist:", error);
 		}
 	};
+
+	if (loading) {
+		return (
+			<View style={styles.loading} testID="loading">
+				<ActivityIndicator size="large" color="#fff" />
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView

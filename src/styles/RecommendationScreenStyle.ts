@@ -14,6 +14,13 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 		zIndex: 1
+	},
+	scrollView: {
+		flex: 1,
+		backgroundColor: "#0A1E38"
+	},
+	scrollContainer: {
+		flex: 1
 	}
 });
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FlatList, View, Image, Text } from "react-native";
 import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
-import GradientDivider from "./TraitGradiant"; // Import the divider component
+import GradientDivider from "./TraitGradiant";
 import styles from "@/src/styles/CarouselWatchListStyle";
 
 // Component displaying a horizontal carousel of movies from a playlist
@@ -55,13 +55,7 @@ export default function CarouselWatchList({
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						keyExtractor={(item, index) => index.toString()}
-						renderItem={({
-							item,
-							index
-						}: {
-							item: Movie;
-							index: number;
-						}) => (
+						renderItem={({ item }: { item: Movie }) => (
 							<Link
 								href={{
 									pathname: "/watchList/[id]",

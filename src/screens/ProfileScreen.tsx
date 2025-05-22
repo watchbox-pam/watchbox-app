@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	ScrollView,
 	View,
@@ -6,7 +6,8 @@ import {
 	Image,
 	Modal,
 	TextInput,
-	Button
+	Button,
+	RefreshControl
 } from "react-native";
 import styles from "../styles/ProfileScreenStyle";
 import { LinearGradient } from "expo-linear-gradient";
@@ -37,6 +38,11 @@ export default function Index() {
 	const [error, setError] = useState(null);
 	const currentUser = useSessionStore((state: any) => state.user);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
+
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
 
 	const handleCreateWatchlist = () => {
 		setModalVisible(true);
@@ -74,6 +80,8 @@ export default function Index() {
 	};
 
 	useEffect(() => {
+		setLoading(true);
+
 		const userId = currentUser && currentUser.id;
 		if (userId && typeof userId === "string") {
 			fetchProfileData(userId);
@@ -82,7 +90,10 @@ export default function Index() {
 			setError("ID utilisateur invalide" as any);
 			setLoading(false);
 		}
-	}, [currentUser]);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [currentUser, refreshing]);
 
 	useEffect(() => {
 		const userId = currentUser && currentUser.id;
@@ -103,7 +114,6 @@ export default function Index() {
 	}, [userPlaylists, currentUser]);
 
 	const fetchProfileData = async (userId: string) => {
-		setLoading(true);
 		setError(null);
 
 		try {
@@ -120,7 +130,7 @@ export default function Index() {
 					response.message
 				);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			setError(error.message || "Une erreur est survenue");
 		} finally {
 			setLoading(false);
@@ -128,11 +138,20 @@ export default function Index() {
 	};
 
 	const fetchUserPlaylists = async (userId: string) => {
-		const response = await getUserPlaylists(userId);
-		if (response.success) {
-			setUserPlaylists(response.data);
-		} else {
-			console.error("Error fetching user playlists:", response.message);
+		try {
+			const response = await getUserPlaylists(userId);
+			if (response.success) {
+				setUserPlaylists(response.data);
+			} else {
+				console.error(
+					"Error fetching user playlists:",
+					response.message
+				);
+			}
+		} catch (error: any) {
+			console.error("Error fetching user playlists:", error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -148,7 +167,10 @@ export default function Index() {
 		<ScrollView
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
-			showsVerticalScrollIndicator={false}>
+			showsVerticalScrollIndicator={false}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}>
 			{error && (
 				<View style={styles.errorContainer}>
 					<Text style={styles.errorText}>{error}</Text>
@@ -210,11 +232,7 @@ export default function Index() {
 						source={require("../assets/images/default-user.png")}
 						style={styles.ProfilPicture}
 					/>
-					<Text style={styles.title}>
-						{loading
-							? "Chargement..."
-							: profileData?.username || "Utilisateur inconnu"}
-					</Text>
+					<Text style={styles.title}>{profileData?.username}</Text>
 				</View>
 				<DropDownButton />
 			</View>
