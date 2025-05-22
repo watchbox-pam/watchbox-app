@@ -1,6 +1,7 @@
 import BackButton from "../components/BackButton";
 import { useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
+import styles from "../styles/WatchListScreenStyle";
 import {
 	View,
 	StyleSheet,

@@ -8,6 +8,7 @@ import {
 	TextInput,
 	Button
 } from "react-native";
+import styles from "../styles/ProfileScreenStyle";
 import { LinearGradient } from "expo-linear-gradient";
 import DropDownButton from "../components/DropDownButton";
 import TraitGradiant from "../components/TraitGradiant";
@@ -23,7 +24,6 @@ import {
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 import { ActivityIndicator } from "react-native-paper";
-import styles from "@/src/styles/ProfieScreenStyle";
 
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
@@ -91,7 +91,8 @@ export default function Index() {
 				(p) => p.title === "Historique"
 			);
 			if (historique) {
-				getMovieRuntime(userId, historique.title).then((result) => {
+				console.log("historique id", historique.id);
+				getMovieRuntime(historique.id).then((result) => {
 					if (result.success && result.data) {
 						setTotalMovies(result.data.movie_count);
 						setTotalRuntime(result.data.total_runtime);

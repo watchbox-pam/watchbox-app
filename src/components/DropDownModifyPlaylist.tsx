@@ -8,6 +8,7 @@ import {
 	TextInput
 } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
+import styles from "@/src/styles/DropDownModifyPlaylistStyle";
 import { deletePlaylist, updatePlaylist } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { useRouter } from "expo-router";
