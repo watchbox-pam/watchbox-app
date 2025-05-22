@@ -8,13 +8,17 @@ import { getReviewsByMedia } from "@/src/services/ReviewService";
 import StyledText from "../components/StyledText";
 
 const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
+	// Controls whether to show only user's comments or all comments
 	const [isMyComments, setIsMyComments] = useState(true);
+	// Stores the list of reviews fetched from the backend
 	const [reviews, setReviews] = useState([]);
 
+	// Toggle between "my comments" and "all comments"
 	const handleSwitch = () => {
 		setIsMyComments((prevState) => !prevState);
 	};
 
+	// Fetch reviews for the current media by its ID
 	const fetchReviews = async () => {
 		try {
 			const result = await getReviewsByMedia(parseInt(mediaId));

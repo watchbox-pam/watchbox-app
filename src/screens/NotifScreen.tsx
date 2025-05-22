@@ -4,12 +4,13 @@ import {
 	Text,
 	FlatList,
 	TouchableOpacity,
-	StyleSheet,
 	ScrollView
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
+import styles from "@/src/styles/NotifScreenStyle";
 
+// Notification data type
 interface Notification {
 	id: number;
 	message: string;
@@ -23,6 +24,7 @@ const NotifScreen: React.FC = () => {
 		{ id: 3, message: "Votre ami a commenté votre post", read: true }
 	]);
 
+	// Mark a notification as read
 	const markAsRead = (id: number) => {
 		setNotifications((prev) =>
 			prev.map((notif) =>
@@ -55,36 +57,5 @@ const NotifScreen: React.FC = () => {
 		</ScrollView>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 20,
-		backgroundColor: "#0A1E38"
-	},
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between"
-	},
-	NotifTitle: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 10,
-		color: "#fff"
-	},
-	notification: {
-		padding: 15,
-		marginVertical: 5,
-		backgroundColor: "#64a2f9",
-		borderRadius: 8
-	},
-	readNotification: {
-		backgroundColor: "#326bbb"
-	},
-	message: {
-		fontSize: 16
-	}
-});
 
 export default NotifScreen;

@@ -11,6 +11,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function HomeScreen() {
+	// State for grouped movie sections (e.g., popular, genres)
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
 		[]
 	);
@@ -24,6 +25,7 @@ export default function HomeScreen() {
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
+	// Fetch movie data from multiple endpoints
 	const fetchMovies = async () => {
 		try {
 			const list = [];
@@ -33,6 +35,7 @@ export default function HomeScreen() {
 			const comedyGenre = await fetchGenre("35");
 			const dramaGenre = await fetchGenre("18");
 
+			// If any fetch fails, show error state
 			if (
 				!popularDay.success ||
 				!popularWeek.success ||
@@ -44,6 +47,7 @@ export default function HomeScreen() {
 				return;
 			}
 
+			// Build the movie sections
 			list.push(
 				{
 					title: "Populaires aujourd'hui",

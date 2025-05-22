@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import styles from "@/src/styles/TagStyle";
 
 export default function Tag({
 	children,
@@ -10,15 +11,3 @@ export default function Tag({
 }) {
 	return <View style={[styles.div, style]}>{children}</View>;
 }
-const styles = StyleSheet.create({
-	div: {
-		backgroundColor: "#506E7D",
-		borderRadius: 3,
-		paddingRight: 5,
-		paddingLeft: 5,
-		paddingBottom: 3,
-		alignSelf: "flex-start",
-		justifyContent: "center",
-		zIndex: 1
-	}
-});

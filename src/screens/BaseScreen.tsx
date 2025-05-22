@@ -13,14 +13,16 @@ import { checkLogin } from "@/src/services/LandingService";
 import useSessionStore from "@/src/zustand/sessionStore";
 
 export default function BaseScreen() {
+	// Retrieve the signIn function from the session store
 	// @ts-ignore
 	const signIn = useSessionStore((state) => state.signIn);
 
+	// Check if the user is already logged in
 	const checkUserLogin = async () => {
 		const result = await checkLogin();
 		if (result !== null) {
 			signIn(result?.id, result?.identifier, result?.token);
-			router.replace("/");
+			router.replace("/"); // Redirect to home if logged in
 			return;
 		}
 	};

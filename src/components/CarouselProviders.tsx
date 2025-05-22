@@ -1,6 +1,8 @@
 import React from "react";
-import { FlatList, StyleSheet, View, Image } from "react-native";
+import { FlatList, View, Image } from "react-native";
+import styles from "@/src/styles/CarouselProvidersStyle";
 
+// Horizontal carousel displaying provider logos (e.g. Netflix, Hulu)
 export default function CarouselProviders({
 	providers
 }: {
@@ -31,16 +33,3 @@ export default function CarouselProviders({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	image: {
-		aspectRatio: 1 / 1,
-		width: 40
-	},
-	imageContainer: {
-		margin: 5
-	},
-	container: {
-		height: 50
-	}
-});
