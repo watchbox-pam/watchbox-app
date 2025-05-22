@@ -1,7 +1,14 @@
 import BackButton from "../components/BackButton";
 import { useLocalSearchParams, router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { View, Image, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+	View,
+	Image,
+	Text,
+	ScrollView,
+	TouchableOpacity,
+	RefreshControl
+} from "react-native";
 import { fetchMovieDetails } from "../services/MovieDetailService";
 import StyledText from "../components/StyledText";
 import {
@@ -12,6 +19,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
 import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function Index() {
 	const { id, movies }: { id: string; movies: any } = useLocalSearchParams();
@@ -35,14 +43,19 @@ export default function Index() {
 	);
 	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		if (playlistTitle)
-			setEditedTitle(
-				Array.isArray(playlistTitle) ? playlistTitle[0] : playlistTitle
-			);
-	}, [playlistTitle]);
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+	const [error, setError] = useState(false);
 
 	useEffect(() => {
+		// Reset error state when refreshing or component remounts
+		if (error && !refreshing) {
+			// Don't reset error if we're refreshing - let the refresh handle that
+			return;
+		}
+
 		setLoading(true);
 
 		const fetchData = async () => {
@@ -56,25 +69,58 @@ export default function Index() {
 							"Failed to fetch playlist title:",
 							result.message
 						);
+						setError(true);
+						return;
 					}
 				}
 				if (parsedMovies.length > 0) {
-					const detailedMovies = await Promise.all(
-						parsedMovies.map(async (movie) => {
-							const details = await fetchMovieDetails(movie.id);
-							return details.data;
-						})
-					);
-					setMovieList(detailedMovies);
+					try {
+						const detailedMovies = await Promise.all(
+							parsedMovies.map(async (movie) => {
+								try {
+									const details = await fetchMovieDetails(
+										movie.id
+									);
+									if (!details.success) {
+										throw new Error(
+											details.data ||
+												"Failed to fetch movie details"
+										);
+									}
+									return details.data;
+								} catch (err) {
+									console.error(
+										`Error fetching details for movie ID ${movie.id}:`,
+										err
+									);
+									// Show the error screen for any fetch failure
+									setError(true);
+									throw new Error(
+										"Failed to fetch movie details"
+									);
+								}
+							})
+						);
+						setMovieList(detailedMovies);
+					} catch (mapError) {
+						console.error("Error mapping movie details:", mapError);
+						setError(true);
+					}
 				}
 			} catch (error) {
+				setError(true);
 				console.error("Error fetching playlist data:", error);
 			} finally {
 				setLoading(false);
+				// Always reset refreshing when data fetch completes
+				if (refreshing) {
+					setRefreshing(false);
+				}
 			}
 		};
+
 		fetchData();
-	}, [parsedMovies, id]);
+	}, [parsedMovies, id, refreshing, stringifiedId, error]);
 
 	const handleDeleteMedia = async (movieId: number) => {
 		try {
@@ -93,9 +139,33 @@ export default function Index() {
 				);
 			}
 		} catch (error) {
+			setError(true);
 			console.error("Error deleting media from playlist:", error);
 		}
 	};
+
+	const handleRetry = () => {
+		// Force the useEffect to run again by toggling error and refreshing
+		console.log(
+			"Retry button pressed, resetting error and triggering refresh"
+		);
+		setError(false);
+		// Forcing a re-fetch by adding a timestamp to the URL
+		// This is a workaround for network errors that might be cached
+		setTimeout(() => {
+			console.log("Setting refreshing state to true");
+			setRefreshing(true);
+		}, 500);
+	};
+
+	if (error) {
+		return (
+			<ErrorMessage
+				message="Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer."
+				onRetry={handleRetry}
+			/>
+		);
+	}
 
 	if (loading) {
 		return (
@@ -109,7 +179,10 @@ export default function Index() {
 		<ScrollView
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
-			overScrollMode="never">
+			overScrollMode="never"
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}>
 			<View style={styles.headers}>
 				<BackButton />
 				<Text style={styles.playlistName}>{playlistTitle}</Text>

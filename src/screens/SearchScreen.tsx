@@ -239,7 +239,7 @@ export default function SearchScreen() {
 	};
 
 	if (error) {
-		return <ErrorMessage />;
+		return <ErrorMessage onRetry={() => setRefreshing(!refreshing)} />;
 	}
 
 	return (

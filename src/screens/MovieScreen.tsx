@@ -44,6 +44,11 @@ export default function MovieScreen() {
 		setRefreshing(true);
 	}, []);
 
+	const handleRetry = useCallback(() => {
+		setError(false);
+		setRefreshing(true);
+	}, []);
+
 	const fetchData = async () => {
 		try {
 			setLoading(true);
@@ -84,7 +89,7 @@ export default function MovieScreen() {
 	};
 
 	if (error) {
-		return <ErrorMessage />;
+		return <ErrorMessage onRetry={handleRetry} />;
 	}
 
 	if (loading) {

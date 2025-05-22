@@ -20,6 +20,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "#0A1E38",
 		margin: 0
 	},
+	loading: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#0A1E38"
+	},
 	contentContainer: {
 		alignItems: "center",
 		paddingVertical: 90

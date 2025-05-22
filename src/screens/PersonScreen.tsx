@@ -12,6 +12,7 @@ import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function PersonScreen() {
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
 	const [person, setPerson] = useState<Person | undefined>(undefined);
 	const [moviesCast, setMoviesCast] = useState<Media[] | undefined>(
 		undefined
@@ -30,6 +31,14 @@ export default function PersonScreen() {
 		setRefreshing(true);
 	}, []);
 
+	// Create explicit retry function that properly resets error state and triggers a new fetch
+	const handleRetry = useCallback(() => {
+		// Reset error state
+		setError(false);
+		// Trigger refresh
+		setRefreshing(true);
+	}, []);
+
 	const removeDuplicates = (arr: Media[]) => {
 		return arr.filter(
 			(item: Media, index: number, self: Media[]) =>
@@ -41,46 +50,53 @@ export default function PersonScreen() {
 	useEffect(() => {
 		setLoading(true);
 		(async () => {
-			setLoading(true);
-			let response = await fetchPerson(id);
+			try {
+				setLoading(true);
+				let response = await fetchPerson(id);
 
-			if (!response) {
+				if (!response) {
+					setError(true);
+					setLoading(false);
+					return;
+				}
+
+				setPerson(response.data.person);
+
+				// Separate cast and crew by media type
+				setMoviesCast(
+					removeDuplicates(
+						response.data.combined_credits.cast.filter(
+							(item: Media) => item.media_type === "movie"
+						)
+					)
+				);
+				setTvCast(
+					removeDuplicates(
+						response.data.combined_credits.cast.filter(
+							(item: Media) => item.media_type === "tv"
+						)
+					)
+				);
+				setMoviesCrew(
+					removeDuplicates(
+						response.data.combined_credits.crew.filter(
+							(item: Media) => item.media_type === "movie"
+						)
+					)
+				);
+				setTvCrew(
+					removeDuplicates(
+						response.data.combined_credits.crew.filter(
+							(item: Media) => item.media_type === "tv"
+						)
+					)
+				);
 				setLoading(false);
-				return;
+			} catch (error) {
+				console.error("Error fetching person data:", error);
+				setError(true);
+				setLoading(false);
 			}
-
-			setPerson(response.data.person);
-
-			// Separate cast and crew by media type
-			setMoviesCast(
-				removeDuplicates(
-					response.data.combined_credits.cast.filter(
-						(item: Media) => item.media_type === "movie"
-					)
-				)
-			);
-			setTvCast(
-				removeDuplicates(
-					response.data.combined_credits.cast.filter(
-						(item: Media) => item.media_type === "tv"
-					)
-				)
-			);
-			setMoviesCrew(
-				removeDuplicates(
-					response.data.combined_credits.crew.filter(
-						(item: Media) => item.media_type === "movie"
-					)
-				)
-			);
-			setTvCrew(
-				removeDuplicates(
-					response.data.combined_credits.crew.filter(
-						(item: Media) => item.media_type === "tv"
-					)
-				)
-			);
-			setLoading(false);
 		})();
 		if (refreshing) {
 			setRefreshing(false);
@@ -118,8 +134,8 @@ export default function PersonScreen() {
 		);
 	}
 
-	if (!checkData()) {
-		return <ErrorMessage />;
+	if (!checkData() || error) {
+		return <ErrorMessage onRetry={handleRetry} />;
 	}
 
 	return (
