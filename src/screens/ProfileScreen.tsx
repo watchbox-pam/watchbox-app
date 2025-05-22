@@ -25,6 +25,7 @@ import {
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
 import { ActivityIndicator } from "react-native-paper";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
@@ -35,7 +36,7 @@ export default function Index() {
 
 	const [profileData, setProfileData] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+	const [error, setError] = useState(false);
 	const currentUser = useSessionStore((state: any) => state.user);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
@@ -70,7 +71,7 @@ export default function Index() {
 			setModalVisible(false);
 			setPlaylistTitle("");
 			setIsPrivate(false);
-			await fetchUserPlaylists(userId);
+			await fetchData(userId);
 		} else {
 			alert(
 				result.message ||
@@ -84,10 +85,9 @@ export default function Index() {
 
 		const userId = currentUser && currentUser.id;
 		if (userId && typeof userId === "string") {
-			fetchProfileData(userId);
-			fetchUserPlaylists(userId);
+			fetchData(userId);
 		} else {
-			setError("ID utilisateur invalide" as any);
+			setError(true);
 			setLoading(false);
 		}
 		if (refreshing) {
@@ -97,63 +97,94 @@ export default function Index() {
 
 	useEffect(() => {
 		const userId = currentUser && currentUser.id;
-		if (userId && typeof userId === "string" && userPlaylists.length > 0) {
-			const historique = userPlaylists.find(
-				(p) => p.title === "Historique"
-			);
-			if (historique) {
-				console.log("historique id", historique.id);
-				getMovieRuntime(historique.id).then((result) => {
-					if (result.success && result.data) {
-						setTotalMovies(result.data.movie_count);
-						setTotalRuntime(result.data.total_runtime);
-					}
-				});
+		if (
+			userId &&
+			typeof userId === "string" &&
+			Array.isArray(userPlaylists) &&
+			userPlaylists.length > 0
+		) {
+			try {
+				const historique = userPlaylists.find(
+					(p) => p.title === "Historique"
+				);
+				if (historique) {
+					console.log("historique id", historique.id);
+					getMovieRuntime(historique.id)
+						.then((result) => {
+							if (result.success && result.data) {
+								setTotalMovies(result.data.movie_count);
+								setTotalRuntime(result.data.total_runtime);
+							}
+						})
+						.catch((error) => {
+							console.error(
+								"Erreur lors de la récupération du runtime:",
+								error
+							);
+						});
+				}
+			} catch (error) {
+				console.error(
+					"Erreur lors du traitement des playlists:",
+					error
+				);
 			}
 		}
 	}, [userPlaylists, currentUser]);
 
-	const fetchProfileData = async (userId: string) => {
-		setError(null);
-
+	const fetchData = async (userId: string) => {
 		try {
-			const response = await getUserProfile(userId);
-			if (response.success) {
-				setProfileData(response.data);
-			} else {
-				setError(
-					response.message ||
-						"Erreur lors de la récupération du profil"
-				);
+			// Récupération du profil utilisateur
+			try {
+				const response = await getUserProfile(userId);
+				if (response.success) {
+					setProfileData(response.data);
+				} else {
+					console.error(
+						"Erreur lors de la récupération du profil:",
+						response.message
+					);
+				}
+			} catch (profileError) {
 				console.error(
 					"Erreur lors de la récupération du profil:",
-					response.message
+					profileError
 				);
+				// Ne pas définir error=true ici pour permettre l'affichage partiel
 			}
-		} catch (error: any) {
-			setError(error.message || "Une erreur est survenue");
+
+			// Récupération des playlists utilisateur
+			try {
+				const response2 = await getUserPlaylists(userId);
+				if (response2.success && response2.data) {
+					setUserPlaylists(response2.data);
+				} else {
+					console.error(
+						"Erreur lors de la récupération des playlists:",
+						response2?.message
+					);
+					// S'assurer que userPlaylists est toujours un tableau vide en cas d'échec
+					setUserPlaylists([]);
+				}
+			} catch (playlistError) {
+				console.error(
+					"Erreur lors de la récupération des playlists:",
+					playlistError
+				);
+				// S'assurer que userPlaylists est toujours un tableau vide en cas d'erreur réseau
+				setUserPlaylists([]);
+			}
+		} catch (error) {
+			console.error("Erreur générale:", error);
+			setError(true);
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const fetchUserPlaylists = async (userId: string) => {
-		try {
-			const response = await getUserPlaylists(userId);
-			if (response.success) {
-				setUserPlaylists(response.data);
-			} else {
-				console.error(
-					"Error fetching user playlists:",
-					response.message
-				);
-			}
-		} catch (error: any) {
-			console.error("Error fetching user playlists:", error.message);
-		} finally {
-			setLoading(false);
-		}
-	};
+	if (error) {
+		return <ErrorMessage />;
+	}
 
 	if (loading) {
 		return (
@@ -171,11 +202,6 @@ export default function Index() {
 			refreshControl={
 				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 			}>
-			{error && (
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{error}</Text>
-				</View>
-			)}
 			<Modal
 				animationType="slide"
 				transparent={true}
@@ -248,7 +274,7 @@ export default function Index() {
 						<Text style={styles.createWatchlistButtonText}>+</Text>
 					</TouchableOpacity>
 				</View>
-				{userPlaylists.length > 0 ? (
+				{Array.isArray(userPlaylists) && userPlaylists.length > 0 ? (
 					userPlaylists.map((playlist) => (
 						<View key={playlist.id} style={styles.WatchList}>
 							<View style={styles.watchListHeader}>

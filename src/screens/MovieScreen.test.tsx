@@ -207,7 +207,7 @@ describe("<MovieScreen />", () => {
 		await waitFor(() => {
 			expect(getByTestId("error")).toBeTruthy();
 			expect(getByTestId("error")).toHaveTextContent(
-				"Erreur lors du chargement des données."
+				"Erreur lors du chargement des données.Réessayer"
 			);
 		});
 	});

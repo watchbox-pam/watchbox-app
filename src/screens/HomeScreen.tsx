@@ -92,7 +92,7 @@ export default function HomeScreen() {
 	}, [refreshing]);
 
 	if (error) {
-		return <ErrorMessage />;
+		return <ErrorMessage onRetry={() => setRefreshing(!refreshing)} />;
 	}
 
 	if (loading) {
