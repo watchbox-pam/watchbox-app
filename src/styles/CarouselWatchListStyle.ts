@@ -1,28 +1,67 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-	image: {
-		width: 100,
-		height: 150,
-		borderRadius: 10
+	container: {
+		height: 180,
+		paddingHorizontal: 15,
+		marginVertical: 8
 	},
 	imageContainer: {
-		marginRight: 10,
+		marginRight: 15,
 		height: 160,
-		alignItems: "center"
+		width: 110,
+		alignItems: "center",
+		borderRadius: 12,
+		overflow: "hidden",
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 4
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 5,
+		elevation: 8
 	},
-	container: {
+	image: {
+		width: 110,
 		height: 160,
-		paddingLeft: 10
+		borderRadius: 12,
+		backgroundColor: "#e8e8e8"
 	},
 	emptyContainer: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		backgroundColor: "#0D1321",
+		borderRadius: 12,
+		paddingVertical: 30,
+		paddingHorizontal: 20,
+		marginHorizontal: 10
 	},
-	emptyImage: {
-		width: 100,
-		height: 100
+	emptyIcon: {
+		fontSize: 48,
+		marginBottom: 15,
+		color: "#D0BFFF"
+	},
+	emptyText: {
+		fontSize: 20,
+		color: "#FFF",
+		fontWeight: "bold",
+		textAlign: "center",
+		marginBottom: 10,
+		letterSpacing: 1
+	},
+	emptySubText: {
+		fontSize: 14,
+		color: "#FFF",
+		textAlign: "center",
+		lineHeight: 20,
+		opacity: 0.8,
+		fontWeight: "500"
+	},
+	emptyHighlight: {
+		color: "#FF4A4A",
+		fontWeight: "bold"
 	}
 });
 
