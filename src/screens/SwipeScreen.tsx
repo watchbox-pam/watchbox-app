@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-	StyleSheet,
 	Text,
 	View,
 	Image,
@@ -9,69 +8,57 @@ import {
 	TouchableOpacity,
 	Dimensions
 } from "react-native";
+
+import styles from "@/src/styles/SwipeStyle";
 import { fetchMovies } from "../services/SwipeService";
-import { useLocalSearchParams } from "expo-router";
+import { Link } from "expo-router";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SWIPE_THRESHOLD = 120;
+const SWIPE_VERTICAL_THRESHOLD = 100;
 
-export default function App() {
-	// Liste de films exemple
-	const [movies, setMovies] = useState([
-		{
-			id: "1",
-			title: "Inception",
-			image: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg"
-		},
-		{
-			id: "2",
-			title: "The Dark Knight",
-			image: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg"
-		},
-		{
-			id: "3",
-			title: "Interstellar",
-			image: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg"
-		},
-		{
-			id: "4",
-			title: "Pulp Fiction",
-			image: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
-		},
-		{
-			id: "5",
-			title: "The Godfather",
-			image: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
-		}
-	]);
+interface Movie {
+	id: number;
+	title: string;
+	poster_path: string | null;
+}
 
+export default function SwipeScreen() {
+	const [movies, setMovies] = useState<Movie[]>([]);
 	const [loading, setLoading] = useState(true);
-	const { id } = useLocalSearchParams();
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [likedMovies, setLikedMovies] = useState<Movie[]>([]);
+	const [dislikedMovies, setDislikedMovies] = useState<Movie[]>([]);
+	const [skippedMovies, setSkippedMovies] = useState<Movie[]>([]);
+	const [isAnimating, setIsAnimating] = useState(false);
 
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const response = await fetchMovies(+id);
-			if (response.success) {
-				setMovies(response.data);
-			}
-			setLoading(false);
-		} catch (e) {
-			console.error(e);
-		}
-	};
+	// Créer une nouvelle position pour chaque carte
+	const position = useRef(new Animated.ValueXY()).current;
 
 	useEffect(() => {
-		setLoading(true);
-		fetchData();
-	}, [id]);
+		const loadMovies = async () => {
+			try {
+				const res = await fetchMovies();
+				setMovies(res);
+			} catch (error) {
+				console.error("Erreur lors du chargement des films :", error);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-	const [currentIndex, setCurrentIndex] = useState(0);
-	const [likedMovies, setLikedMovies] = useState([]);
-	const [dislikedMovies, setDislikedMovies] = useState([]);
+		loadMovies();
+	}, []);
 
-	// Animation pour le swipe
-	const position = useRef(new Animated.ValueXY()).current;
+	// Reset la position quand l'index change
+	useEffect(() => {
+		if (currentIndex > 0) {
+			position.setValue({ x: 0, y: 0 });
+			setIsAnimating(false);
+		}
+	}, [currentIndex]);
+
 	const rotate = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
 		outputRange: ["-10deg", "0deg", "10deg"],
@@ -87,14 +74,10 @@ export default function App() {
 		outputRange: [1, 0],
 		extrapolate: "clamp"
 	});
-	const nextCardOpacity = position.x.interpolate({
-		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-		outputRange: [1, 0.5, 1],
-		extrapolate: "clamp"
-	});
-	const nextCardScale = position.x.interpolate({
-		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-		outputRange: [1, 0.8, 1],
+
+	const skipOpacity = position.y.interpolate({
+		inputRange: [-SCREEN_WIDTH / 4, 0],
+		outputRange: [1, 0],
 		extrapolate: "clamp"
 	});
 
@@ -104,8 +87,10 @@ export default function App() {
 
 		if (direction === "right") {
 			setLikedMovies((prev) => [...prev, item]);
-		} else {
+		} else if (direction === "left") {
 			setDislikedMovies((prev) => [...prev, item]);
+		} else {
+			setSkippedMovies((prev) => [...prev, item]);
 		}
 
 		setCurrentIndex((prev) => prev + 1);
@@ -134,6 +119,17 @@ export default function App() {
 					}).start(() => {
 						handleSwipeComplete("left");
 					});
+				} else if (gestureState.dy < -SWIPE_VERTICAL_THRESHOLD) {
+					Animated.timing(position, {
+						toValue: {
+							x: gestureState.dx,
+							y: -SCREEN_HEIGHT - 100
+						},
+						duration: 5000,
+						useNativeDriver: false
+					}).start(() => {
+						handleSwipeComplete("up");
+					});
 				} else {
 					Animated.spring(position, {
 						toValue: { x: 0, y: 0 },
@@ -145,75 +141,72 @@ export default function App() {
 		})
 	).current;
 
-	// Fonction pour liker ou disliker via les boutons
-	const handleButtonPress = (direction: string) => {
-		Animated.spring(position, {
-			toValue: {
-				x:
-					direction === "right"
-						? SCREEN_WIDTH + 100
-						: -SCREEN_WIDTH - 100,
-				y: 0
-			},
+	const handleButtonPress = (direction: "left" | "right" | "up") => {
+		if (currentIndex >= movies.length || isAnimating) return;
+
+		setIsAnimating(true);
+		let toValue = { x: 0, y: 0 };
+
+		if (direction === "right") {
+			toValue = { x: SCREEN_WIDTH + 100, y: 0 };
+		} else if (direction === "left") {
+			toValue = { x: -SCREEN_WIDTH - 100, y: 0 };
+		} else if (direction === "up") {
+			toValue = { x: 0, y: -SCREEN_HEIGHT - 100 };
+		}
+
+		Animated.timing(position, {
+			toValue,
+			duration: 400,
 			useNativeDriver: false
 		}).start(() => {
 			handleSwipeComplete(direction);
 		});
 	};
 
-	// Rendu des cartes
-	const renderCards = () => {
-		if (currentIndex >= movies.length) {
-			return (
-				<View style={styles.endContainer}>
-					<Text style={styles.endText}>
-						Vous avez parcouru tous les films!
-					</Text>
-					<Text style={styles.endSubText}>
-						Films aimés: {likedMovies.length}
-					</Text>
-					<Text style={styles.endSubText}>
-						Films non aimés: {dislikedMovies.length}
-					</Text>
-					<TouchableOpacity
-						style={styles.resetButton}
-						onPress={() => {
-							setCurrentIndex(0);
-							setLikedMovies([]);
-							setDislikedMovies([]);
-						}}>
-						<Text style={styles.resetButtonText}>Recommencer</Text>
-					</TouchableOpacity>
-				</View>
-			);
-		}
+	const renderCurrentCard = () => {
+		if (currentIndex >= movies.length) return null;
 
-		return movies
-			.map((movie, index) => {
-				if (index < currentIndex) {
-					return null;
-				}
+		const movie = movies[currentIndex];
+		const posterUri = movie.poster_path
+			? movie.poster_path.startsWith("http")
+				? movie.poster_path
+				: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+			: "https://via.placeholder.com/300x450?text=Pas+d'image";
 
-				if (index === currentIndex) {
-					return (
-						<Animated.View
-							key={movie.id}
-							style={[
-								styles.card,
-								{
-									transform: [
-										{ translateX: position.x },
-										{ translateY: position.y },
-										{ rotate: rotate }
-									]
-								}
-							]}
-							{...panResponder.panHandlers}>
-							<Image
-								source={{ uri: movie.image }}
-								style={styles.posterImage}
-							/>
-							<Text style={styles.movieTitle}>{movie.title}</Text>
+		return (
+			<Animated.View
+				key={`current-${movie.id}-${currentIndex}`}
+				style={[
+					styles.card,
+					{
+						transform: [
+							{ translateX: position.x },
+							{ translateY: position.y },
+							{ rotate }
+						],
+						zIndex: 100
+					}
+				]}
+				{...panResponder.panHandlers}
+				pointerEvents="box-none">
+				<View style={{ flex: 1 }}>
+					<Link
+						href={{
+							pathname: "/movie/[id]",
+							params: { id: movie.id.toString() }
+						}}
+						asChild>
+						<TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
+							<View style={[styles.card]}>
+								<Image
+									source={{ uri: posterUri }}
+									style={styles.posterImage}
+								/>
+								<Text style={styles.movieTitle}>
+									{movie.title}
+								</Text>
+							</View>
 
 							<Animated.View
 								style={[
@@ -225,6 +218,16 @@ export default function App() {
 
 							<Animated.View
 								style={[
+									styles.skipLabel,
+									{ opacity: skipOpacity }
+								]}>
+								<Text style={styles.skipLabelText}>
+									Pas Vue
+								</Text>
+							</Animated.View>
+
+							<Animated.View
+								style={[
 									styles.dislikeLabel,
 									{ opacity: dislikeOpacity }
 								]}>
@@ -232,187 +235,121 @@ export default function App() {
 									NOPE
 								</Text>
 							</Animated.View>
-						</Animated.View>
-					);
-				}
+						</TouchableOpacity>
+					</Link>
+				</View>
+			</Animated.View>
+		);
+	};
 
-				if (index === currentIndex + 1) {
-					return (
-						<Animated.View
-							key={movie.id}
-							style={[
-								styles.card,
-								{
-									opacity: nextCardOpacity,
-									transform: [{ scale: nextCardScale }],
-									zIndex: -1
-								}
-							]}>
-							<Image
-								source={{ uri: movie.image }}
-								style={styles.posterImage}
-							/>
-							<Text style={styles.movieTitle}>{movie.title}</Text>
-						</Animated.View>
-					);
-				}
+	const renderBackgroundCards = () => {
+		const cards = [];
+		const maxBackgroundCards = 2;
 
-				return null;
-			})
-			.reverse();
+		for (let i = 1; i <= maxBackgroundCards; i++) {
+			const index = currentIndex + i;
+			if (index >= movies.length) continue;
+
+			const movie = movies[index];
+			const posterUri = movie.poster_path
+				? movie.poster_path.startsWith("http")
+					? movie.poster_path
+					: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+				: "https://via.placeholder.com/300x450?text=Pas+d'image";
+
+			const cardScale = 0.95 - i * 0.05;
+			const imageOpacity = 0.8 - i * 0.2; // Opacité pour l'image seulement
+			const cardOffset = i * 8;
+
+			cards.push(
+				<View
+					key={`bg-${movie.id}-${index}`}
+					style={[
+						styles.card,
+						{
+							transform: [
+								{ scale: cardScale },
+								{ translateY: cardOffset }
+							],
+							zIndex: 10 - i
+						}
+					]}>
+					<Image
+						source={{ uri: posterUri }}
+						style={[
+							styles.posterImage,
+							{ opacity: imageOpacity } // Appliquer l'opacité seulement à l'image
+						]}
+					/>
+					{/* Le titre reste complètement invisible pour les cartes d'arrière-plan */}
+					<View style={{ opacity: 1 }}>
+						<Text style={styles.movieTitle}>{movie.title}</Text>
+					</View>
+				</View>
+			);
+		}
+
+		return cards;
+	};
+
+	const renderCards = () => {
+		if (movies.length === 0) {
+			return (
+				<View style={styles.endContainer}>
+					<Text style={styles.endText}>Aucun film disponible.</Text>
+				</View>
+			);
+		}
+
+		if (currentIndex >= movies.length) {
+			return (
+				<View style={styles.endContainer}>
+					<Text style={styles.endText}>Plus de films à swiper !</Text>
+					<Text style={styles.endText}>
+						Aimés: {likedMovies.length} | Pas aimés:{" "}
+						{dislikedMovies.length} | Pas vus:{" "}
+						{skippedMovies.length}
+					</Text>
+				</View>
+			);
+		}
+
+		return (
+			<>
+				{renderBackgroundCards()}
+				{renderCurrentCard()}
+			</>
+		);
 	};
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.cardContainer}>{renderCards()}</View>
 
-			<View style={styles.buttonsContainer}>
-				<TouchableOpacity
-					style={styles.dislikeButton}
-					onPress={() => handleButtonPress("left")}>
-					<Text style={styles.buttonText}>✗</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.likeButton}
-					onPress={() => handleButtonPress("right")}>
-					<Text style={styles.buttonText}>♥</Text>
-				</TouchableOpacity>
-			</View>
+			{!loading && currentIndex < movies.length && (
+				<View style={styles.buttonsContainer}>
+					<TouchableOpacity
+						style={styles.dislikeButton}
+						onPress={() => handleButtonPress("left")}
+						disabled={isAnimating}>
+						<Text style={styles.buttonText}>X</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.skipButton}
+						onPress={() => handleButtonPress("up")}
+						disabled={isAnimating}>
+						<Text style={styles.buttonText}>?</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.likeButton}
+						onPress={() => handleButtonPress("right")}
+						disabled={isAnimating}>
+						<Text style={styles.buttonText}>♥</Text>
+					</TouchableOpacity>
+				</View>
+			)}
 		</View>
 	);
 }
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#0A1E38",
-		paddingTop: 50
-	},
-	cardContainer: {
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center"
-	},
-	card: {
-		position: "absolute",
-		width: SCREEN_WIDTH * 0.9,
-		height: SCREEN_WIDTH * 1.5,
-		borderRadius: 20,
-		backgroundColor: "#143b71",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 5,
-		alignItems: "center",
-		padding: 10
-	},
-	posterImage: {
-		width: "100%",
-		height: "85%",
-		borderRadius: 15,
-		resizeMode: "cover"
-	},
-	movieTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		marginTop: 15,
-		color: "#fff"
-	},
-	buttonsContainer: {
-		flexDirection: "row",
-		justifyContent: "space-around",
-		marginBottom: 30,
-		width: "80%",
-		alignSelf: "center"
-	},
-	likeButton: {
-		width: 70,
-		height: 70,
-		borderRadius: 35,
-		backgroundColor: "#4caf50",
-		justifyContent: "center",
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 5
-	},
-	dislikeButton: {
-		width: 70,
-		height: 70,
-		borderRadius: 35,
-		backgroundColor: "#ff5252",
-		justifyContent: "center",
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		elevation: 5
-	},
-	buttonText: {
-		fontSize: 30,
-		color: "white"
-	},
-	likeLabel: {
-		position: "absolute",
-		top: 50,
-		right: 40,
-		transform: [{ rotate: "20deg" }],
-		borderWidth: 4,
-		borderColor: "#4caf50",
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 5
-	},
-	likeLabelText: {
-		fontSize: 32,
-		fontWeight: "bold",
-		color: "#4caf50"
-	},
-	dislikeLabel: {
-		position: "absolute",
-		top: 50,
-		left: 40,
-		transform: [{ rotate: "-20deg" }],
-		borderWidth: 4,
-		borderColor: "#ff5252",
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 5
-	},
-	dislikeLabelText: {
-		fontSize: 32,
-		fontWeight: "bold",
-		color: "#ff5252"
-	},
-	endContainer: {
-		alignItems: "center",
-		justifyContent: "center",
-		color: "white"
-	},
-	endText: {
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 20,
-		color: "#fff"
-	},
-	endSubText: {
-		fontSize: 18,
-		marginBottom: 5,
-		color: "#fff"
-	},
-	resetButton: {
-		marginTop: 30,
-		backgroundColor: "#143b71",
-		paddingVertical: 12,
-		paddingHorizontal: 30,
-		borderRadius: 8
-	},
-	resetButtonText: {
-		color: "white",
-		fontSize: 18,
-		fontWeight: "bold"
-	}
-});
