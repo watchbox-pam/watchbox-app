@@ -1,8 +1,8 @@
 import { useLocalSearchParams } from "expo-router";
-import { Image, ScrollView, View } from "react-native";
+import { Image, RefreshControl, ScrollView, View } from "react-native";
 import { styles } from "../styles/PersonStyle";
 import BackButton from "../components/BackButton";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native-paper";
 import StyledText from "../components/StyledText";
 import ReadMore from "../components/ReadMore";
@@ -23,6 +23,11 @@ export default function PersonScreen() {
 	const [tvCrew, setTvCrew] = useState<Media[] | undefined>(undefined);
 	const { id }: { id: string } = useLocalSearchParams();
 
+	const [refreshing, setRefreshing] = useState(false);
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+	}, []);
+
 	const removeDuplicates = (arr: Media[]) => {
 		return arr.filter(
 			(item: Media, index: number, self: Media[]) =>
@@ -31,6 +36,7 @@ export default function PersonScreen() {
 	};
 
 	useEffect(() => {
+		setLoading(true);
 		(async () => {
 			setLoading(true);
 			let response = await fetchPerson(id);
@@ -72,7 +78,10 @@ export default function PersonScreen() {
 			);
 			setLoading(false);
 		})();
-	}, [id]);
+		if (refreshing) {
+			setRefreshing(false);
+		}
+	}, [id, refreshing]);
 
 	const checkData = () => {
 		return person && moviesCast && tvCast && moviesCrew && tvCrew
@@ -109,7 +118,12 @@ export default function PersonScreen() {
 	}
 
 	return (
-		<ScrollView style={styles.container} overScrollMode="never">
+		<ScrollView
+			style={styles.container}
+			overScrollMode="never"
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}>
 			<View style={styles.headers}>
 				<BackButton />
 			</View>

@@ -42,14 +42,8 @@ export default function CarouselWatchList({ providers }: { providers: any }) {
 					data={filteredMovies}
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					keyExtractor={(item, index) => index.toString()}
-					renderItem={({
-						item,
-						index
-					}: {
-						item: Movie;
-						index: number;
-					}) => (
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item }: { item: Movie }) => (
 						<Link
 							href={{
 								pathname: "/watchList/[id]",
@@ -109,5 +103,11 @@ const styles = StyleSheet.create({
 	emptyImage: {
 		width: 100,
 		height: 100
+	},
+	loading: {
+		backgroundColor: "#0A1E38",
+		height: "100%",
+		width: "100%",
+		justifyContent: "center"
 	}
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import {
 	StyleSheet,
@@ -7,7 +7,8 @@ import {
 	FlatList,
 	Image,
 	TouchableOpacity,
-	ActivityIndicator
+	ActivityIndicator,
+	RefreshControl
 } from "react-native";
 import StyledText from "./StyledText";
 
@@ -33,6 +34,8 @@ interface MovieListProps {
 	selectedEmotion: Emotion | null;
 	onRetry: () => void;
 	onBack: () => void;
+	refreshing: boolean;
+	onRefresh: () => void;
 }
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -43,7 +46,9 @@ const MovieList: React.FC<MovieListProps> = ({
 	error,
 	selectedEmotion,
 	onRetry,
-	onBack
+	onBack,
+	refreshing,
+	onRefresh
 }) => {
 	const renderMovieItem = ({ item }: { item: Movie }) => (
 		<Link
@@ -131,6 +136,12 @@ const MovieList: React.FC<MovieListProps> = ({
 					showsHorizontalScrollIndicator={false}
 					columnWrapperStyle={styles.columnWrapper}
 					extraData={movies}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+						/>
+					}
 				/>
 			)}
 		</View>
