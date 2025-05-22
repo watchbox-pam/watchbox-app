@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import styles from "@/src/styles/DropDownPlaylistStyle";
 import {
 	View,
 	Modal,
