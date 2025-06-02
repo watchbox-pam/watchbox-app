@@ -21,7 +21,7 @@
     "@expo/config-plugins": "~9.0.15",
     "@expo/prebuild-config": "~8.0.27",
     "@expo/vector-icons": "~14.0.2",
-    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.2.0",
     "@react-native-community/slider": "^4.5.6",
     "@react-native-picker/picker": "2.9.0",
@@ -50,6 +50,7 @@
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
     "react-native-chart-kit": "^6.12.0",
+    "react-native-flipper": "^0.273.0",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-paper": "^5.13.1",
     "react-native-pie": "^1.1.2",
@@ -63,8 +64,7 @@
     "react-native-webview": "13.12.5",
     "react-native-youtube-iframe": "^2.3.0",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.3",
-    "@react-native-async-storage/async-storage": "1.23.1"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -72,6 +72,7 @@
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
+    "@react-native-community/cli": "latest",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~8.0.1",
     "eslint-config-prettier": "^10.1.1",
