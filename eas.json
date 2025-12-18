@@ -13,7 +13,7 @@
     },
     "production": {
       "autoIncrement": true,
-      "node": "18.17.0"
+      "node": "20.19.4"
     }
   },
   "submit": {
