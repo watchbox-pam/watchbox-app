@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "watchbox-app",
+    "name": "Watchbox",
     "slug": "watchbox-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,12 +10,15 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.watchbox.watchbox"
+      "bundleIdentifier": "com.watchbox.watchbox",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./src/assets/images/watchbox-logo.png",
+        "backgroundColor": "#0A1E38"
       },
       "package": "com.watchbox.watchbox"
     },
@@ -36,7 +39,9 @@
         }
       ],
       "expo-video",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -48,6 +53,12 @@
       "eas": {
         "projectId": "5cafa03b-bbf2-4cf1-9519-15dfb1af5f58"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5cafa03b-bbf2-4cf1-9519-15dfb1af5f58"
     }
   }
 }
