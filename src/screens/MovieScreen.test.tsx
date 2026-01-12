@@ -2,6 +2,7 @@ import { render, waitFor } from "@testing-library/react-native";
 import MovieScreen from "./MovieScreen";
 import { getUserPlaylists } from "../services/PlaylistService";
 import { fetchMovieDetails } from "../services/MovieDetailService";
+import { Text, View } from "react-native";
 
 jest.mock("@/src/services/MovieDetailService", () => ({
 	fetchMovieDetails: jest.fn()
@@ -42,8 +43,6 @@ jest.mock("@/src/components/StyledText", () => {
 });
 
 jest.mock("@/src/components/TagList", () => {
-	const { View, Text } = require("react-native");
-
 	// mock les composants de TagList
 	return function MockTagList({
 		tags,
