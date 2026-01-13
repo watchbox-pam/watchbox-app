@@ -4,8 +4,8 @@ type UserSignup = {
 	email: string;
 	password: string;
 	confirmPassword: string;
-	country: string;
-	birthdate: Date;
+	country?: string;
+	birthdate: Date | null;
 };
 
 export default UserSignup;

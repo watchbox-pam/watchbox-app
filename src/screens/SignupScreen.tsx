@@ -4,7 +4,7 @@ import Logo from "@/src/components/Logo";
 import styles from "@/src/styles/SignupStyle";
 import StyledText from "@/src/components/StyledText";
 import { useEffect, useState } from "react";
-import Country from "@/src/models/Country";
+//import Country from "@/src/models/Country";
 import { Picker } from "@react-native-picker/picker";
 import { getAllCountries, registerUser } from "@/src/services/SignupService";
 import RNDateTimePicker, {
@@ -19,25 +19,26 @@ export default function SignupScreen() {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
-	const [countries, setCountries] = useState<Country[]>([]);
-	const [country, setCountry] = useState<string>("");
+	//const [countries, setCountries] = useState<Country[]>([]);
+	//const [country, setCountry] = useState<string>("");
 	const [dtPickerVisible, setDtPickerVisible] = useState<boolean>(false);
 	const [birthdate, setBirthdate] = useState<Date | null>(null);
 
 	const signIn = useSessionStore((state: any) => state.signIn);
 
-	const getCountries = async () => {
-		const countriesResult = await getAllCountries();
-		setCountries(countriesResult);
-	};
+	// const getCountries = async () => {
+	// 	const countriesResult = await getAllCountries();
+	// 	setCountries(countriesResult);
+	// };
 
 	const onChangeBirthdate = (
 		event: DateTimePickerEvent,
-		selectedDate: Date
+		selectedDate: Date | undefined
 	) => {
-		const currentDate = selectedDate;
-		setDtPickerVisible(false);
-		setBirthdate(currentDate);
+		if (selectedDate) {
+			setDtPickerVisible(false);
+			setBirthdate(selectedDate);
+		}
 	};
 
 	const signupUser = async () => {
@@ -47,7 +48,7 @@ export default function SignupScreen() {
 			email: email,
 			password: password,
 			confirmPassword: confirmPassword,
-			country: country,
+			country: "FR",
 			birthdate: birthdate
 		};
 		const result = await registerUser(userToInsert);
@@ -60,9 +61,9 @@ export default function SignupScreen() {
 		}
 	};
 
-	useEffect(() => {
-		getCountries();
-	}, []);
+	// useEffect(() => {
+	// 	getCountries();
+	// }, []);
 
 	return (
 		<View style={styles.container}>
@@ -97,7 +98,7 @@ export default function SignupScreen() {
 				secureTextEntry
 				onChangeText={setConfirmPassword}
 			/>
-			<Picker
+			{/* <Picker
 				style={styles.picker}
 				selectedValue={country}
 				onValueChange={(itemValue, itemIndex) => setCountry(itemValue)}>
@@ -110,8 +111,9 @@ export default function SignupScreen() {
 								value={country.iso}
 							/>
 						);
-					})}
-			</Picker>
+					})
+			</Picker>*/}
+
 			<Text style={styles.input} onPress={() => setDtPickerVisible(true)}>
 				{birthdate
 					? birthdate.toLocaleDateString("fr-FR")
@@ -120,7 +122,7 @@ export default function SignupScreen() {
 			{dtPickerVisible && (
 				<RNDateTimePicker
 					testID="dateTimePicker"
-					value={new Date(Date.now())}
+					value={birthdate || new Date(Date.now())}
 					mode="date"
 					onChange={onChangeBirthdate}
 					minimumDate={new Date(1900, 0, 1)}
