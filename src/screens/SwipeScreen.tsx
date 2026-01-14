@@ -201,7 +201,7 @@ export default function SwipeScreen() {
 
 		Animated.timing(position, {
 			toValue,
-			duration: 400,
+			duration: 2000,
 			useNativeDriver: false
 		}).start(() => {
 			handleSwipeComplete(direction);
