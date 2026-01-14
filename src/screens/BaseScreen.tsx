@@ -1,10 +1,4 @@
-import {
-	Image,
-	SafeAreaView,
-	Text,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import styles from "@/src/styles/BasePageStyle";
 import StyledText from "@/src/components/StyledText";
 import { router } from "expo-router";
@@ -33,7 +27,7 @@ export default function BaseScreen() {
 	}, []);
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<View style={styles.Logo}>
 				<Image
 					style={{ width: 75, height: 75 }}
@@ -54,6 +48,6 @@ export default function BaseScreen() {
 					<Text style={styles.buttonText}>Créez votre compte</Text>
 				</TouchableOpacity>
 			</View>
-		</SafeAreaView>
+		</View>
 	);
 }
