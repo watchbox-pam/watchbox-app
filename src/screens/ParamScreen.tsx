@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { Checkbox, IconButton } from "react-native-paper";
 import {
 	View,
 	Text,
 	Pressable,
 	ScrollView,
 	Image,
-	ActivityIndicator
+	ActivityIndicator,
+	TouchableOpacity,
+	Modal,
+	Platform,
+	Alert
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import { providerService } from "../services/ProviderService";
-/* import AsyncStorage from "@react-native-async-storage/async-storage";
- */ import styles from "../styles/ParamStyle";
+import StyledText from "../components/StyledText";
+import useSessionStore from "@/src/zustand/sessionStore";
+import * as SecureStore from "expo-secure-store";
+import * as FileSystem from "expo-file-system";
+/* import AsyncStorage from "@react-native-async-storage/async-storage";*/
+import styles from "../styles/ParamStyle";
 
 // Type for providers
 type Provider = {
@@ -21,9 +30,8 @@ type Provider = {
 };
 
 const ParamScreen: React.FC = () => {
-	const [homeOption, setHomeOption] = useState(false);
 	const [notifications, setNotifications] = useState(false);
-	const [darkMode, setDarkMode] = useState(true);
+	//const [darkMode, setDarkMode] = useState(true);
 	const [publicProfile, setPublicProfile] = useState(false);
 	const [history, setHistory] = useState(false);
 	const [adultContent, setAdultContent] = useState(false);
@@ -32,6 +40,21 @@ const ParamScreen: React.FC = () => {
 	const [providers, setProviders] = useState<Provider[]>([]);
 	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [showAllProviders, setShowAllProviders] = useState(false);
+
+	// Modal state
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showClearCacheModal, setShowClearCacheModal] = useState(false);
+	const [cacheSize, setCacheSize] = useState<string>("0 MB");
+	const [isCalculatingCache, setIsCalculatingCache] = useState(false);
+
+	const MAX_VISIBLE_PROVIDERS = 8;
+	const signOut = useSessionStore((state) => state.signOut);
+
+	// Determine which providers to display
+	const displayedProviders = showAllProviders
+		? providers
+		: providers.slice(0, MAX_VISIBLE_PROVIDERS);
 
 	// Load providers on component mount
 	useEffect(() => {
@@ -43,6 +66,89 @@ const ParamScreen: React.FC = () => {
 	useEffect(() => {
 		saveSelectedProviders();
 	}, [selectedProviders]);
+
+	const calculateCacheSize = async () => {
+		setIsCalculatingCache(true);
+		try {
+			const cacheDir = FileSystem.cacheDirectory;
+			if (cacheDir) {
+				const info = await FileSystem.getInfoAsync(cacheDir);
+				if (info.exists) {
+					// Calculer la taille du cache
+					const size = await getCacheSize(cacheDir);
+					const sizeInMB = (size / (1024 * 1024)).toFixed(2);
+					setCacheSize(`${sizeInMB} MB`);
+				}
+			}
+		} catch (error) {
+			console.error("Erreur calcul cache:", error);
+			setCacheSize("0 MB");
+		} finally {
+			setIsCalculatingCache(false);
+		}
+	};
+
+	// Fonction récursive pour calculer la taille du cache
+	const getCacheSize = async (directory: string): Promise<number> => {
+		try {
+			const files = await FileSystem.readDirectoryAsync(directory);
+			let totalSize = 0;
+
+			for (const file of files) {
+				const filePath = `${directory}${file}`;
+				const info = await FileSystem.getInfoAsync(filePath);
+
+				if (info.exists) {
+					if (info.isDirectory) {
+						totalSize += await getCacheSize(`${filePath}/`);
+					} else {
+						totalSize += info.size || 0;
+					}
+				}
+			}
+
+			return totalSize;
+		} catch (error) {
+			console.error("Erreur lecture dossier:", error);
+			return 0;
+		}
+	};
+
+	// Vider le cache
+	const handleClearCache = async () => {
+		try {
+			const cacheDir = FileSystem.cacheDirectory;
+			if (cacheDir) {
+				// Supprimer tous les fichiers du cache
+				const files = await FileSystem.readDirectoryAsync(cacheDir);
+
+				for (const file of files) {
+					try {
+						await FileSystem.deleteAsync(`${cacheDir}${file}`, {
+							idempotent: true
+						});
+					} catch (err) {
+						console.error(`Erreur suppression ${file}:`, err);
+					}
+				}
+
+				// Recalculer la taille du cache
+				await calculateCacheSize();
+
+				setShowClearCacheModal(false);
+
+				// Afficher un message de succès
+				Alert.alert("Cache vidé", "Le cache a été vidé avec succès !", [
+					{ text: "OK" }
+				]);
+			}
+		} catch (error) {
+			console.error("Erreur lors du vidage du cache:", error);
+			Alert.alert("Erreur", "Impossible de vider le cache", [
+				{ text: "OK" }
+			]);
+		}
+	};
 
 	// Fetch providers from API
 	const fetchProviders = async () => {
@@ -95,50 +201,64 @@ const ParamScreen: React.FC = () => {
 		});
 	};
 
+	const handleDeleteAccount = async () => {
+		try {
+			// Supprimer les données locales
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.deleteItemAsync("id");
+				await SecureStore.deleteItemAsync("identifier");
+				await SecureStore.deleteItemAsync("token");
+			} else {
+				localStorage.removeItem("id");
+				localStorage.removeItem("identifier");
+				localStorage.removeItem("token");
+			}
+
+			// Déconnexion
+			signOut();
+			setShowDeleteModal(false);
+
+			console.log("Compte supprimé et déconnecté");
+		} catch (error) {
+			console.error("Erreur lors de la suppression:", error);
+		}
+	};
+
 	return (
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
 				<BackButton />
-				<Text style={styles.paramTitle}>Settings</Text>
+				<Text style={styles.paramTitle}>Paramêtres</Text>
 				<Logo />
 			</View>
 
-			{/* Setting: Home Option */}
+			{/* Setting: Account Info */}
+			<TouchableOpacity style={styles.item}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Compte</Text>
+					<Text style={styles.desc}>julien@example.com</Text>
+				</View>
+				<IconButton icon="chevron-right" />
+			</TouchableOpacity>
+
+			{/* Setting: Language */}
 			<View style={styles.item}>
-				<View>
-					<Text style={styles.text}>Home Option</Text>
-					<Text style={styles.desc}>Home - Swipe</Text>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Langue</Text>
+					<Text style={styles.desc}>Français</Text>
 				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setHomeOption(true)}
-						style={[
-							styles.toggleButton,
-							homeOption ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								homeOption && styles.activeText
-							]}>
-							Home
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setHomeOption(false)}
-						style={[
-							styles.toggleButton,
-							!homeOption ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!homeOption && styles.activeText
-							]}>
-							Swipe
-						</Text>
-					</Pressable>
+				<IconButton icon="chevron-right" />
+			</View>
+
+			{/* Setting: Content Region */}
+			<View style={styles.item}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Région</Text>
+					<Text style={styles.desc}>
+						Contenu disponible dans votre pays
+					</Text>
 				</View>
+				<IconButton icon="chevron-right" />
 			</View>
 
 			{/* Setting: Platforms (Providers) */}
@@ -160,82 +280,78 @@ const ParamScreen: React.FC = () => {
 						marginBottom: 10
 					}}>
 					<View>
-						<Text style={styles.text}>Platforms</Text>
-						<Text style={styles.desc}>Platforms you use</Text>
+						<Text style={styles.text}>Plateformes</Text>
+						<Text style={styles.desc}>
+							Plateforme que vous utilisez
+						</Text>
 					</View>
 				</View>
 
 				{isLoading ? (
 					<ActivityIndicator size="small" color="#fff" />
 				) : (
-					<View style={styles.providersContainer}>
-						{providers.map((provider) => (
-							<Pressable
-								key={provider.id}
-								style={[
-									styles.providerButton,
-									selectedProviders.includes(provider.id) &&
-										styles.selectedProvider
-								]}
-								onPress={() => toggleProvider(provider.id)}>
-								{provider.logo_path ? (
-									<Image
-										source={{
-											uri: `https://image.tmdb.org/t/p/original${provider.logo_path}`
-										}}
-										style={styles.providerLogo}
-									/>
-								) : (
-									<Text style={styles.providerText}>
-										{provider.name}
-									</Text>
-								)}
-							</Pressable>
-						))}
-					</View>
+					<>
+						<View style={styles.providersContainer}>
+							{displayedProviders.map((provider) => (
+								<Pressable
+									key={provider.id}
+									style={[
+										styles.providerButton,
+										selectedProviders.includes(
+											provider.id
+										) && styles.selectedProvider
+									]}
+									onPress={() => toggleProvider(provider.id)}>
+									{provider.logo_path ? (
+										<Image
+											source={{
+												uri: `https://image.tmdb.org/t/p/original${provider.logo_path}`
+											}}
+											style={styles.providerLogo}
+										/>
+									) : (
+										<Text style={styles.providerText}>
+											{provider.name}
+										</Text>
+									)}
+								</Pressable>
+							))}
+						</View>
+
+						{/* Bouton Voir plus/moins */}
+						{providers.length > MAX_VISIBLE_PROVIDERS && (
+							<TouchableOpacity
+								style={styles.readMoreButton}
+								onPress={() =>
+									setShowAllProviders(!showAllProviders)
+								}>
+								<StyledText style={styles.readMoreText}>
+									{showAllProviders
+										? "Voir moins"
+										: `Voir plus (${providers.length - MAX_VISIBLE_PROVIDERS} autres)`}
+								</StyledText>
+							</TouchableOpacity>
+						)}
+					</>
 				)}
 			</View>
 
 			{/* Setting: Notifications */}
-			<View style={styles.item}>
-				<View>
+			<View style={styles.CheckboxItem}>
+				<View style={{ flex: 1 }}>
 					<Text style={styles.text}>Notifications</Text>
-					<Text style={styles.desc}>Receive notifications</Text>
+					<Text style={styles.desc}>
+						Cochez pour recevoir les notifications
+					</Text>
 				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setNotifications(true)}
-						style={[
-							styles.toggleButton,
-							notifications ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								notifications && styles.activeText
-							]}>
-							On
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setNotifications(false)}
-						style={[
-							styles.toggleButton,
-							!notifications ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!notifications && styles.activeText
-							]}>
-							Off
-						</Text>
-					</Pressable>
-				</View>
+				<Checkbox
+					status={notifications ? "checked" : "unchecked"}
+					onPress={() => setNotifications(!notifications)}
+					color="#007AFF"
+				/>
 			</View>
-
 			{/* Setting: Dark Mode */}
-			<View style={styles.item}>
+			{/* <View style={styles.item}>
 				<View>
 					<Text style={styles.text}>Dark Mode</Text>
 					<Text style={styles.desc}>Enable dark theme</Text>
@@ -270,121 +386,112 @@ const ParamScreen: React.FC = () => {
 						</Text>
 					</Pressable>
 				</View>
-			</View>
-
+			</View> */}
 			{/* Setting: Public Profile */}
-			<View style={styles.item}>
-				<View>
-					<Text style={styles.text}>Public Profile</Text>
-					<Text style={styles.desc}>Profile visible to everyone</Text>
+			<View style={styles.CheckboxItem}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Profile Public</Text>
+					<Text style={styles.desc}>Profile visible à tous</Text>
 				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setPublicProfile(true)}
-						style={[
-							styles.toggleButton,
-							publicProfile ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								publicProfile && styles.activeText
-							]}>
-							Public
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setPublicProfile(false)}
-						style={[
-							styles.toggleButton,
-							!publicProfile ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!publicProfile && styles.activeText
-							]}>
-							Private
-						</Text>
-					</Pressable>
-				</View>
+				<Checkbox
+					status={publicProfile ? "checked" : "unchecked"}
+					onPress={() => setPublicProfile(!publicProfile)}
+					color="#007AFF"
+				/>
 			</View>
-
 			{/* Setting: History */}
-			<View style={styles.item}>
-				<View>
-					<Text style={styles.text}>History</Text>
-					<Text style={styles.desc}>History visible to others</Text>
+			<View style={styles.CheckboxItem}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Historique</Text>
+					<Text style={styles.desc}>
+						Historique visible pour tous
+					</Text>
 				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setHistory(true)}
-						style={[
-							styles.toggleButton,
-							history ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								history && styles.activeText
-							]}>
-							Public
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setHistory(false)}
-						style={[
-							styles.toggleButton,
-							!history ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!history && styles.activeText
-							]}>
-							Private
-						</Text>
-					</Pressable>
+				<Checkbox
+					status={history ? "checked" : "unchecked"}
+					onPress={() => setHistory(!history)}
+					color="#007AFF"
+				/>
+			</View>
+			{/* Setting: Adult Content */}
+			<View style={styles.CheckboxItem}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Contenu pour adultes</Text>
+					<Text style={styles.desc}>Contenu +18 ans</Text>
 				</View>
+				<Checkbox
+					status={adultContent ? "checked" : "unchecked"}
+					onPress={() => setAdultContent(!adultContent)}
+					color="#007AFF"
+				/>
 			</View>
 
-			{/* Setting: Adult Content */}
-			<View style={styles.item}>
+			{/* Setting: Clear Cache */}
+			<TouchableOpacity
+				style={styles.item}
+				onPress={() => setShowClearCacheModal(true)}>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.text}>Vider le cache</Text>
+					<Text style={styles.desc}>
+						{isCalculatingCache ? "Calcul..." : cacheSize}
+					</Text>
+				</View>
+			</TouchableOpacity>
+
+			{/* Setting: Delete Account */}
+			<TouchableOpacity
+				style={styles.Reditem}
+				onPress={() => setShowDeleteModal(true)}>
 				<View>
-					<Text style={styles.text}>Adult Content</Text>
-					<Text style={styles.desc}>+18 content</Text>
+					<Text style={styles.text}>Supprimer votre compte</Text>
 				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setAdultContent(true)}
-						style={[
-							styles.toggleButton,
-							adultContent ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								adultContent && styles.activeText
-							]}>
-							Enabled
+			</TouchableOpacity>
+
+			{/* Modal de confirmation de suppression */}
+			<Modal
+				visible={showDeleteModal}
+				transparent={true}
+				animationType="fade"
+				onRequestClose={() => setShowDeleteModal(false)}>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>
+							Supprimer votre compte
 						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setAdultContent(false)}
-						style={[
-							styles.toggleButton,
-							!adultContent ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!adultContent && styles.activeText
-							]}>
-							Disabled
+						<Text style={styles.modalText}>
+							Êtes-vous sûr de vouloir supprimer votre compte ?
+							{"\n\n"}
+							Cette action est{" "}
+							<Text style={styles.boldText}>irréversible</Text> et
+							supprimera toutes vos données, listes et historique.
 						</Text>
-					</Pressable>
+
+						<View style={styles.modalButtons}>
+							<TouchableOpacity
+								style={[
+									styles.modalButton,
+									styles.cancelButton
+								]}
+								onPress={() => setShowDeleteModal(false)}>
+								<Text style={styles.cancelButtonText}>
+									Annuler
+								</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={[
+									styles.modalButton,
+									styles.deleteButton
+								]}
+								onPress={handleDeleteAccount}>
+								<Text style={styles.deleteButtonText}>
+									Supprimer
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
 				</View>
-			</View>
+			</Modal>
 		</ScrollView>
 	);
 };

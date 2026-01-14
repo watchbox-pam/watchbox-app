@@ -30,6 +30,85 @@ const styles = StyleSheet.create({
 		marginHorizontal: "auto",
 		marginBottom: 30
 	},
+	Reditem: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingHorizontal: 15,
+		backgroundColor: "#8B0000",
+		borderRadius: 8,
+		width: "100%",
+		height: 70,
+		marginHorizontal: "auto",
+		marginBottom: 30
+	},
+	// Styles pour le modal
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: "rgba(0, 0, 0, 0.7)",
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20
+	},
+	modalContent: {
+		backgroundColor: "#1C1C1E",
+		borderRadius: 20,
+		padding: 24,
+		width: "100%",
+		maxWidth: 400,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5
+	},
+	modalTitle: {
+		fontSize: 22,
+		fontWeight: "bold",
+		color: "#FFFFFF",
+		marginBottom: 16,
+		textAlign: "center"
+	},
+	modalText: {
+		fontSize: 16,
+		color: "#B0B0B0",
+		lineHeight: 24,
+		marginBottom: 24,
+		textAlign: "center"
+	},
+	boldText: {
+		fontWeight: "bold",
+		color: "#FF3B30"
+	},
+	modalButtons: {
+		flexDirection: "row",
+		gap: 12
+	},
+	modalButton: {
+		flex: 1,
+		paddingVertical: 14,
+		borderRadius: 12,
+		alignItems: "center"
+	},
+	cancelButton: {
+		backgroundColor: "#2C2C2E"
+	},
+	cancelButtonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
+	},
+	deleteButton: {
+		backgroundColor: "#FF3B30"
+	},
+	deleteButtonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
+	},
 	text: { fontSize: 18, color: "#fff" },
 	desc: { fontSize: 12, color: "#fff" },
 	toggleContainer: {
@@ -62,6 +141,23 @@ const styles = StyleSheet.create({
 	},
 	activeText: {
 		color: "#fff"
+	},
+	readMoreButton: {
+		marginTop: 10
+	},
+	readMoreText: {
+		fontWeight: "600"
+	},
+	CheckboxItem: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingHorizontal: 15,
+		borderRadius: 8,
+		width: "100%",
+		height: 35,
+		marginHorizontal: "auto",
+		marginBottom: 30
 	},
 	// Nouveaux styles pour les providers
 	providersContainer: {

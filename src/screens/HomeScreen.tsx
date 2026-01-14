@@ -11,7 +11,6 @@ import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function HomeScreen() {
-	// State for grouped movie sections (e.g., popular, genres)
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
 		[]
 	);
