@@ -142,6 +142,14 @@ const styles = StyleSheet.create({
 	activeText: {
 		color: "#fff"
 	},
+	confirmButton: {
+		backgroundColor: "#007AFF"
+	},
+	confirmButtonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
+	},
 	readMoreButton: {
 		marginTop: 10
 	},

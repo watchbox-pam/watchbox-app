@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
-import IconProfile from "../components/IconProfile";
-// import LogoButton from "../components/Logo";
+import LogoButton from "../components/Logo";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
@@ -67,6 +67,14 @@ export default function HomeScreen() {
 				{
 					title: "Drama",
 					movies: dramaGenre.data["results"]
+				},
+				{
+					title: "Drama",
+					movies: dramaGenre.data["results"]
+				},
+				{
+					title: "Drama",
+					movies: dramaGenre.data["results"]
 				}
 			);
 
@@ -120,13 +128,23 @@ export default function HomeScreen() {
 
 			{movies &&
 				movies.map(({ title, movies }, index) => (
-					<View key={index} style={styles.WatchList}>
-						<View style={styles.TitleWatchList}>
-							<StyledText style={styles.MainTitleWatchList}>
-								{title}
-							</StyledText>
+					<View key={index}>
+						<View style={styles.WatchList}>
+							<View style={styles.TitleWatchList}>
+								<StyledText style={styles.MainTitleWatchList}>
+									{title}
+								</StyledText>
+							</View>
+							{movies && <CarouselPoster data={movies} />}
 						</View>
-						{movies && <CarouselPoster data={movies} />}
+						{(index + 1) % 3 === 0 && (
+							<CadrePublicitaire
+								title="🎬 Streaming Premium"
+								description="Profitez de 30 jours gratuits sur toutes les plateformes"
+								imageUrl="https://via.placeholder.com/150"
+								link="https://example.com"
+							/>
+						)}
 					</View>
 				))}
 		</ScrollView>
