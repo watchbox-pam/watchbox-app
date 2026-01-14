@@ -6,7 +6,11 @@ import styles from "@/src/styles/LayoutStyle";
 export default function Root() {
 	return (
 		<SafeAreaProvider>
-			<StatusBar translucent={true} />
+			<StatusBar
+				translucent={false}
+				backgroundColor="#102A4C"
+				barStyle="light-content"
+			/>
 			<SafeAreaView style={styles.layout}>
 				<Slot />
 			</SafeAreaView>

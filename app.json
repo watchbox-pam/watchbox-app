@@ -22,10 +22,10 @@
 
 		"android": {
 			"package": "com.watchbox.watchbox",
-			"backgroundColor": "#FFFFFF",
+			"backgroundColor": "#102A4C",
 			"adaptiveIcon": {
 				"foregroundImage": "./src/assets/images/watchbox-logo.png",
-				"backgroundColor": "#FFFFFF"
+				"backgroundColor": "#102A4C"
 			}
 		},
 
