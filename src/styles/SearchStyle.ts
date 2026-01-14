@@ -30,6 +30,50 @@ const styles = StyleSheet.create({
 		color: "#000",
 		margin: "auto"
 	},
+
+	searchInputContainer: {
+		flex: 1,
+		position: "relative"
+	},
+	suggestionsContainer: {
+		position: "absolute",
+		top: "100%",
+		left: 0,
+		right: 0,
+		backgroundColor: "#1a1a1a",
+		borderRadius: 8,
+		marginTop: 4,
+		maxHeight: 300,
+		zIndex: 1000,
+		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84
+	},
+	suggestionItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		padding: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: "#333"
+	},
+	suggestionImage: {
+		width: 40,
+		height: 60,
+		borderRadius: 4,
+		marginRight: 12
+	},
+	suggestionText: {
+		flex: 1,
+		color: "#fff",
+		fontSize: 14
+	},
+	suggestionLoadingContainer: {
+		padding: 20,
+		alignItems: "center"
+	},
+
 	filterSection: {
 		flexDirection: "row",
 		justifyContent: "space-between",
