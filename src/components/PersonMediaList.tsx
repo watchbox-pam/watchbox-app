@@ -30,7 +30,7 @@ export default function PersonMediaList({
 							// add path /tv/[id] in the future
 							// it will fail when you click on a tv show / serie
 							// pathname: item.media_type === "movie" ? "/movie/[id]" : "/tv/[id]",
-							pathname: "/movie/[id]",
+							pathname: "/(app)/(tabs)/movie/[id]",
 							params: { id: item.id }
 						}}
 						asChild>

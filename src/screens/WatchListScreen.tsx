@@ -205,7 +205,9 @@ export default function Index() {
 						<View key={movie.id} style={styles.viewResult}>
 							<TouchableOpacity
 								onPress={() =>
-									router.push(`/movie/${movie.id}`)
+									router.push(
+										`/(app)/(tabs)/movie/${movie.id}`
+									)
 								}
 								style={styles.resultatInfo}>
 								<Image

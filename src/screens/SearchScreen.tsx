@@ -159,9 +159,9 @@ export default function SearchScreen() {
 		Keyboard.dismiss();
 
 		if ("title" in item) {
-			router.push(`/movie/${item.id}`);
+			router.push(`/(app)/(tabs)/movie/${item.id}`);
 		} else {
-			router.push(`/person/${item.id}`);
+			router.push(`/(app)/(tabs)/person/${item.id}`);
 		}
 	};
 
@@ -261,7 +261,7 @@ export default function SearchScreen() {
 	const renderMovieItem = (item: Movie) => (
 		<View key={item.id} style={styles.viewResult}>
 			<TouchableOpacity
-				onPress={() => router.push(`/movie/${item.id}`)}
+				onPress={() => router.push(`/(app)/(tabs)/movie/${item.id}`)}
 				style={styles.resultatInfo}>
 				<Image
 					source={{
@@ -291,7 +291,7 @@ export default function SearchScreen() {
 	const renderActorItem = (item: Person) => (
 		<View key={item.id} style={styles.viewResult}>
 			<TouchableOpacity
-				onPress={() => router.push(`/person/${item.id}`)}
+				onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
 				style={styles.resultatInfo}>
 				<Image
 					source={{

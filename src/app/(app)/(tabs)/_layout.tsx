@@ -168,6 +168,34 @@ export default function TabLayout() {
 						)
 					}}
 				/>
+				<Tabs.Screen
+					name="movie/[id]"
+					options={{
+						href: null,
+						title: "Movie",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="movie"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
+					name="person/[id]"
+					options={{
+						href: null,
+						title: "Person",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="person"
+								color={color}
+							/>
+						)
+					}}
+				/>
 			</Tabs>
 		</View>
 	);

@@ -135,7 +135,7 @@ export default function SwipeScreen() {
 					if (currentMovie) {
 						console.log("Navigating to movie:", currentMovie.id);
 						router.push({
-							pathname: "/movie/[id]",
+							pathname: "/(app)/(tabs)/movie/[id]",
 							params: { id: currentMovie.id.toString() }
 						});
 						position.setValue({ x: 0, y: 0 });

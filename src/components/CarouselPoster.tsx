@@ -20,7 +20,7 @@ export default function CarouselPoster({ data }: any) {
 					<Link
 						style={styles.imageContainer}
 						href={{
-							pathname: "/movie/[id]",
+							pathname: "/(app)/(tabs)/movie/[id]",
 							params: { id: item.id.toString() }
 						}}>
 						<Image

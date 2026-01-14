@@ -40,7 +40,7 @@ const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 				<Text style={styles.CommentTitle}>Commentaires</Text>
 				<Link
 					style={styles.addComment}
-					href={`/movie/${mediaId}/review`}>
+					href={`/(app)/(tabs)/movie/${mediaId}/review`}>
 					Ajouter une review
 				</Link>
 			</View>
