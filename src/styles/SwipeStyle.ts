@@ -45,14 +45,14 @@ const styles = StyleSheet.create({
 	likeLabel: {
 		position: "absolute",
 		top: 50,
-		right: 30,
+		right: 180,
 		borderWidth: 4,
 		borderColor: "#4CAF50",
 		paddingHorizontal: 20,
 		paddingVertical: 10,
 		borderRadius: 10,
 		backgroundColor: "rgba(76, 175, 80, 0.2)",
-		transform: [{ rotate: "15deg" }]
+		transform: [{ rotate: "-15deg" }]
 	},
 	likeLabelText: {
 		color: "#4CAF50",
@@ -62,12 +62,12 @@ const styles = StyleSheet.create({
 	},
 	skipLabel: {
 		position: "absolute",
-		top: 50,
+		top: 350,
 		alignSelf: "center",
 		left: "50%",
 		marginLeft: -50,
 		paddingHorizontal: 20,
-		backgroundColor: "rgba(76, 175, 80, 0.2)",
+		backgroundColor: "rgba(141, 141, 141, 0.87)",
 		paddingVertical: 10,
 		borderRadius: 10,
 		borderWidth: 4,
@@ -82,14 +82,14 @@ const styles = StyleSheet.create({
 	dislikeLabel: {
 		position: "absolute",
 		top: 50,
-		left: 30,
+		left: 180,
 		borderWidth: 4,
 		borderColor: "#F44336",
 		paddingHorizontal: 20,
 		paddingVertical: 10,
 		borderRadius: 10,
 		backgroundColor: "rgba(244, 67, 54, 0.2)",
-		transform: [{ rotate: "-15deg" }]
+		transform: [{ rotate: "15deg" }]
 	},
 	dislikeLabelText: {
 		color: "#F44336",

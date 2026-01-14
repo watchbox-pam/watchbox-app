@@ -11,7 +11,7 @@ import {
 
 import styles from "@/src/styles/SwipeStyle";
 import { fetchMovies } from "../services/SwipeService";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -33,8 +33,11 @@ export default function SwipeScreen() {
 	const [skippedMovies, setSkippedMovies] = useState<Movie[]>([]);
 	const [isAnimating, setIsAnimating] = useState(false);
 
-	// Créer une nouvelle position pour chaque carte
+	const router = useRouter();
 	const position = useRef(new Animated.ValueXY()).current;
+	const tapStartTime = useRef<number>(0);
+	const moviesRef = useRef<Movie[]>([]);
+	const currentIndexRef = useRef<number>(0);
 
 	useEffect(() => {
 		const loadMovies = async () => {
@@ -51,13 +54,21 @@ export default function SwipeScreen() {
 		loadMovies();
 	}, []);
 
+	useEffect(() => {
+		moviesRef.current = movies;
+	}, [movies]);
+
+	useEffect(() => {
+		currentIndexRef.current = currentIndex;
+	}, [currentIndex]);
+
 	// Reset la position quand l'index change
 	useEffect(() => {
 		if (currentIndex > 0) {
 			position.setValue({ x: 0, y: 0 });
 			setIsAnimating(false);
 		}
-	}, [currentIndex]);
+	}, [currentIndex, position]);
 
 	const rotate = position.x.interpolate({
 		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
@@ -101,10 +112,43 @@ export default function SwipeScreen() {
 	const panResponder = useRef(
 		PanResponder.create({
 			onStartShouldSetPanResponder: () => true,
+			onPanResponderGrant: () => {
+				tapStartTime.current = Date.now();
+			},
 			onPanResponderMove: (evt, gestureState) => {
 				position.setValue({ x: gestureState.dx, y: gestureState.dy });
 			},
 			onPanResponderRelease: (evt, gestureState) => {
+				const tapDuration = Date.now() - tapStartTime.current;
+
+				// Détecter un simple tap
+				const isClick =
+					Math.abs(gestureState.dx) < 10 &&
+					Math.abs(gestureState.dy) < 10 &&
+					tapDuration < 300;
+
+				if (isClick) {
+					// Utiliser les refs pour avoir les valeurs actuelles
+					const currentMovie =
+						moviesRef.current[currentIndexRef.current];
+
+					if (currentMovie) {
+						console.log("Navigating to movie:", currentMovie.id);
+						router.push({
+							pathname: "/movie/[id]",
+							params: { id: currentMovie.id.toString() }
+						});
+						position.setValue({ x: 0, y: 0 });
+						return;
+					} else {
+						console.log(
+							"No movie found at index:",
+							currentIndexRef.current
+						);
+					}
+				}
+
+				// Gestion normale du swipe
 				if (gestureState.dx > SWIPE_THRESHOLD) {
 					Animated.spring(position, {
 						toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy },
@@ -125,7 +169,7 @@ export default function SwipeScreen() {
 							x: gestureState.dx,
 							y: -SCREEN_HEIGHT - 100
 						},
-						duration: 5000,
+						duration: 500,
 						useNativeDriver: false
 					}).start(() => {
 						handleSwipeComplete("up");
@@ -157,10 +201,11 @@ export default function SwipeScreen() {
 
 		Animated.timing(position, {
 			toValue,
-			duration: 400,
+			duration: 2000,
 			useNativeDriver: false
 		}).start(() => {
 			handleSwipeComplete(direction);
+			setIsAnimating(false);
 		});
 	};
 
@@ -188,56 +233,24 @@ export default function SwipeScreen() {
 						zIndex: 100
 					}
 				]}
-				{...panResponder.panHandlers}
-				pointerEvents="box-none">
-				<View style={{ flex: 1 }}>
-					<Link
-						href={{
-							pathname: "/movie/[id]",
-							params: { id: movie.id.toString() }
-						}}
-						asChild>
-						<TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
-							<View style={[styles.card]}>
-								<Image
-									source={{ uri: posterUri }}
-									style={styles.posterImage}
-								/>
-								<Text style={styles.movieTitle}>
-									{movie.title}
-								</Text>
-							</View>
+				{...panResponder.panHandlers}>
+				<Image source={{ uri: posterUri }} style={styles.posterImage} />
+				<Text style={styles.movieTitle}>{movie.title}</Text>
 
-							<Animated.View
-								style={[
-									styles.likeLabel,
-									{ opacity: likeOpacity }
-								]}>
-								<Text style={styles.likeLabelText}>LIKE</Text>
-							</Animated.View>
+				<Animated.View
+					style={[styles.likeLabel, { opacity: likeOpacity }]}>
+					<Text style={styles.likeLabelText}>LIKE</Text>
+				</Animated.View>
 
-							<Animated.View
-								style={[
-									styles.skipLabel,
-									{ opacity: skipOpacity }
-								]}>
-								<Text style={styles.skipLabelText}>
-									Pas Vue
-								</Text>
-							</Animated.View>
+				<Animated.View
+					style={[styles.skipLabel, { opacity: skipOpacity }]}>
+					<Text style={styles.skipLabelText}>Pas Vue</Text>
+				</Animated.View>
 
-							<Animated.View
-								style={[
-									styles.dislikeLabel,
-									{ opacity: dislikeOpacity }
-								]}>
-								<Text style={styles.dislikeLabelText}>
-									NOPE
-								</Text>
-							</Animated.View>
-						</TouchableOpacity>
-					</Link>
-				</View>
+				<Animated.View
+					style={[styles.dislikeLabel, { opacity: dislikeOpacity }]}>
+					<Text style={styles.dislikeLabelText}>NOPE</Text>
+				</Animated.View>
 			</Animated.View>
 		);
 	};
@@ -332,21 +345,21 @@ export default function SwipeScreen() {
 						style={styles.dislikeButton}
 						onPress={() => handleButtonPress("left")}
 						disabled={isAnimating}>
-						<Text style={styles.buttonText}>X</Text>
+						<Text style={styles.buttonText}>👎</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={styles.skipButton}
 						onPress={() => handleButtonPress("up")}
 						disabled={isAnimating}>
-						<Text style={styles.buttonText}>?</Text>
+						<Text style={styles.buttonText}>🤔</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={styles.likeButton}
 						onPress={() => handleButtonPress("right")}
 						disabled={isAnimating}>
-						<Text style={styles.buttonText}>♥</Text>
+						<Text style={styles.buttonText}>👍</Text>
 					</TouchableOpacity>
 				</View>
 			)}
