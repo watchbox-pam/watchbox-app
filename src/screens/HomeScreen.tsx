@@ -3,7 +3,6 @@ import CarouselPoster from "../components/CarouselPoster";
 import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
-
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
@@ -12,7 +11,6 @@ import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 export default function HomeScreen() {
-	// State for grouped movie sections (e.g., popular, genres)
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
 		[]
 	);
@@ -124,7 +122,8 @@ export default function HomeScreen() {
 				<StyledText style={styles.TitleHeader}>
 					Hello there, {currentUser.identifier}
 				</StyledText>
-				<LogoButton />
+				<IconProfile />
+				{/* <LogoButton /> */}
 			</View>
 
 			{movies &&
