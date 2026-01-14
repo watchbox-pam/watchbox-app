@@ -63,6 +63,14 @@ const styles = StyleSheet.create({
 	activeText: {
 		color: "#fff"
 	},
+	confirmButton: {
+		backgroundColor: "#007AFF"
+	},
+	confirmButtonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
+	},
 	// Nouveaux styles pour les providers
 	providersContainer: {
 		flexDirection: "row",
