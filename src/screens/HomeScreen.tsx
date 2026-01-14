@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
-import LogoButton from "../components/Logo";
+import IconProfile from "../components/IconProfile";
+// import LogoButton from "../components/Logo";
 import { View, ScrollView, RefreshControl } from "react-native";
-
 import StyledText from "@/src/components/StyledText";
 import styles from "@/src/styles/HomeStyle";
 import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
@@ -115,7 +115,8 @@ export default function HomeScreen() {
 				<StyledText style={styles.TitleHeader}>
 					Hello there, {currentUser.identifier}
 				</StyledText>
-				<LogoButton />
+				<IconProfile />
+				{/* <LogoButton /> */}
 			</View>
 
 			{movies &&
