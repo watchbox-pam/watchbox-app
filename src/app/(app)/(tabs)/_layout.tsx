@@ -4,7 +4,7 @@ import { View } from "react-native";
 import useSessionStore from "@/src/zustand/sessionStore";
 
 export default function TabLayout() {
-	const isLoggedIn = useSessionStore((state) => state.isLoggedIn);
+	const isLoggedIn = useSessionStore((state: any) => state.isLoggedIn);
 
 	if (!isLoggedIn) {
 		return <Redirect href="/base" />;
@@ -86,8 +86,22 @@ export default function TabLayout() {
 					}}
 				/>
 				<Tabs.Screen
+					name="calendar"
+					options={{
+						title: "Calendar",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="calendar-today"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
 					name="profile"
 					options={{
+						href: null,
 						title: "Profil",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons

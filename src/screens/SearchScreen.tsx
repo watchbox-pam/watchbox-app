@@ -509,7 +509,7 @@ export default function SearchScreen() {
 				{/* No search term message */}
 				{!searchTerm.trim() && (
 					<StyledText style={styles.NoResult}>
-						Veuillez entrer un recherche
+						Veuillez entrer une recherche
 					</StyledText>
 				)}
 
