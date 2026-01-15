@@ -9,15 +9,14 @@ import {
 	ActivityIndicator,
 	TouchableOpacity,
 	Modal,
-	Platform,
 	Alert
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import { providerService } from "../services/ProviderService";
+import { userService } from "../services/UserService";
 import StyledText from "../components/StyledText";
 import useSessionStore from "@/src/zustand/sessionStore";
-import * as SecureStore from "expo-secure-store";
 import * as FileSystem from "expo-file-system";
 /* import AsyncStorage from "@react-native-async-storage/async-storage";*/
 import styles from "../styles/ParamStyle";
@@ -47,6 +46,7 @@ const ParamScreen: React.FC = () => {
 	const [showClearCacheModal, setShowClearCacheModal] = useState(false);
 	const [cacheSize, setCacheSize] = useState<string>("0 MB");
 	const [isCalculatingCache, setIsCalculatingCache] = useState(false);
+	const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
 	const MAX_VISIBLE_PROVIDERS = 8;
 	const signOut = useSessionStore((state) => state.signOut);
@@ -202,25 +202,25 @@ const ParamScreen: React.FC = () => {
 	};
 
 	const handleDeleteAccount = async () => {
+		setIsDeletingAccount(true);
 		try {
-			// Supprimer les données locales
-			if (Platform.OS === "ios" || Platform.OS === "android") {
-				await SecureStore.deleteItemAsync("id");
-				await SecureStore.deleteItemAsync("identifier");
-				await SecureStore.deleteItemAsync("token");
+			const result = await userService.deleteAccount();
+
+			if (result.success) {
+				signOut();
+				setShowDeleteModal(false);
+				Alert.alert("Compte supprimé", result.message, [
+					{ text: "OK" }
+				]);
 			} else {
-				localStorage.removeItem("id");
-				localStorage.removeItem("identifier");
-				localStorage.removeItem("token");
+				Alert.alert("Erreur", result.message, [{ text: "OK" }]);
 			}
-
-			// Déconnexion
-			signOut();
-			setShowDeleteModal(false);
-
-			console.log("Compte supprimé et déconnecté");
 		} catch (error) {
-			console.error("Erreur lors de la suppression:", error);
+			Alert.alert("Erreur", "Une erreur inattendue est survenue", [
+				{ text: "OK" }
+			]);
+		} finally {
+			setIsDeletingAccount(false);
 		}
 	};
 
@@ -228,7 +228,7 @@ const ParamScreen: React.FC = () => {
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
 				<BackButton />
-				<Text style={styles.paramTitle}>Paramêtres</Text>
+				<Text style={styles.paramTitle}>Paramètres</Text>
 				<Logo />
 			</View>
 
@@ -472,7 +472,8 @@ const ParamScreen: React.FC = () => {
 									styles.modalButton,
 									styles.cancelButton
 								]}
-								onPress={() => setShowDeleteModal(false)}>
+								onPress={() => setShowDeleteModal(false)}
+								disabled={isDeletingAccount}>
 								<Text style={styles.cancelButtonText}>
 									Annuler
 								</Text>
@@ -483,10 +484,18 @@ const ParamScreen: React.FC = () => {
 									styles.modalButton,
 									styles.deleteButton
 								]}
-								onPress={handleDeleteAccount}>
-								<Text style={styles.deleteButtonText}>
-									Supprimer
-								</Text>
+								onPress={handleDeleteAccount}
+								disabled={isDeletingAccount}>
+								{isDeletingAccount ? (
+									<ActivityIndicator
+										size="small"
+										color="#fff"
+									/>
+								) : (
+									<Text style={styles.deleteButtonText}>
+										Supprimer
+									</Text>
+								)}
 							</TouchableOpacity>
 						</View>
 					</View>
