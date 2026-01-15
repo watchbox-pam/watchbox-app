@@ -11,7 +11,7 @@ import {
 
 import styles from "@/src/styles/SwipeStyle";
 import { fetchMovies } from "../services/SwipeService";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;

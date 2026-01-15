@@ -318,9 +318,9 @@ export default function SearchScreen() {
 	const renderSuggestionItem = (item: Movie | Person) => {
 		const isMovie = "title" in item;
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
-		const imagePath = isMovie
+		/* const imagePath = isMovie
 			? (item as Movie).poster_path
-			: (item as Person).profile_path;
+			: (item as Person).profile_path; */
 
 		return (
 			<TouchableOpacity

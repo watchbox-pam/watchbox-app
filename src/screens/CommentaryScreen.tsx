@@ -13,9 +13,10 @@ const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 	const [reviews, setReviews] = useState([]);
 
 	// Toggle between "my comments" and "all comments"
-	const handleSwitch = () => {
+	// not sure why this is needed, commented out
+	/* const handleSwitch = () => {
 		setIsMyComments((prevState) => !prevState);
-	};
+	}; */
 
 	// Fetch reviews for the current media by its ID
 	const fetchReviews = async () => {

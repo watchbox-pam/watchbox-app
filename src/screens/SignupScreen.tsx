@@ -3,10 +3,9 @@ import BackButton from "@/src/components/BackButton";
 import Logo from "@/src/components/Logo";
 import styles from "@/src/styles/SignupStyle";
 import StyledText from "@/src/components/StyledText";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 //import Country from "@/src/models/Country";
-import { Picker } from "@react-native-picker/picker";
-import { getAllCountries, registerUser } from "@/src/services/SignupService";
+import { registerUser } from "@/src/services/SignupService";
 import RNDateTimePicker, {
 	DateTimePickerEvent
 } from "@react-native-community/datetimepicker";
