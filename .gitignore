@@ -50,3 +50,7 @@ yarn.lock
 
 android/
 ios/
+
+bun.lock
+*.apk
+*.aab

@@ -13,14 +13,27 @@
       "bundleIdentifier": "com.watchbox.watchbox",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "associatedDomains": ["applinks:watchbox-app.expo.link"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/watchbox-logo.png",
         "backgroundColor": "#0A1E38"
       },
-      "package": "com.watchbox.watchbox"
+      "package": "com.watchbox.watchbox",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "watchbox-app.expo.link"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
