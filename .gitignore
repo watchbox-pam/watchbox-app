@@ -54,3 +54,4 @@ ios/
 bun.lock
 *.apk
 *.aab
+*.ipa
