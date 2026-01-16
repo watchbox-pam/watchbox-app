@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
-import { router } from "expo-router"; // Ajoute cet import
+import { router } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
-import * as SecureStore from "expo-secure-store";
 import styles from "../styles/DropDownButtonStyle";
 
 const DropDownButton = () => {
@@ -13,25 +12,13 @@ const DropDownButton = () => {
 	const openMenu = () => setVisible(true);
 	const closeMenu = () => setVisible(false);
 
-	// Décommente et corrige cette fonction
 	const handleNavigate = (screen: string) => {
-		router.push(`/${screen.toLowerCase()}`); // ou router.replace si tu préfères
+		router.push(`/${screen.toLowerCase()}`);
 		closeMenu();
 	};
 
-	// Logout and clear stored user session
 	const handleLogout = async () => {
-		if (Platform.OS === "ios" || Platform.OS === "android") {
-			await SecureStore.deleteItemAsync("id");
-			await SecureStore.deleteItemAsync("identifier");
-			await SecureStore.deleteItemAsync("token");
-		} else {
-			localStorage.removeItem("id");
-			localStorage.removeItem("identifier");
-			localStorage.removeItem("token");
-		}
-
-		signOut();
+		await signOut();
 		closeMenu();
 	};
 
