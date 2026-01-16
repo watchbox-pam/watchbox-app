@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
 	View,
 	Text,
@@ -42,6 +42,8 @@ const CalendarScreen: React.FC = () => {
 		description: ""
 	});
 	const pan = useRef(new Animated.Value(0)).current;
+	const currentDateRef = useRef(currentDate);
+	currentDateRef.current = currentDate;
 
 	// Mois précédent
 	const goToPreviousMonth = () => {
@@ -58,58 +60,68 @@ const CalendarScreen: React.FC = () => {
 	};
 
 	// PanResponder pour le swipe
-	const panResponder = useRef(
-		PanResponder.create({
-			onStartShouldSetPanResponder: () => false,
-			onMoveShouldSetPanResponder: (_, gestureState) => {
-				// Active le swipe seulement si mouvement horizontal significatif
-				return (
-					Math.abs(gestureState.dx) > 20 &&
-					Math.abs(gestureState.dy) < Math.abs(gestureState.dx)
-				);
-			},
-			onPanResponderMove: (_, gestureState) => {
-				// Limite le mouvement pour un meilleur effet visuel
-				pan.setValue(gestureState.dx * 0.5);
-			},
-			onPanResponderRelease: (_, gestureState) => {
-				// Détection du swipe avec seuil plus bas
-				if (gestureState.dx > 80) {
-					// Swipe vers la droite = mois précédent
-					Animated.timing(pan, {
-						toValue: 0,
-						duration: 200,
-						useNativeDriver: true
-					}).start(() => {
-						goToPreviousMonth();
-					});
-				} else if (gestureState.dx < -80) {
-					// Swipe vers la gauche = mois suivant
-					Animated.timing(pan, {
-						toValue: 0,
-						duration: 200,
-						useNativeDriver: true
-					}).start(() => {
-						goToNextMonth();
-					});
-				} else {
-					// Retour à la position initiale si swipe incomplet
+	const panResponder = useMemo(
+		() =>
+			PanResponder.create({
+				onStartShouldSetPanResponder: () => true,
+				onStartShouldSetPanResponderCapture: () => false,
+				onMoveShouldSetPanResponder: (_, gestureState) => {
+					return (
+						Math.abs(gestureState.dx) > 10 &&
+						Math.abs(gestureState.dy) < Math.abs(gestureState.dx)
+					);
+				},
+				onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+					return Math.abs(gestureState.dx) > 10;
+				},
+				onPanResponderMove: (_, gestureState) => {
+					pan.setValue(gestureState.dx * 0.3);
+				},
+				onPanResponderRelease: (_, gestureState) => {
+					if (
+						gestureState.dx > 50 &&
+						Math.abs(gestureState.vx) > 0.3
+					) {
+						// Swipe vers la droite = mois précédent
+						Animated.timing(pan, {
+							toValue: 400,
+							duration: 300,
+							useNativeDriver: true
+						}).start(() => {
+							pan.setValue(0);
+							goToPreviousMonth();
+						});
+					} else if (
+						gestureState.dx < -50 &&
+						Math.abs(gestureState.vx) > 0.3
+					) {
+						// Swipe vers la gauche = mois suivant
+						Animated.timing(pan, {
+							toValue: -400,
+							duration: 300,
+							useNativeDriver: true
+						}).start(() => {
+							pan.setValue(0);
+							goToNextMonth();
+						});
+					} else {
+						// Retour à la position initiale si swipe incomplet
+						Animated.spring(pan, {
+							toValue: 0,
+							useNativeDriver: true,
+							friction: 7
+						}).start();
+					}
+				},
+				onPanResponderTerminate: () => {
 					Animated.spring(pan, {
 						toValue: 0,
-						useNativeDriver: true,
-						friction: 7
+						useNativeDriver: true
 					}).start();
 				}
-			},
-			onPanResponderTerminate: () => {
-				// Réinitialise en cas d'interruption
-				Animated.spring(pan, {
-					toValue: 0,
-					useNativeDriver: true
-				}).start();
-			}
-		})
-	).current;
+			}),
+		[currentDate, pan] // Recrée le PanResponder quand currentDate change
+	);
 
 	// Obtenir le nombre de jours dans un mois
 	const getDaysInMonth = (date: Date) => {
@@ -248,7 +260,7 @@ const CalendarScreen: React.FC = () => {
 						{day}
 					</Text>
 					{/* Indicateur d'événement (optionnel) */}
-					{day % 5 === 0 && <View style={styles.eventDot} />}
+					{hasEvents(day) && <View style={styles.eventDot} />}
 				</TouchableOpacity>
 			);
 		}
