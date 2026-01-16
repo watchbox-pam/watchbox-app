@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
-//import LogoButton from "../components/Logo";
+import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
 import StyledText from "@/src/components/StyledText";
@@ -9,7 +9,7 @@ import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
-import IconProfile from "../components/IconProfile";
+import IconProfile from "@/src/components/IconProfile";
 
 export default function HomeScreen() {
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
@@ -127,26 +127,27 @@ export default function HomeScreen() {
 				{/* <LogoButton /> */}
 			</View>
 
-			{movies?.map(({ title, movies }, index) => (
-				<View key={`${title}-${index}`}>
-					<View style={styles.WatchList}>
-						<View style={styles.TitleWatchList}>
-							<StyledText style={styles.MainTitleWatchList}>
-								{title}
-							</StyledText>
+			{movies &&
+				movies.map(({ title, movies }, index) => (
+					<View key={index}>
+						<View style={styles.WatchList}>
+							<View style={styles.TitleWatchList}>
+								<StyledText style={styles.MainTitleWatchList}>
+									{title}
+								</StyledText>
+							</View>
+							{movies && <CarouselPoster data={movies} />}
 						</View>
-						{movies && <CarouselPoster data={movies} />}
+						{(index + 1) % 3 === 0 && (
+							<CadrePublicitaire
+								title="🎬 Streaming Premium"
+								description="Profitez de 30 jours gratuits sur toutes les plateformes"
+								imageUrl="https://via.placeholder.com/150"
+								link="https://example.com"
+							/>
+						)}
 					</View>
-					{(index + 1) % 3 === 0 && (
-						<CadrePublicitaire
-							title="🎬 Streaming Premium"
-							description="Profitez de 30 jours gratuits sur toutes les plateformes"
-							imageUrl="https://via.placeholder.com/150"
-							link="https://example.com"
-						/>
-					)}
-				</View>
-			))}
+				))}
 		</ScrollView>
 	);
 }

@@ -9,17 +9,15 @@ import {
 	ActivityIndicator,
 	TouchableOpacity,
 	Modal,
-	Platform,
 	Alert
 } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import { providerService } from "../services/ProviderService";
+import { deleteAccount } from "../services/ProfileService";
 import StyledText from "../components/StyledText";
 import useSessionStore from "@/src/zustand/sessionStore";
-import * as SecureStore from "expo-secure-store";
 import * as FileSystem from "expo-file-system";
-/* import AsyncStorage from "@react-native-async-storage/async-storage";*/
 import styles from "../styles/ParamStyle";
 
 // Type for providers
@@ -31,7 +29,6 @@ type Provider = {
 
 const ParamScreen: React.FC = () => {
 	const [notifications, setNotifications] = useState(false);
-	//const [darkMode, setDarkMode] = useState(true);
 	const [publicProfile, setPublicProfile] = useState(false);
 	const [history, setHistory] = useState(false);
 	const [adultContent, setAdultContent] = useState(false);
@@ -47,6 +44,7 @@ const ParamScreen: React.FC = () => {
 	const [showClearCacheModal, setShowClearCacheModal] = useState(false);
 	const [cacheSize, setCacheSize] = useState<string>("0 MB");
 	const [isCalculatingCache, setIsCalculatingCache] = useState(false);
+	const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
 	const MAX_VISIBLE_PROVIDERS = 8;
 	const signOut = useSessionStore((state) => state.signOut);
@@ -168,11 +166,7 @@ const ParamScreen: React.FC = () => {
 	// Load selected providers from AsyncStorage
 	const loadSelectedProviders = async () => {
 		try {
-			/* const savedProviders =
-				await AsyncStorage.getItem("selectedProviders");
-			if (savedProviders) {
-				setSelectedProviders(JSON.parse(savedProviders));
-			} */
+			// Implémentation future si nécessaire
 		} catch (error) {
 			console.error("Error loading saved providers:", error);
 		}
@@ -181,10 +175,7 @@ const ParamScreen: React.FC = () => {
 	// Save selected providers to AsyncStorage
 	const saveSelectedProviders = async () => {
 		try {
-			/* await AsyncStorage.setItem(
-				"selectedProviders",
-				JSON.stringify(selectedProviders)
-			); */
+			// Implémentation future si nécessaire
 		} catch (error) {
 			console.error("Error saving providers:", error);
 		}
@@ -202,25 +193,25 @@ const ParamScreen: React.FC = () => {
 	};
 
 	const handleDeleteAccount = async () => {
+		setIsDeletingAccount(true);
 		try {
-			// Supprimer les données locales
-			if (Platform.OS === "ios" || Platform.OS === "android") {
-				await SecureStore.deleteItemAsync("id");
-				await SecureStore.deleteItemAsync("identifier");
-				await SecureStore.deleteItemAsync("token");
+			const result = await deleteAccount();
+
+			if (result.success) {
+				await signOut();
+				setShowDeleteModal(false);
+				Alert.alert("Compte supprimé", result.message, [
+					{ text: "OK" }
+				]);
 			} else {
-				localStorage.removeItem("id");
-				localStorage.removeItem("identifier");
-				localStorage.removeItem("token");
+				Alert.alert("Erreur", result.message, [{ text: "OK" }]);
 			}
-
-			// Déconnexion
-			signOut();
-			setShowDeleteModal(false);
-
-			console.log("Compte supprimé et déconnecté");
 		} catch (error) {
-			console.error("Erreur lors de la suppression:", error);
+			Alert.alert("Erreur", "Une erreur inattendue est survenue", [
+				{ text: "OK" }
+			]);
+		} finally {
+			setIsDeletingAccount(false);
 		}
 	};
 
@@ -228,7 +219,7 @@ const ParamScreen: React.FC = () => {
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
 				<BackButton />
-				<Text style={styles.paramTitle}>Paramêtres</Text>
+				<Text style={styles.paramTitle}>Paramètres</Text>
 				<Logo />
 			</View>
 
@@ -350,43 +341,7 @@ const ParamScreen: React.FC = () => {
 					color="#007AFF"
 				/>
 			</View>
-			{/* Setting: Dark Mode */}
-			{/* <View style={styles.item}>
-				<View>
-					<Text style={styles.text}>Dark Mode</Text>
-					<Text style={styles.desc}>Enable dark theme</Text>
-				</View>
-				<View style={styles.toggleContainer}>
-					<Pressable
-						onPress={() => setDarkMode(true)}
-						style={[
-							styles.toggleButton,
-							darkMode ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								darkMode && styles.activeText
-							]}>
-							Light
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => setDarkMode(false)}
-						style={[
-							styles.toggleButton,
-							!darkMode ? styles.active : styles.inactive
-						]}>
-						<Text
-							style={[
-								styles.toggleText,
-								!darkMode && styles.activeText
-							]}>
-							Dark
-						</Text>
-					</Pressable>
-				</View>
-			</View> */}
+
 			{/* Setting: Public Profile */}
 			<View style={styles.CheckboxItem}>
 				<View style={{ flex: 1 }}>
@@ -399,6 +354,7 @@ const ParamScreen: React.FC = () => {
 					color="#007AFF"
 				/>
 			</View>
+
 			{/* Setting: History */}
 			<View style={styles.CheckboxItem}>
 				<View style={{ flex: 1 }}>
@@ -413,6 +369,7 @@ const ParamScreen: React.FC = () => {
 					color="#007AFF"
 				/>
 			</View>
+
 			{/* Setting: Adult Content */}
 			<View style={styles.CheckboxItem}>
 				<View style={{ flex: 1 }}>
@@ -472,7 +429,8 @@ const ParamScreen: React.FC = () => {
 									styles.modalButton,
 									styles.cancelButton
 								]}
-								onPress={() => setShowDeleteModal(false)}>
+								onPress={() => setShowDeleteModal(false)}
+								disabled={isDeletingAccount}>
 								<Text style={styles.cancelButtonText}>
 									Annuler
 								</Text>
@@ -483,9 +441,58 @@ const ParamScreen: React.FC = () => {
 									styles.modalButton,
 									styles.deleteButton
 								]}
-								onPress={handleDeleteAccount}>
+								onPress={handleDeleteAccount}
+								disabled={isDeletingAccount}>
+								{isDeletingAccount ? (
+									<ActivityIndicator
+										size="small"
+										color="#fff"
+									/>
+								) : (
+									<Text style={styles.deleteButtonText}>
+										Supprimer
+									</Text>
+								)}
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
+
+			{/* Modal de confirmation vidage cache */}
+			<Modal
+				visible={showClearCacheModal}
+				transparent={true}
+				animationType="fade"
+				onRequestClose={() => setShowClearCacheModal(false)}>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>Vider le cache</Text>
+						<Text style={styles.modalText}>
+							Êtes-vous sûr de vouloir vider le cache ?{"\n\n"}
+							Taille actuelle : {cacheSize}
+						</Text>
+
+						<View style={styles.modalButtons}>
+							<TouchableOpacity
+								style={[
+									styles.modalButton,
+									styles.cancelButton
+								]}
+								onPress={() => setShowClearCacheModal(false)}>
+								<Text style={styles.cancelButtonText}>
+									Annuler
+								</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={[
+									styles.modalButton,
+									styles.deleteButton
+								]}
+								onPress={handleClearCache}>
 								<Text style={styles.deleteButtonText}>
-									Supprimer
+									Vider
 								</Text>
 							</TouchableOpacity>
 						</View>
