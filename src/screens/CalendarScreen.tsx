@@ -6,17 +6,41 @@ import {
 	ScrollView,
 	Animated,
 	PanResponder,
-	Image
+	Image,
+	Modal,
+	TextInput
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import IconProfil from "../components/IconProfile";
 import styles from "@/src/styles/CalendarScreenStyle";
 
+interface Event {
+	id: string;
+	date: string;
+	time: string;
+	title: string;
+	description: string;
+	type?: "movie" | "show" | "custom";
+	movieData?: {
+		id: number;
+		title: string;
+		poster_path: string;
+		vote_average: number;
+	};
+}
+
 const CalendarScreen: React.FC = () => {
 	const router = useRouter();
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const [events, setEvents] = useState<Event[]>([]);
+	const [showEventModal, setShowEventModal] = useState(false);
+	const [newEvent, setNewEvent] = useState({
+		time: "",
+		title: "",
+		description: ""
+	});
 	const pan = useRef(new Animated.Value(0)).current;
 
 	// Mois précédent
@@ -131,6 +155,61 @@ const CalendarScreen: React.FC = () => {
 		);
 	};
 
+	// Verifie si un jour a des événements
+	const hasEvents = (day: number) => {
+		const dateStr = formatDateToString(
+			new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+		);
+		return events.some((event) => event.date === dateStr);
+	};
+
+	// Formater une date string "YYYY-MM-DD" en "DD-MM-YYYY"
+	const formatDateToString = (date: Date) => {
+		return `${String(date.getDate()).padStart(2, "0")}-${String(
+			date.getMonth() + 1
+		).padStart(2, "0")}-${date.getFullYear()}`;
+	};
+
+	//Récuperer des evenements pour une date donnée
+	const getEventsForDate = (date: Date) => {
+		const dateStr = formatDateToString(date);
+		return events.filter((event) => event.date === dateStr);
+	};
+
+	// ouvrir le modal pour créer un événement
+	const openCreateEventModal = () => {
+		if (!selectedDate) {
+			alert("Veuillez sélectionner une date pour ajouter un événement.");
+			return;
+		}
+		setNewEvent({ time: "", title: "", description: "" });
+		setShowEventModal(true);
+	};
+
+	// Créer un nouvel événement
+	const createEvent = () => {
+		if (!selectedDate || !newEvent.title) {
+			alert("Veuillez remplir au moins le titre");
+			return;
+		}
+		const event: Event = {
+			id: Date.now().toString(),
+			date: formatDateToString(selectedDate),
+			time: newEvent.time,
+			title: newEvent.title,
+			description: newEvent.description,
+			type: "custom"
+		};
+		setEvents([...events, event]);
+		setShowEventModal(false);
+		setNewEvent({ time: "", title: "", description: "" });
+	};
+
+	// supprimer un événement
+	const deleteEvent = (eventId: string) => {
+		setEvents(events.filter((event) => event.id !== eventId));
+	};
+
 	// Générer le calendrier
 	const renderCalendar = () => {
 		const daysInMonth = getDaysInMonth(currentDate);
@@ -196,17 +275,6 @@ const CalendarScreen: React.FC = () => {
 	// Noms des jours
 	const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
-	const movie = {
-		id: 1,
-		title: "Avengers 5",
-		poster_path: "/path/to/poster.jpg",
-		vote_average: 8.5
-	};
-
-	function addToWatchlist(id: number): void {
-		throw new Error("Function not implemented.");
-	}
-
 	return (
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
@@ -268,83 +336,139 @@ const CalendarScreen: React.FC = () => {
 			{/* Section des événements pour le jour sélectionné */}
 			{selectedDate && (
 				<View style={styles.eventsSection}>
-					<Text style={styles.eventsSectionTitle}>
-						Événements du{" "}
-						{selectedDate.toLocaleDateString("fr-FR", {
-							day: "numeric",
-							month: "long",
-							year: "numeric"
-						})}
-					</Text>
-
-					{/* Liste des événements (exemple) */}
-					<View style={styles.eventCard}>
-						<Text style={styles.eventTime}>20:00</Text>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>
-								Sortie de "Avengers 5"
-							</Text>
-							<Text style={styles.eventDescription}>
-								Au cinéma
-							</Text>
-						</View>
+					<View style={styles.eventsSectionHeader}>
+						<Text style={styles.eventsSectionTitle}>
+							Événements du{" "}
+							{selectedDate.toLocaleDateString("fr-FR", {
+								day: "numeric",
+								month: "long",
+								year: "numeric"
+							})}
+						</Text>
 						<TouchableOpacity
-							onPress={() => addToWatchlist(movie.id)}>
+							style={styles.addEventButton}
+							onPress={openCreateEventModal}>
 							<IconButton
-								icon="bookmark-plus"
-								size={20}
-								iconColor="#FFD700"
+								icon="plus"
+								size={24}
+								iconColor="#FFFFFF"
 							/>
 						</TouchableOpacity>
 					</View>
 
-					<TouchableOpacity
-						style={styles.eventCard}
-						onPress={() => router.push(`/movie/${movie.id}`)}>
-						<Image
-							source={{
-								uri: `https://image.tmdb.org/t/p/w92${movie.poster_path}`
-							}}
-							style={styles.eventPoster}
-						/>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>{movie.title}</Text>
-							<View style={styles.eventMeta}>
-								<Text style={styles.eventRating}>
-									⭐ {movie.vote_average.toFixed(1)}
-								</Text>
-								<Text style={styles.eventGenre}>
-									Action • Aventure
-								</Text>
+					{/* Liste des événements */}
+					{getEventsForDate(selectedDate).length > 0 ? (
+						getEventsForDate(selectedDate).map((event) => (
+							<View key={event.id} style={styles.eventCard}>
+								{event.time && (
+									<Text style={styles.eventTime}>
+										{event.time}
+									</Text>
+								)}
+								<View style={styles.eventDetails}>
+									<Text style={styles.eventTitle}>
+										{event.title}
+									</Text>
+									{event.description && (
+										<Text style={styles.eventDescription}>
+											{event.description}
+										</Text>
+									)}
+								</View>
+								<TouchableOpacity
+									onPress={() => deleteEvent(event.id)}>
+									<IconButton
+										icon="delete"
+										size={20}
+										iconColor="#FF4444"
+									/>
+								</TouchableOpacity>
 							</View>
-						</View>
-						<IconButton
-							icon="chevron-right"
-							size={20}
-							iconColor="#888"
-						/>
-					</TouchableOpacity>
-
-					<View style={styles.eventCard}>
-						<Text style={styles.eventTime}>21:30</Text>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>
-								Nouvelle saison de "Stranger Things"
-							</Text>
-							<Text style={styles.eventDescription}>
-								Sur Netflix
+						))
+					) : (
+						<View style={styles.noEvents}>
+							<Text style={styles.noEventsText}>
+								Aucun événement ce jour
 							</Text>
 						</View>
-					</View>
-
-					{/* Message si aucun événement */}
-					<View style={styles.noEvents}>
-						<Text style={styles.noEventsText}>
-							Aucun événement ce jour
-						</Text>
-					</View>
+					)}
 				</View>
 			)}
+
+			{/* Modal de création d'événement */}
+			<Modal
+				visible={showEventModal}
+				animationType="slide"
+				transparent={true}
+				onRequestClose={() => setShowEventModal(false)}>
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<View style={styles.modalHeader}>
+							<Text style={styles.modalTitle}>
+								Créer un événement
+							</Text>
+							<TouchableOpacity
+								onPress={() => setShowEventModal(false)}>
+								<IconButton
+									icon="close"
+									size={24}
+									iconColor="#FFFFFF"
+								/>
+							</TouchableOpacity>
+						</View>
+
+						<View style={styles.modalBody}>
+							<Text style={styles.inputLabel}>
+								Heure (Optionnel)
+							</Text>
+							<TextInput
+								style={styles.input}
+								placeholder="HH:MM"
+								placeholderTextColor="#888"
+								value={newEvent.time}
+								onChangeText={(text) =>
+									setNewEvent({ ...newEvent, time: text })
+								}
+							/>
+
+							<Text style={styles.inputLabel}>Titre</Text>
+							<TextInput
+								style={styles.input}
+								placeholder="Titre de l'événement"
+								placeholderTextColor="#888"
+								value={newEvent.title}
+								onChangeText={(text) =>
+									setNewEvent({ ...newEvent, title: text })
+								}
+							/>
+
+							<Text style={styles.inputLabel}>
+								Description (Optionnel)
+							</Text>
+							<TextInput
+								style={styles.input}
+								placeholder="Description de l'événement"
+								placeholderTextColor="#888"
+								value={newEvent.description}
+								onChangeText={(text) =>
+									setNewEvent({
+										...newEvent,
+										description: text
+									})
+								}
+							/>
+						</View>
+
+						<TouchableOpacity
+							style={styles.createButton}
+							onPress={createEvent}>
+							<Text style={styles.createButtonText}>
+								Créer l'événement
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</ScrollView>
 	);
 };

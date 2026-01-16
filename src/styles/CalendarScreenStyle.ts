@@ -177,6 +177,82 @@ const styles = StyleSheet.create({
 	eventGenre: {
 		fontSize: 12,
 		color: "#888"
+	},
+	eventsSectionHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 16
+	},
+	addEventButton: {
+		backgroundColor: "#6C5CE7",
+		borderRadius: 8,
+		width: 40,
+		height: 40,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	modalContainer: {
+		flex: 1,
+		backgroundColor: "rgba(0, 0, 0, 0.7)",
+		justifyContent: "flex-end"
+	},
+	modalContent: {
+		backgroundColor: "#1E1E1E",
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		paddingBottom: 40,
+		maxHeight: "80%"
+	},
+	modalHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		padding: 16,
+		borderBottomWidth: 1,
+		borderBottomColor: "#333"
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "#FFFFFF"
+	},
+	modalBody: {
+		padding: 20
+	},
+	inputLabel: {
+		fontSize: 14,
+		color: "#CCCCCC",
+		marginBottom: 8,
+		marginTop: 16
+	},
+	required: {
+		color: "#FF4444"
+	},
+	input: {
+		backgroundColor: "#2A2A2A",
+		borderRadius: 8,
+		padding: 12,
+		color: "#FFFFFF",
+		fontSize: 16,
+		borderWidth: 1,
+		borderColor: "#444"
+	},
+	textArea: {
+		height: 80,
+		textAlignVertical: "top"
+	},
+	createButton: {
+		backgroundColor: "#6C5CE7",
+		borderRadius: 8,
+		padding: 16,
+		alignItems: "center",
+		marginTop: 24
+	},
+	createButtonText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "bold"
 	}
 });
 
