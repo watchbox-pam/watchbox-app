@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#0A1E38",
-		paddingTop: 60
+		paddingTop: 20
 	},
 	header: {
 		flexDirection: "row",
@@ -253,6 +253,106 @@ const styles = StyleSheet.create({
 		color: "#FFFFFF",
 		fontSize: 16,
 		fontWeight: "bold"
+	},
+	inputText: {
+		color: "#FFFFFF",
+		fontSize: 16
+	},
+	timePickerOverlay: {
+		flex: 1,
+		backgroundColor: "rgba(0, 0, 0, 0.7)",
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	timePickerModal: {
+		backgroundColor: "#1E1E1E",
+		borderRadius: 20,
+		padding: 24,
+		width: "85%",
+		maxWidth: 400
+	},
+	timePickerTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "#FFFFFF",
+		textAlign: "center",
+		marginBottom: 24
+	},
+	timePickerContainer: {
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		marginBottom: 20
+	},
+	timeInputWrapper: {
+		alignItems: "center"
+	},
+	timeInput: {
+		backgroundColor: "#2A2A2A",
+		borderRadius: 12,
+		width: 80,
+		height: 80,
+		fontSize: 32,
+		fontWeight: "bold",
+		color: "#FFFFFF",
+		textAlign: "center",
+		borderWidth: 2,
+		borderColor: "#E50914"
+	},
+	timeLabel: {
+		color: "#888",
+		fontSize: 14,
+		marginTop: 8
+	},
+	timeSeparator: {
+		fontSize: 40,
+		fontWeight: "bold",
+		color: "#FFFFFF",
+		marginHorizontal: 16
+	},
+	quickTimeButtons: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		marginBottom: 20
+	},
+	quickTimeButton: {
+		backgroundColor: "#2A2A2A",
+		paddingVertical: 8,
+		paddingHorizontal: 12,
+		borderRadius: 8
+	},
+	quickTimeText: {
+		color: "#FFFFFF",
+		fontSize: 14
+	},
+	timePickerActions: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		gap: 12
+	},
+	timePickerCancelButton: {
+		flex: 1,
+		backgroundColor: "#2A2A2A",
+		paddingVertical: 14,
+		borderRadius: 10,
+		alignItems: "center"
+	},
+	timePickerCancelText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
+	},
+	timePickerConfirmButton: {
+		flex: 1,
+		backgroundColor: "#E50914",
+		paddingVertical: 14,
+		borderRadius: 10,
+		alignItems: "center"
+	},
+	timePickerConfirmText: {
+		color: "#FFFFFF",
+		fontSize: 16,
+		fontWeight: "600"
 	}
 });
 

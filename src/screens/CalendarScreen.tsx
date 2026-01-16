@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import {
 	View,
 	Text,
@@ -6,14 +6,69 @@ import {
 	ScrollView,
 	Animated,
 	PanResponder,
-	Image,
 	Modal,
-	TextInput
+	TextInput,
+	Platform
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import IconProfil from "../components/IconProfile";
 import styles from "@/src/styles/CalendarScreenStyle";
+
+interface TimePickerModalProps {
+	visible: boolean;
+	onClose: () => void;
+	onConfirm: (time: string) => void;
+	initialTime?: string;
+}
+
+const TimePickerModal: React.FC<TimePickerModalProps> = ({
+	visible,
+	onClose,
+	onConfirm,
+	initialTime = ""
+}) => {
+	const [time, setTime] = useState(new Date());
+
+	const handleConfirm = () => {
+		const hours = String(time.getHours()).padStart(2, "0");
+		const minutes = String(time.getMinutes()).padStart(2, "0");
+		onConfirm(`${hours}:${minutes}`);
+		onClose();
+	};
+
+	return (
+		<Modal visible={visible} transparent animationType="fade">
+			<View style={styles.modalContainer}>
+				<View style={styles.modalContent}>
+					<Text style={styles.modalTitle}>Sélectionner l'heure</Text>
+					<DateTimePicker
+						value={time}
+						mode="time"
+						display={Platform.OS === "ios" ? "spinner" : "default"}
+						onChange={(event, selectedTime) => {
+							if (selectedTime) setTime(selectedTime);
+						}}
+					/>
+					<TouchableOpacity
+						style={styles.createButton}
+						onPress={handleConfirm}>
+						<Text style={styles.createButtonText}>Confirmer</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={[
+							styles.createButton,
+							{ backgroundColor: "#666" }
+						]}
+						onPress={onClose}>
+						<Text style={styles.createButtonText}>Annuler</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		</Modal>
+	);
+};
 
 interface Event {
 	id: string;
@@ -41,23 +96,26 @@ const CalendarScreen: React.FC = () => {
 		title: "",
 		description: ""
 	});
+	const [showTimePicker, setShowTimePicker] = useState(false);
+	const [tempHour, setTempHour] = useState("12");
+	const [tempMinute, setTempMinute] = useState("00");
 	const pan = useRef(new Animated.Value(0)).current;
 	const currentDateRef = useRef(currentDate);
 	currentDateRef.current = currentDate;
 
 	// Mois précédent
-	const goToPreviousMonth = () => {
+	const goToPreviousMonth = useCallback(() => {
 		setCurrentDate(
 			new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
 		);
-	};
+	}, [currentDate]);
 
 	// Mois suivant
-	const goToNextMonth = () => {
+	const goToNextMonth = useCallback(() => {
 		setCurrentDate(
 			new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
 		);
-	};
+	}, [currentDate]);
 
 	// PanResponder pour le swipe
 	const panResponder = useMemo(
@@ -120,7 +178,7 @@ const CalendarScreen: React.FC = () => {
 					}).start();
 				}
 			}),
-		[currentDate, pan] // Recrée le PanResponder quand currentDate change
+		[pan, goToPreviousMonth, goToNextMonth]
 	);
 
 	// Obtenir le nombre de jours dans un mois
@@ -260,7 +318,7 @@ const CalendarScreen: React.FC = () => {
 						{day}
 					</Text>
 					{/* Indicateur d'événement (optionnel) */}
-					{hasEvents(day) && <View style={styles.eventDot} />}
+					{hasEvents(day) ? <View style={styles.eventDot} /> : null}
 				</TouchableOpacity>
 			);
 		}
@@ -429,56 +487,205 @@ const CalendarScreen: React.FC = () => {
 							</TouchableOpacity>
 						</View>
 
-						<View style={styles.modalBody}>
-							<Text style={styles.inputLabel}>
-								Heure (Optionnel)
-							</Text>
-							<TextInput
-								style={styles.input}
-								placeholder="HH:MM"
-								placeholderTextColor="#888"
-								value={newEvent.time}
-								onChangeText={(text) =>
-									setNewEvent({ ...newEvent, time: text })
-								}
-							/>
-
-							<Text style={styles.inputLabel}>Titre</Text>
-							<TextInput
-								style={styles.input}
-								placeholder="Titre de l'événement"
-								placeholderTextColor="#888"
-								value={newEvent.title}
-								onChangeText={(text) =>
-									setNewEvent({ ...newEvent, title: text })
-								}
-							/>
-
-							<Text style={styles.inputLabel}>
-								Description (Optionnel)
-							</Text>
-							<TextInput
-								style={styles.input}
-								placeholder="Description de l'événement"
-								placeholderTextColor="#888"
-								value={newEvent.description}
-								onChangeText={(text) =>
-									setNewEvent({
-										...newEvent,
-										description: text
-									})
-								}
-							/>
-						</View>
-
+						<Text style={styles.inputLabel}>Heure (Optionnel)</Text>
 						<TouchableOpacity
-							style={styles.createButton}
-							onPress={createEvent}>
-							<Text style={styles.createButtonText}>
-								Créer l'événement
+							style={styles.input}
+							onPress={() => setShowTimePicker(true)}>
+							<Text
+								style={[
+									styles.inputText,
+									!newEvent.time && { color: "#888" }
+								]}>
+								{newEvent.time || "Choisir une heure"}
 							</Text>
 						</TouchableOpacity>
+
+						{/* Modal Time Picker personnalisé */}
+						<Modal
+							visible={showTimePicker}
+							animationType="fade"
+							transparent={true}
+							onRequestClose={() => setShowTimePicker(false)}>
+							<View style={styles.timePickerOverlay}>
+								<View style={styles.timePickerModal}>
+									<Text style={styles.timePickerTitle}>
+										Choisir l'heure
+									</Text>
+
+									<View style={styles.timePickerContainer}>
+										{/* Heures */}
+										<View style={styles.timeInputWrapper}>
+											<TextInput
+												style={styles.timeInput}
+												value={tempHour}
+												onChangeText={(text) => {
+													const num =
+														parseInt(text) || 0;
+													if (num >= 0 && num <= 23) {
+														setTempHour(
+															String(
+																num
+															).padStart(2, "0")
+														);
+													}
+												}}
+												keyboardType="number-pad"
+												maxLength={2}
+												selectTextOnFocus
+											/>
+											<Text style={styles.timeLabel}>
+												H
+											</Text>
+										</View>
+
+										<Text style={styles.timeSeparator}>
+											:
+										</Text>
+
+										{/* Minutes */}
+										<View style={styles.timeInputWrapper}>
+											<TextInput
+												style={styles.timeInput}
+												value={tempMinute}
+												onChangeText={(text) => {
+													const num =
+														parseInt(text) || 0;
+													if (num >= 0 && num <= 59) {
+														setTempMinute(
+															String(
+																num
+															).padStart(2, "0")
+														);
+													}
+												}}
+												keyboardType="number-pad"
+												maxLength={2}
+												selectTextOnFocus
+											/>
+											<Text style={styles.timeLabel}>
+												M
+											</Text>
+										</View>
+									</View>
+
+									{/* Boutons de raccourci */}
+									<View style={styles.quickTimeButtons}>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("08");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												08:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("12");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												12:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("18");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												18:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("20");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												20:00
+											</Text>
+										</TouchableOpacity>
+									</View>
+
+									{/* Boutons d'action */}
+									<View style={styles.timePickerActions}>
+										<TouchableOpacity
+											style={
+												styles.timePickerCancelButton
+											}
+											onPress={() =>
+												setShowTimePicker(false)
+											}>
+											<Text
+												style={
+													styles.timePickerCancelText
+												}>
+												Annuler
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={
+												styles.timePickerConfirmButton
+											}
+											onPress={() => {
+												setNewEvent({
+													...newEvent,
+													time: `${tempHour}:${tempMinute}`
+												});
+												setShowTimePicker(false);
+											}}>
+											<Text
+												style={
+													styles.timePickerConfirmText
+												}>
+												Confirmer
+											</Text>
+										</TouchableOpacity>
+									</View>
+								</View>
+							</View>
+						</Modal>
+
+						<Text style={styles.inputLabel}>Titre</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Titre de l'événement"
+							placeholderTextColor="#888"
+							value={newEvent.title}
+							onChangeText={(text) =>
+								setNewEvent({ ...newEvent, title: text })
+							}
+						/>
+
+						<Text style={styles.inputLabel}>
+							Description (Optionnel)
+						</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Description de l'événement"
+							placeholderTextColor="#888"
+							value={newEvent.description}
+							onChangeText={(text) =>
+								setNewEvent({
+									...newEvent,
+									description: text
+								})
+							}
+						/>
 					</View>
+
+					<TouchableOpacity
+						style={styles.createButton}
+						onPress={createEvent}>
+						<Text style={styles.createButtonText}>
+							Créer l'événement
+						</Text>
+					</TouchableOpacity>
 				</View>
 			</Modal>
 		</ScrollView>
