@@ -357,8 +357,6 @@ export default function SearchScreen() {
 			{/* Search input and button */}
 			<View style={styles.topSection}>
 				<View style={styles.searchInputContainer}>
-					{" "}
-					{/* ← NOUVEAU conteneur */}
 					<TextInput
 						style={styles.input}
 						onChangeText={setSearchTerm}
