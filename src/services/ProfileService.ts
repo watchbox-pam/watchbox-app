@@ -1,8 +1,6 @@
+import { ApiHelper } from "@/src/utils/axios";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import { ApiHelper } from "@/src/utils/axios";
-
-const API_URL = process.env.EXPO_PUBLIC_BASE_API_URL?.replace(/\/$/, "") || "";
 
 /**
  * Fetch the profile data of a user by their ID
@@ -21,15 +19,27 @@ export async function getUserProfile(userId: string) {
 	try {
 		// Send GET request to retrieve the user's profile
 		const result = await ApiHelper.get(`/users/${userId}`);
-		return {
-			success: true,
-			data: result.data
-		};
+
+		if (result.success) {
+			return {
+				success: true,
+				data: result.data
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result.data || "Erreur lors de la récupération du profil"
+			};
+		}
 	} catch (error) {
 		// Return error message if the request fails
 		return {
 			success: false,
-			message: error.message || "Erreur lors de la récupération du profil"
+			message:
+				error instanceof Error
+					? error.message
+					: "Erreur lors de la récupération du profil"
 		};
 	}
 }
@@ -43,39 +53,27 @@ export async function deleteAccount(): Promise<{
 	message: string;
 }> {
 	try {
-		// Get user credentials
+		// Get user ID
 		const userId =
 			Platform.OS === "ios" || Platform.OS === "android"
 				? await SecureStore.getItemAsync("id")
 				: localStorage.getItem("id");
 
-		const token =
-			Platform.OS === "ios" || Platform.OS === "android"
-				? await SecureStore.getItemAsync("token")
-				: localStorage.getItem("token");
-
-		if (!userId || !token) {
+		if (!userId) {
 			return { success: false, message: "Session invalide" };
 		}
 
-		// Call API to delete account
-		const response = await fetch(`${API_URL}/users/${userId}`, {
-			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token.replace(/^"(.*)"$/, "$1")}`
-			}
-		});
+		// Call API to delete account using ApiHelper
+		const result = await ApiHelper.delete(`/users/${userId}`);
 
-		if (!response.ok) {
-			const errorData = await response.json();
+		if (result.success) {
+			return { success: true, message: "Compte supprimé avec succès" };
+		} else {
 			return {
 				success: false,
-				message: errorData.detail || "Erreur lors de la suppression"
+				message: result.data || "Erreur lors de la suppression"
 			};
 		}
-
-		return { success: true, message: "Compte supprimé avec succès" };
 	} catch (error) {
 		console.error("Erreur deleteAccount:", error);
 		return {
