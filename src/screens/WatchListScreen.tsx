@@ -31,7 +31,7 @@ export default function Index() {
 	const [movieList, setMovieList] =
 		useState<{ id: number; [key: string]: any }[]>(parsedMovies);
 	const [playlistTitle, setPlaylistTitle] = useState(id);
-	const [editedTitle, setEditedTitle] = useState("");
+	//const [editedTitle, setEditedTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 
 	const restrictedNames = ["Watchlist", "Historique", "Favoris"];
@@ -205,7 +205,9 @@ export default function Index() {
 						<View key={movie.id} style={styles.viewResult}>
 							<TouchableOpacity
 								onPress={() =>
-									router.push(`/movie/${movie.id}`)
+									router.push(
+										`/(app)/(tabs)/movie/${movie.id}`
+									)
 								}
 								style={styles.resultatInfo}>
 								<Image

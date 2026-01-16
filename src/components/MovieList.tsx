@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { Link } from "expo-router";
 import {
 	View,
@@ -53,7 +53,7 @@ const MovieList: React.FC<MovieListProps> = ({
 	const renderMovieItem = ({ item }: { item: Movie }) => (
 		<Link
 			href={{
-				pathname: "/movie/[id]",
+				pathname: "/(app)/(tabs)/movie/[id]",
 				params: { id: item.id }
 			}}
 			style={styles.movieCard}>

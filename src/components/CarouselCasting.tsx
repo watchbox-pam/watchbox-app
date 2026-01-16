@@ -25,7 +25,7 @@ export default function CarouselCasting({
 				renderItem={({ item }) => (
 					<Link
 						href={{
-							pathname: "/person/[id]",
+							pathname: "/(app)/(tabs)/person/[id]",
 							params: { id: item.id.toString() }
 						}}
 						asChild>

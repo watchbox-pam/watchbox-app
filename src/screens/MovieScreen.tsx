@@ -1,19 +1,9 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-	Image,
-	ScrollView,
-	View,
-	TouchableOpacity,
-	Modal,
-	Button,
-	Text,
-	RefreshControl
-} from "react-native";
+import { Image, ScrollView, View, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
-import { Menu, Provider } from "react-native-paper";
-import { Picker } from "@react-native-picker/picker";
+import { Provider } from "react-native-paper";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";

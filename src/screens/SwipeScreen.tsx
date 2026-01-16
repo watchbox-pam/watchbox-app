@@ -11,7 +11,7 @@ import {
 
 import styles from "@/src/styles/SwipeStyle";
 import { fetchMovies } from "../services/SwipeService";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -135,7 +135,7 @@ export default function SwipeScreen() {
 					if (currentMovie) {
 						console.log("Navigating to movie:", currentMovie.id);
 						router.push({
-							pathname: "/movie/[id]",
+							pathname: "/(app)/(tabs)/movie/[id]",
 							params: { id: currentMovie.id.toString() }
 						});
 						position.setValue({ x: 0, y: 0 });

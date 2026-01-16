@@ -13,7 +13,7 @@ export default function TabLayout() {
 	return (
 		<View style={{ flex: 1, backgroundColor: "#0A1E38" }}>
 			<Tabs
-				backBehavior={"history"}
+				backBehavior={"fullHistory"}
 				screenOptions={{
 					tabBarActiveTintColor: "#AC2821",
 					tabBarInactiveTintColor: "#F5EFF7",
@@ -159,6 +159,34 @@ export default function TabLayout() {
 					options={{
 						href: null,
 						title: "Params",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="person"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
+					name="movie/[id]"
+					options={{
+						href: null,
+						title: "Movie",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="movie"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
+					name="person/[id]"
+					options={{
+						href: null,
+						title: "Person",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
 								size={28}
