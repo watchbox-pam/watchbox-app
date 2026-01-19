@@ -22,22 +22,11 @@ const styles = StyleSheet.create({
 		marginRight: 44
 	},
 	backButton: {
-		padding: 0,
-		borderRadius: 30,
 		width: 44,
 		height: 44,
+		borderRadius: 30,
 		justifyContent: "center",
-		alignItems: "center",
-		display: "flex"
-	},
-	backButtonText: {
-		color: "#ffffff",
-		fontSize: 24,
-		fontWeight: "bold",
-		textAlign: "center",
-		lineHeight: 24,
-		includeFontPadding: false,
-		textAlignVertical: "center"
+		alignItems: "center"
 	},
 	loadingContainer: {
 		flex: 1,
@@ -81,9 +70,7 @@ const styles = StyleSheet.create({
 		margin: 8,
 		borderRadius: 8,
 		overflow: "hidden",
-		maxWidth: "47%",
-		display: "flex",
-		flexDirection: "column"
+		maxWidth: "47%"
 	},
 	imagePosterContainer: {
 		width: "100%",

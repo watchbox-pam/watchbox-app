@@ -9,6 +9,7 @@ import {
 	ActivityIndicator,
 	RefreshControl
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import StyledText from "./StyledText";
 import styles from "@/src/styles/MovieListStyle";
 
@@ -92,7 +93,7 @@ const MovieList: React.FC<MovieListProps> = ({
 					]}
 					onPress={onBack}
 					activeOpacity={0.7}>
-					<Text style={styles.backButtonText}>←</Text>
+					<Ionicons name="arrow-back" size={24} color="#ffffff" />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>
 					Films pour: {selectedEmotion?.label || ""}
