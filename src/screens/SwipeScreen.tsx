@@ -244,7 +244,7 @@ export default function SwipeScreen() {
 
 				<Animated.View
 					style={[styles.skipLabel, { opacity: skipOpacity }]}>
-					<Text style={styles.skipLabelText}>Pas Vue</Text>
+					<Text style={styles.skipLabelText}>Pas Vu</Text>
 				</Animated.View>
 
 				<Animated.View

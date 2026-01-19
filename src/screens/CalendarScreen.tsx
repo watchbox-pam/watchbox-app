@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import {
 	View,
 	Text,
@@ -6,86 +6,180 @@ import {
 	ScrollView,
 	Animated,
 	PanResponder,
-	Image
+	Modal,
+	TextInput,
+	Platform
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import IconProfil from "../components/IconProfile";
 import styles from "@/src/styles/CalendarScreenStyle";
 
+interface TimePickerModalProps {
+	visible: boolean;
+	onClose: () => void;
+	onConfirm: (time: string) => void;
+	initialTime?: string;
+}
+
+const TimePickerModal: React.FC<TimePickerModalProps> = ({
+	visible,
+	onClose,
+	onConfirm,
+	initialTime = ""
+}) => {
+	const [time, setTime] = useState(new Date());
+
+	const handleConfirm = () => {
+		const hours = String(time.getHours()).padStart(2, "0");
+		const minutes = String(time.getMinutes()).padStart(2, "0");
+		onConfirm(`${hours}:${minutes}`);
+		onClose();
+	};
+
+	return (
+		<Modal visible={visible} transparent animationType="fade">
+			<View style={styles.modalContainer}>
+				<View style={styles.modalContent}>
+					<Text style={styles.modalTitle}>Sélectionner l'heure</Text>
+					<DateTimePicker
+						value={time}
+						mode="time"
+						display={Platform.OS === "ios" ? "spinner" : "default"}
+						onChange={(event, selectedTime) => {
+							if (selectedTime) setTime(selectedTime);
+						}}
+					/>
+					<TouchableOpacity
+						style={styles.createButton}
+						onPress={handleConfirm}>
+						<Text style={styles.createButtonText}>Confirmer</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={[
+							styles.createButton,
+							{ backgroundColor: "#666" }
+						]}
+						onPress={onClose}>
+						<Text style={styles.createButtonText}>Annuler</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		</Modal>
+	);
+};
+
+interface Event {
+	id: string;
+	date: string;
+	time: string;
+	title: string;
+	description: string;
+	type?: "movie" | "show" | "custom";
+	movieData?: {
+		id: number;
+		title: string;
+		poster_path: string;
+		vote_average: number;
+	};
+}
+
 const CalendarScreen: React.FC = () => {
 	const router = useRouter();
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const [events, setEvents] = useState<Event[]>([]);
+	const [showEventModal, setShowEventModal] = useState(false);
+	const [newEvent, setNewEvent] = useState({
+		time: "",
+		title: "",
+		description: ""
+	});
+	const [showTimePicker, setShowTimePicker] = useState(false);
+	const [tempHour, setTempHour] = useState("12");
+	const [tempMinute, setTempMinute] = useState("00");
 	const pan = useRef(new Animated.Value(0)).current;
+	const currentDateRef = useRef(currentDate);
+	currentDateRef.current = currentDate;
 
 	// Mois précédent
-	const goToPreviousMonth = () => {
+	const goToPreviousMonth = useCallback(() => {
 		setCurrentDate(
 			new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
 		);
-	};
+	}, [currentDate]);
 
 	// Mois suivant
-	const goToNextMonth = () => {
+	const goToNextMonth = useCallback(() => {
 		setCurrentDate(
 			new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
 		);
-	};
+	}, [currentDate]);
 
 	// PanResponder pour le swipe
-	const panResponder = useRef(
-		PanResponder.create({
-			onStartShouldSetPanResponder: () => false,
-			onMoveShouldSetPanResponder: (_, gestureState) => {
-				// Active le swipe seulement si mouvement horizontal significatif
-				return (
-					Math.abs(gestureState.dx) > 20 &&
-					Math.abs(gestureState.dy) < Math.abs(gestureState.dx)
-				);
-			},
-			onPanResponderMove: (_, gestureState) => {
-				// Limite le mouvement pour un meilleur effet visuel
-				pan.setValue(gestureState.dx * 0.5);
-			},
-			onPanResponderRelease: (_, gestureState) => {
-				// Détection du swipe avec seuil plus bas
-				if (gestureState.dx > 80) {
-					// Swipe vers la droite = mois précédent
-					Animated.timing(pan, {
-						toValue: 0,
-						duration: 200,
-						useNativeDriver: true
-					}).start(() => {
-						goToPreviousMonth();
-					});
-				} else if (gestureState.dx < -80) {
-					// Swipe vers la gauche = mois suivant
-					Animated.timing(pan, {
-						toValue: 0,
-						duration: 200,
-						useNativeDriver: true
-					}).start(() => {
-						goToNextMonth();
-					});
-				} else {
-					// Retour à la position initiale si swipe incomplet
+	const panResponder = useMemo(
+		() =>
+			PanResponder.create({
+				onStartShouldSetPanResponder: () => true,
+				onStartShouldSetPanResponderCapture: () => false,
+				onMoveShouldSetPanResponder: (_, gestureState) => {
+					return (
+						Math.abs(gestureState.dx) > 10 &&
+						Math.abs(gestureState.dy) < Math.abs(gestureState.dx)
+					);
+				},
+				onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+					return Math.abs(gestureState.dx) > 10;
+				},
+				onPanResponderMove: (_, gestureState) => {
+					pan.setValue(gestureState.dx * 0.3);
+				},
+				onPanResponderRelease: (_, gestureState) => {
+					if (
+						gestureState.dx > 50 &&
+						Math.abs(gestureState.vx) > 0.3
+					) {
+						// Swipe vers la droite = mois précédent
+						Animated.timing(pan, {
+							toValue: 400,
+							duration: 300,
+							useNativeDriver: true
+						}).start(() => {
+							pan.setValue(0);
+							goToPreviousMonth();
+						});
+					} else if (
+						gestureState.dx < -50 &&
+						Math.abs(gestureState.vx) > 0.3
+					) {
+						// Swipe vers la gauche = mois suivant
+						Animated.timing(pan, {
+							toValue: -400,
+							duration: 300,
+							useNativeDriver: true
+						}).start(() => {
+							pan.setValue(0);
+							goToNextMonth();
+						});
+					} else {
+						// Retour à la position initiale si swipe incomplet
+						Animated.spring(pan, {
+							toValue: 0,
+							useNativeDriver: true,
+							friction: 7
+						}).start();
+					}
+				},
+				onPanResponderTerminate: () => {
 					Animated.spring(pan, {
 						toValue: 0,
-						useNativeDriver: true,
-						friction: 7
+						useNativeDriver: true
 					}).start();
 				}
-			},
-			onPanResponderTerminate: () => {
-				// Réinitialise en cas d'interruption
-				Animated.spring(pan, {
-					toValue: 0,
-					useNativeDriver: true
-				}).start();
-			}
-		})
-	).current;
+			}),
+		[pan, goToPreviousMonth, goToNextMonth]
+	);
 
 	// Obtenir le nombre de jours dans un mois
 	const getDaysInMonth = (date: Date) => {
@@ -131,6 +225,61 @@ const CalendarScreen: React.FC = () => {
 		);
 	};
 
+	// Verifie si un jour a des événements
+	const hasEvents = (day: number) => {
+		const dateStr = formatDateToString(
+			new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+		);
+		return events.some((event) => event.date === dateStr);
+	};
+
+	// Formater une date string "YYYY-MM-DD" en "DD-MM-YYYY"
+	const formatDateToString = (date: Date) => {
+		return `${String(date.getDate()).padStart(2, "0")}-${String(
+			date.getMonth() + 1
+		).padStart(2, "0")}-${date.getFullYear()}`;
+	};
+
+	//Récuperer des evenements pour une date donnée
+	const getEventsForDate = (date: Date) => {
+		const dateStr = formatDateToString(date);
+		return events.filter((event) => event.date === dateStr);
+	};
+
+	// ouvrir le modal pour créer un événement
+	const openCreateEventModal = () => {
+		if (!selectedDate) {
+			alert("Veuillez sélectionner une date pour ajouter un événement.");
+			return;
+		}
+		setNewEvent({ time: "", title: "", description: "" });
+		setShowEventModal(true);
+	};
+
+	// Créer un nouvel événement
+	const createEvent = () => {
+		if (!selectedDate || !newEvent.title) {
+			alert("Veuillez remplir au moins le titre");
+			return;
+		}
+		const event: Event = {
+			id: Date.now().toString(),
+			date: formatDateToString(selectedDate),
+			time: newEvent.time,
+			title: newEvent.title,
+			description: newEvent.description,
+			type: "custom"
+		};
+		setEvents([...events, event]);
+		setShowEventModal(false);
+		setNewEvent({ time: "", title: "", description: "" });
+	};
+
+	// supprimer un événement
+	const deleteEvent = (eventId: string) => {
+		setEvents(events.filter((event) => event.id !== eventId));
+	};
+
 	// Générer le calendrier
 	const renderCalendar = () => {
 		const daysInMonth = getDaysInMonth(currentDate);
@@ -169,7 +318,7 @@ const CalendarScreen: React.FC = () => {
 						{day}
 					</Text>
 					{/* Indicateur d'événement (optionnel) */}
-					{day % 5 === 0 && <View style={styles.eventDot} />}
+					{hasEvents(day) ? <View style={styles.eventDot} /> : null}
 				</TouchableOpacity>
 			);
 		}
@@ -195,17 +344,6 @@ const CalendarScreen: React.FC = () => {
 
 	// Noms des jours
 	const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-
-	const movie = {
-		id: 1,
-		title: "Avengers 5",
-		poster_path: "/path/to/poster.jpg",
-		vote_average: 8.5
-	};
-
-	function addToWatchlist(id: number): void {
-		throw new Error("Function not implemented.");
-	}
 
 	return (
 		<ScrollView style={styles.container}>
@@ -268,83 +406,288 @@ const CalendarScreen: React.FC = () => {
 			{/* Section des événements pour le jour sélectionné */}
 			{selectedDate && (
 				<View style={styles.eventsSection}>
-					<Text style={styles.eventsSectionTitle}>
-						Événements du{" "}
-						{selectedDate.toLocaleDateString("fr-FR", {
-							day: "numeric",
-							month: "long",
-							year: "numeric"
-						})}
-					</Text>
-
-					{/* Liste des événements (exemple) */}
-					<View style={styles.eventCard}>
-						<Text style={styles.eventTime}>20:00</Text>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>
-								Sortie de "Avengers 5"
-							</Text>
-							<Text style={styles.eventDescription}>
-								Au cinéma
-							</Text>
-						</View>
+					<View style={styles.eventsSectionHeader}>
+						<Text style={styles.eventsSectionTitle}>
+							Événements du{" "}
+							{selectedDate.toLocaleDateString("fr-FR", {
+								day: "numeric",
+								month: "long",
+								year: "numeric"
+							})}
+						</Text>
 						<TouchableOpacity
-							onPress={() => addToWatchlist(movie.id)}>
+							style={styles.addEventButton}
+							onPress={openCreateEventModal}>
 							<IconButton
-								icon="bookmark-plus"
-								size={20}
-								iconColor="#FFD700"
+								icon="plus"
+								size={24}
+								iconColor="#FFFFFF"
 							/>
 						</TouchableOpacity>
 					</View>
 
-					<TouchableOpacity
-						style={styles.eventCard}
-						onPress={() => router.push(`/movie/${movie.id}`)}>
-						<Image
-							source={{
-								uri: `https://image.tmdb.org/t/p/w92${movie.poster_path}`
-							}}
-							style={styles.eventPoster}
-						/>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>{movie.title}</Text>
-							<View style={styles.eventMeta}>
-								<Text style={styles.eventRating}>
-									⭐ {movie.vote_average.toFixed(1)}
-								</Text>
-								<Text style={styles.eventGenre}>
-									Action • Aventure
-								</Text>
+					{/* Liste des événements */}
+					{getEventsForDate(selectedDate).length > 0 ? (
+						getEventsForDate(selectedDate).map((event) => (
+							<View key={event.id} style={styles.eventCard}>
+								{event.time && (
+									<Text style={styles.eventTime}>
+										{event.time}
+									</Text>
+								)}
+								<View style={styles.eventDetails}>
+									<Text style={styles.eventTitle}>
+										{event.title}
+									</Text>
+									{event.description && (
+										<Text style={styles.eventDescription}>
+											{event.description}
+										</Text>
+									)}
+								</View>
+								<TouchableOpacity
+									onPress={() => deleteEvent(event.id)}>
+									<IconButton
+										icon="delete"
+										size={20}
+										iconColor="#FF4444"
+									/>
+								</TouchableOpacity>
 							</View>
-						</View>
-						<IconButton
-							icon="chevron-right"
-							size={20}
-							iconColor="#888"
-						/>
-					</TouchableOpacity>
-
-					<View style={styles.eventCard}>
-						<Text style={styles.eventTime}>21:30</Text>
-						<View style={styles.eventDetails}>
-							<Text style={styles.eventTitle}>
-								Nouvelle saison de "Stranger Things"
-							</Text>
-							<Text style={styles.eventDescription}>
-								Sur Netflix
+						))
+					) : (
+						<View style={styles.noEvents}>
+							<Text style={styles.noEventsText}>
+								Aucun événement ce jour
 							</Text>
 						</View>
-					</View>
-
-					{/* Message si aucun événement */}
-					<View style={styles.noEvents}>
-						<Text style={styles.noEventsText}>
-							Aucun événement ce jour
-						</Text>
-					</View>
+					)}
 				</View>
 			)}
+
+			{/* Modal de création d'événement */}
+			<Modal
+				visible={showEventModal}
+				animationType="slide"
+				transparent={true}
+				onRequestClose={() => setShowEventModal(false)}>
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<View style={styles.modalHeader}>
+							<Text style={styles.modalTitle}>
+								Créer un événement
+							</Text>
+							<TouchableOpacity
+								onPress={() => setShowEventModal(false)}>
+								<IconButton
+									icon="close"
+									size={24}
+									iconColor="#FFFFFF"
+								/>
+							</TouchableOpacity>
+						</View>
+
+						<Text style={styles.inputLabel}>Heure (Optionnel)</Text>
+						<TouchableOpacity
+							style={styles.input}
+							onPress={() => setShowTimePicker(true)}>
+							<Text
+								style={[
+									styles.inputText,
+									!newEvent.time && { color: "#888" }
+								]}>
+								{newEvent.time || "Choisir une heure"}
+							</Text>
+						</TouchableOpacity>
+
+						{/* Modal Time Picker personnalisé */}
+						<Modal
+							visible={showTimePicker}
+							animationType="fade"
+							transparent={true}
+							onRequestClose={() => setShowTimePicker(false)}>
+							<View style={styles.timePickerOverlay}>
+								<View style={styles.timePickerModal}>
+									<Text style={styles.timePickerTitle}>
+										Choisir l'heure
+									</Text>
+
+									<View style={styles.timePickerContainer}>
+										{/* Heures */}
+										<View style={styles.timeInputWrapper}>
+											<TextInput
+												style={styles.timeInput}
+												value={tempHour}
+												onChangeText={(text) => {
+													const num =
+														parseInt(text) || 0;
+													if (num >= 0 && num <= 23) {
+														setTempHour(
+															String(
+																num
+															).padStart(2, "0")
+														);
+													}
+												}}
+												keyboardType="number-pad"
+												maxLength={2}
+												selectTextOnFocus
+											/>
+											<Text style={styles.timeLabel}>
+												H
+											</Text>
+										</View>
+
+										<Text style={styles.timeSeparator}>
+											:
+										</Text>
+
+										{/* Minutes */}
+										<View style={styles.timeInputWrapper}>
+											<TextInput
+												style={styles.timeInput}
+												value={tempMinute}
+												onChangeText={(text) => {
+													const num =
+														parseInt(text) || 0;
+													if (num >= 0 && num <= 59) {
+														setTempMinute(
+															String(
+																num
+															).padStart(2, "0")
+														);
+													}
+												}}
+												keyboardType="number-pad"
+												maxLength={2}
+												selectTextOnFocus
+											/>
+											<Text style={styles.timeLabel}>
+												M
+											</Text>
+										</View>
+									</View>
+
+									{/* Boutons de raccourci */}
+									<View style={styles.quickTimeButtons}>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("08");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												08:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("12");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												12:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("18");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												18:00
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.quickTimeButton}
+											onPress={() => {
+												setTempHour("20");
+												setTempMinute("00");
+											}}>
+											<Text style={styles.quickTimeText}>
+												20:00
+											</Text>
+										</TouchableOpacity>
+									</View>
+
+									{/* Boutons d'action */}
+									<View style={styles.timePickerActions}>
+										<TouchableOpacity
+											style={
+												styles.timePickerCancelButton
+											}
+											onPress={() =>
+												setShowTimePicker(false)
+											}>
+											<Text
+												style={
+													styles.timePickerCancelText
+												}>
+												Annuler
+											</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={
+												styles.timePickerConfirmButton
+											}
+											onPress={() => {
+												setNewEvent({
+													...newEvent,
+													time: `${tempHour}:${tempMinute}`
+												});
+												setShowTimePicker(false);
+											}}>
+											<Text
+												style={
+													styles.timePickerConfirmText
+												}>
+												Confirmer
+											</Text>
+										</TouchableOpacity>
+									</View>
+								</View>
+							</View>
+						</Modal>
+
+						<Text style={styles.inputLabel}>Titre</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Titre de l'événement"
+							placeholderTextColor="#888"
+							value={newEvent.title}
+							onChangeText={(text) =>
+								setNewEvent({ ...newEvent, title: text })
+							}
+						/>
+
+						<Text style={styles.inputLabel}>
+							Description (Optionnel)
+						</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Description de l'événement"
+							placeholderTextColor="#888"
+							value={newEvent.description}
+							onChangeText={(text) =>
+								setNewEvent({
+									...newEvent,
+									description: text
+								})
+							}
+						/>
+					</View>
+
+					<TouchableOpacity
+						style={styles.createButton}
+						onPress={createEvent}>
+						<Text style={styles.createButtonText}>
+							Créer l'événement
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</Modal>
 		</ScrollView>
 	);
 };
