@@ -3,10 +3,8 @@ import BackButton from "@/src/components/BackButton";
 import Logo from "@/src/components/Logo";
 import styles from "@/src/styles/SignupStyle";
 import StyledText from "@/src/components/StyledText";
-import { useEffect, useState } from "react";
-//import Country from "@/src/models/Country";
-import { Picker } from "@react-native-picker/picker";
-import { getAllCountries, registerUser } from "@/src/services/SignupService";
+import { useState } from "react";
+import { registerUser } from "@/src/services/SignupService";
 import RNDateTimePicker, {
 	DateTimePickerEvent
 } from "@react-native-community/datetimepicker";
@@ -19,17 +17,10 @@ export default function SignupScreen() {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
-	//const [countries, setCountries] = useState<Country[]>([]);
-	//const [country, setCountry] = useState<string>("");
 	const [dtPickerVisible, setDtPickerVisible] = useState<boolean>(false);
 	const [birthdate, setBirthdate] = useState<Date | null>(null);
 
 	const signIn = useSessionStore((state: any) => state.signIn);
-
-	// const getCountries = async () => {
-	// 	const countriesResult = await getAllCountries();
-	// 	setCountries(countriesResult);
-	// };
 
 	const onChangeBirthdate = (
 		event: DateTimePickerEvent,
@@ -53,17 +44,14 @@ export default function SignupScreen() {
 		};
 		const result = await registerUser(userToInsert);
 		if (result.success) {
-			signIn(result.message.id, username, result.message.token);
-			router.replace("/");
+			alert("Un code de vérification a été envoyé à votre adresse mail");
+			//signIn(result.message.id, username, result.message.token);
+			router.replace("/userVerification");
 			return;
 		} else {
 			alert(result.message);
 		}
 	};
-
-	// useEffect(() => {
-	// 	getCountries();
-	// }, []);
 
 	return (
 		<View style={styles.container}>
@@ -98,21 +86,6 @@ export default function SignupScreen() {
 				secureTextEntry
 				onChangeText={setConfirmPassword}
 			/>
-			{/* <Picker
-				style={styles.picker}
-				selectedValue={country}
-				onValueChange={(itemValue, itemIndex) => setCountry(itemValue)}>
-				{countries &&
-					countries.map((country: Country) => {
-						return (
-							<Picker.Item
-								key={country.iso}
-								label={country.name}
-								value={country.iso}
-							/>
-						);
-					})
-			</Picker>*/}
 
 			<Text style={styles.input} onPress={() => setDtPickerVisible(true)}>
 				{birthdate

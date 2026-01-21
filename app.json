@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "associatedDomains": ["applinks:watchbox-app.expo.link"]
+      "associatedDomains": ["applinks:app.watchbox-app.fr"]
     },
     "android": {
       "adaptiveIcon": {
@@ -25,10 +25,12 @@
       "intentFilters": [
         {
           "action": "VIEW",
+          "autoVerify": true,
           "data": [
             {
               "scheme": "https",
-              "host": "watchbox-app.expo.link"
+              "host": "app.watchbox-app.fr",
+              "pathPrefix": "/"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
