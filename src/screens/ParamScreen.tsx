@@ -14,11 +14,12 @@ import {
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import { providerService } from "../services/ProviderService";
-import { deleteAccount } from "../services/ProfileService";
+import { deleteAccount, getUserProfile } from "../services/ProfileService";
 import StyledText from "../components/StyledText";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as FileSystem from "expo-file-system";
 import styles from "../styles/ParamStyle";
+import UserProfile from "@/src/models/UserProfile";
 
 // Type for providers
 type Provider = {
@@ -38,6 +39,8 @@ const ParamScreen: React.FC = () => {
 	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [showAllProviders, setShowAllProviders] = useState(false);
+	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
 	// Modal state
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -47,6 +50,7 @@ const ParamScreen: React.FC = () => {
 	const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
 	const MAX_VISIBLE_PROVIDERS = 8;
+	const userId = useSessionStore((state) => state.user.id);
 	const signOut = useSessionStore((state) => state.signOut);
 
 	// Determine which providers to display
@@ -56,9 +60,32 @@ const ParamScreen: React.FC = () => {
 
 	// Load providers on component mount
 	useEffect(() => {
+		fetchUserProfile();
 		fetchProviders();
 		loadSelectedProviders();
 	}, []);
+
+	const fetchUserProfile = async () => {
+		setIsLoadingProfile(true);
+		try {
+			const result = await getUserProfile(userId);
+			if (result.success) {
+				setUserProfile(result.data);
+				setPublicProfile(!result.data.is_private);
+				setHistory(!result.data.history_private);
+				setAdultContent(result.data.adult_content);
+			} else {
+				console.error("Error loading profile:", result.message);
+				Alert.alert("Erreur", "Impossible de charger le profil", [
+					{ text: "OK" }
+				]);
+			}
+		} catch (error) {
+			console.error("Error fetching user profile:", error);
+		} finally {
+			setIsLoadingProfile(false);
+		}
+	};
 
 	// Save selected providers when changed
 	useEffect(() => {
@@ -227,7 +254,15 @@ const ParamScreen: React.FC = () => {
 			<TouchableOpacity style={styles.item}>
 				<View style={{ flex: 1 }}>
 					<Text style={styles.text}>Compte</Text>
-					<Text style={styles.desc}>julien@example.com</Text>
+					{isLoadingProfile ? (
+						<ActivityIndicator size="small" color="#007AFF" />
+					) : (
+						<Text style={styles.desc}>
+							{userProfile?.email ||
+								userProfile?.username ||
+								"Non disponible"}
+						</Text>
+					)}
 				</View>
 				<IconButton icon="chevron-right" />
 			</TouchableOpacity>
