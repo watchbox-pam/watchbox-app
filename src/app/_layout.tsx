@@ -1,20 +1,18 @@
 import { Slot } from "expo-router";
-import {
-	StatusBar,
-	View,
-	Image,
-	ActivityIndicator,
-	Platform
-} from "react-native";
+import { StatusBar, View, Platform } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import styles from "@/src/styles/LayoutStyle";
 import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import useSessionStore from "@/src/zustand/sessionStore";
+import useMoviesStore from "@/src/zustand/moviesStore";
+import { fetchAllMovieSections } from "../services/HomePageService";
+import WatchboxLogoAnimation from "@/src/components/WatchboxLogoAnimation";
 
 export default function Root() {
 	const [isAppReady, setIsAppReady] = useState(false);
-	const { signIn, signOut } = useSessionStore();
+	const { signIn, signOut } = useSessionStore() as any;
+	const setSections = useMoviesStore((state) => state.setSections);
 
 	useEffect(() => {
 		async function prepare() {
@@ -33,32 +31,48 @@ export default function Root() {
 					identifier = localStorage.getItem("identifier");
 				}
 
-				if (token && id && identifier) {
-					try {
-						const response = await fetch(
-							"https://http://10.0.2.2:8000/validate-token",
-							{
-								method: "POST",
-								headers: {
-									Authorization: `Bearer ${token}`
+				await Promise.all([
+					(async () => {
+						if (token && id && identifier) {
+							try {
+								const response = await fetch(
+									"https://http://10.0.2.2:8000/validate-token",
+									{
+										method: "POST",
+										headers: {
+											Authorization: `Bearer ${token}`
+										}
+									}
+								);
+								if (response.ok) {
+									signIn(id, identifier, token);
+									console.log("Utilisateur connecté");
+								} else {
+									console.log("Token invalide, déconnexion");
+									await signOut();
 								}
+							} catch (e) {
+								console.warn("⚠️ Validation échouée:", e);
+								signIn(id, identifier, token);
 							}
-						);
-						if (response.ok) {
-							signIn({ token, id, identifier });
-							console.log("✅ Utilisateur connecté");
-						} else {
-							console.log("❌ Token invalide, déconnexion");
-							await signOut();
 						}
-					} catch (e) {
-						console.warn(e);
-						signIn(id, identifier, token);
-					}
-				} else {
-					console.log("❌ Pas de token, utilisateur non connecté");
-				}
-				await new Promise((resolve) => setTimeout(resolve, 10000));
+					})(),
+
+					(async () => {
+						console.log("🎬 Chargement des sections...");
+						const result = await fetchAllMovieSections();
+						if (result.success) {
+							setSections(result.data);
+							console.log(
+								`✅ ${result.data.length} sections stockées dans le store`
+							);
+						} else {
+							console.log("❌ Erreur de chargement des sections");
+							setSections([]);
+						}
+					})()
+				]);
+				await new Promise((resolve) => setTimeout(resolve, 500));
 			} catch (e) {
 				console.warn(e);
 			} finally {
@@ -83,16 +97,7 @@ export default function Root() {
 					backgroundColor="#102A4C"
 					barStyle="light-content"
 				/>
-				<Image
-					source={require("@/src/assets/images/splash-icon.png")}
-					style={{ width: 150, height: 150, marginBottom: 30 }}
-					resizeMode="contain"
-				/>
-				<ActivityIndicator
-					size="large"
-					color="#FFFFFF"
-					style={{ marginTop: 20 }}
-				/>
+				<WatchboxLogoAnimation />
 			</View>
 		);
 	}

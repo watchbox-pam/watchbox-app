@@ -13,7 +13,7 @@
 		"newArchEnabled": true,
 
 		"splash": {
-			"image": "./src/assets/images/splash-icon.png",
+			"image": "./src/assets/images/banner-interstellar.png",
 			"resizeMode": "contain",
 			"backgroundColor": "#000000"
 		},
