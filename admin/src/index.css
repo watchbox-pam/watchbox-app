@@ -1,27 +1,37 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
 
-/* Smooth scroll */
-html {
-	scroll-behavior: smooth;
+html,
+body,
+#root,
+.app,
+.content {
+	height: 100%;
+	width: 100%;
+	font-family: "Oswald", sans-serif;
 }
 
-/* Scrollbar personnalisée */
+.app {
+	display: flex;
+	position: relative;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+
 ::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
+	width: 10px;
 }
 
+/* Track */
 ::-webkit-scrollbar-track {
-	background: #f1f1f1;
+	background: #e0e0e0;
 }
 
+/* Handle */
 ::-webkit-scrollbar-thumb {
 	background: #888;
-	border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+/* handle on Hover */
+::-webkit-scrollbar-track:hover {
 	background: #555;
 }

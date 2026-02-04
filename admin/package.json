@@ -1,39 +1,60 @@
 {
 	"name": "admin",
+	"version": "0.1.0",
 	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc -b && vite build",
-		"lint": "eslint .",
-		"preview": "vite preview",
-		"deploy": "npm run build && cp -r dist ../../watchbox-backend/admin/"
-	},
 	"dependencies": {
-		"@tanstack/react-query": "^5.90.20",
-		"axios": "^1.13.3",
-		"lucide-react": "^0.563.0",
-		"react": "^19.2.0",
-		"react-dom": "^19.2.0",
-		"react-router-dom": "^7.13.0",
-		"recharts": "^3.7.0"
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
+		"@fullcalendar/core": "^6.1.20",
+		"@fullcalendar/daygrid": "^6.1.20",
+		"@fullcalendar/interaction": "^6.1.20",
+		"@fullcalendar/list": "^6.1.20",
+		"@fullcalendar/react": "^6.1.20",
+		"@fullcalendar/timegrid": "^6.1.20",
+		"@mui/icons-material": "^7.3.7",
+		"@mui/material": "^7.3.7",
+		"@mui/x-data-grid": "^8.27.0",
+		"@nivo/bar": "^0.99.0",
+		"@nivo/core": "^0.99.0",
+		"@nivo/geo": "^0.99.0",
+		"@nivo/line": "^0.99.0",
+		"@nivo/pie": "^0.99.0",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^13.5.0",
+		"ajv": "^8.17.1",
+		"formik": "^2.4.9",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-pro-sidebar": "^0.7.1",
+		"react-router-dom": "^6.30.3",
+		"react-scripts": "5.0.1",
+		"web-vitals": "^2.1.4",
+		"yup": "^1.7.1"
 	},
-	"devDependencies": {
-		"@eslint/js": "^9.39.1",
-		"@types/node": "^24.10.1",
-		"@types/react": "^19.2.5",
-		"@types/react-dom": "^19.2.3",
-		"@vitejs/plugin-react": "^5.1.1",
-		"autoprefixer": "^10.4.23",
-		"eslint": "^9.39.1",
-		"eslint-plugin-react-hooks": "^7.0.1",
-		"eslint-plugin-react-refresh": "^0.4.24",
-		"globals": "^16.5.0",
-		"postcss": "^8.5.6",
-		"tailwindcss": "^3.4.1",
-		"typescript": "~5.9.3",
-		"typescript-eslint": "^8.46.4",
-		"vite": "^7.2.4"
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
 	}
 }
