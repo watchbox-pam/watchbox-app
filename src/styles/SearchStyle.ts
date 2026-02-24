@@ -5,10 +5,12 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#0A1E38",
 		margin: 0,
-		padding: 10
+		padding: 0,
+		paddingTop: 20
 	},
 	topSection: {
-		width: "100%",
+		marginHorizontal: 10,
+		width: "auto",
 		flexDirection: "row",
 		justifyContent: "space-between",
 		marginVertical: 10,
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
 	},
 
 	filterSection: {
+		margin: 10,
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",

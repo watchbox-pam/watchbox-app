@@ -6,6 +6,7 @@ import Emotion from "@/src/models/Emotion";
 import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
+import Header from "../components/Header";
 
 interface Movie {
 	id: number;
@@ -196,6 +197,7 @@ export default function RecommendationScreen() {
 			<Animated.View
 				style={[styles.overlayContainer, { opacity: emotionsOpacity }]}
 				pointerEvents={selectedEmotion ? "none" : "auto"}>
+				<Header title="Recommandations" />
 				<EmotionsList
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}

@@ -13,7 +13,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
-import IconProfil from "../components/IconProfile";
+import Header from "../components/Header";
 import styles from "@/src/styles/CalendarScreenStyle";
 
 interface TimePickerModalProps {
@@ -347,10 +347,11 @@ const CalendarScreen: React.FC = () => {
 
 	return (
 		<ScrollView style={styles.container}>
-			<View style={styles.header}>
+			<Header title="Calendrier" />
+			{/* <View style={styles.header}>
 				<Text style={styles.CalendarTitle}>Calendrier</Text>
 				<IconProfil />
-			</View>
+			</View> */}
 
 			<TouchableOpacity
 				style={styles.todayButton}

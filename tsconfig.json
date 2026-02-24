@@ -12,6 +12,6 @@
 		"**/*.tsx",
 		".expo/types/**/*.ts",
 		"expo-env.d.ts",
-		"admin/src/screens/index.jsx"
+		"admin/src/screens/index.tsx"
 	]
 }
