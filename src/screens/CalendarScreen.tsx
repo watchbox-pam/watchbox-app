@@ -348,10 +348,6 @@ const CalendarScreen: React.FC = () => {
 	return (
 		<ScrollView style={styles.container}>
 			<Header title="Calendrier" />
-			{/* <View style={styles.header}>
-				<Text style={styles.CalendarTitle}>Calendrier</Text>
-				<IconProfil />
-			</View> */}
 
 			<TouchableOpacity
 				style={styles.todayButton}

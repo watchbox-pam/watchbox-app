@@ -16,7 +16,6 @@ import {
 } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
 const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 	const [visible, setVisible] = useState(false);
@@ -45,24 +44,23 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 	};
 
 	const onShare = async () => {
-		// Systeme de partage à implémenter, actuellement désactivé pour éviter les erreurs liées à l'environnement de développementage
-		// try {
-		// 	const result = await Share.share({
-		// 		message:
-		// 			"React Native | A framework for building native apps using React"
-		// 	});
-		// 	if (result.action === Share.sharedAction) {
-		// 		if (result.activityType) {
-		// 			// shared with activity type of result.activityType
-		// 		} else {
-		// 			// shared
-		// 		}
-		// 	} else if (result.action === Share.dismissedAction) {
-		// 		// dismissed
-		// 	}
-		// } catch (error: any) {
-		// 	Alert.alert(error.message);
-		// }
+		try {
+			const result = await Share.share({
+				message:
+					"React Native | A framework for building native apps using React"
+			});
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					// shared with activity type of result.activityType
+				} else {
+					// shared
+				}
+			} else if (result.action === Share.dismissedAction) {
+				// dismissed
+			}
+		} catch (error: any) {
+			Alert.alert(error.message);
+		}
 	};
 
 	// Open modal and load playlists for the current user

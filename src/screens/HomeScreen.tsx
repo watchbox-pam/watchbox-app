@@ -121,11 +121,6 @@ export default function HomeScreen() {
 				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 			}>
 			<Header title={`Hello there, ${currentUser.identifier}`} />
-			{/* <StyledText style={styles.TitleHeader}>
-					Hello there, {currentUser.identifier}
-				</StyledText> 
-				<IconProfile />*/}
-			{/* <LogoButton /> */}
 
 			{movies &&
 				movies.map(({ title, movies }, index) => (
