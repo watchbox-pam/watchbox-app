@@ -41,10 +41,11 @@ const styles = StyleSheet.create({
 		zIndex: 1
 	},
 	imagePoster: {
-		aspectRatio: 2 / 3
+		aspectRatio: 2 / 3,
+		borderRadius: 7
 	},
 	title: {
-		fontSize: 40,
+		fontSize: 35,
 		maxWidth: "100%",
 		zIndex: 1
 	},
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold"
 	},
 	description: {
-		fontSize: 14,
+		fontSize: 17,
 		paddingRight: 20,
 		paddingLeft: 20
 	},
@@ -69,14 +70,15 @@ const styles = StyleSheet.create({
 	},
 	infoDiv: {
 		flexDirection: "column",
-		alignSelf: "flex-end",
+		justifyContent: "space-between",
+		alignSelf: "stretch",
 		flex: 1
 	},
-	tagContainer: {
-		marginBottom: -10
+	tagAgeContainer: {
+		marginTop: 3
 	},
 	textTag: {
-		fontSize: 10
+		fontSize: 13
 	},
 	providersContainer: {
 		flexDirection: "column",
@@ -90,6 +92,9 @@ const styles = StyleSheet.create({
 		paddingRight: 20,
 		paddingLeft: 20,
 		marginTop: 30
+	},
+	textSynopsis: {
+		fontSize: 25
 	},
 	textCasting: {
 		fontSize: 25

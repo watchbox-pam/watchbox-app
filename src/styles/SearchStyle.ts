@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
 		width: "auto",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginVertical: 10,
+		marginBottom: 10,
 		backgroundColor: "#fff",
 		borderWidth: 1,
 		borderRadius: 8

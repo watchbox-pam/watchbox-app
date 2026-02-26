@@ -8,13 +8,13 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		marginBottom: 20,
 		width: "100%",
+		fontFamily: "Oswald",
 		marginTop: Platform.OS === "ios" ? 30 : 0
 	},
 	title: {
 		fontSize: 28,
 		fontWeight: "bold",
-		color: "#FFFFFF",
-		fontFamily: Platform.OS === "ios" ? "Oswald" : "Oswald"
+		color: "#FFFFFF"
 	}
 });
 
