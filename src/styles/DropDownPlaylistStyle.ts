@@ -34,9 +34,6 @@ const styles = StyleSheet.create({
 		color: "#FFFFFF",
 		fontWeight: "bold"
 	},
-	menuItemContent: {
-		backgroundColor: "#0A1E38"
-	},
 	modalContainer: {
 		flex: 1,
 		justifyContent: "center",

@@ -6,18 +6,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#0A1E38",
 		paddingTop: 20
 	},
-	header: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		paddingHorizontal: 16,
-		marginBottom: 20
-	},
-	CalendarTitle: {
-		fontSize: 28,
-		fontWeight: "bold",
-		color: "#FFFFFF"
-	},
 	todayButton: {
 		backgroundColor: "#007AFF",
 		paddingHorizontal: 16,

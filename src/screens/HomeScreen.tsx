@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
-import LogoButton from "../components/Logo";
+//import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
 import StyledText from "@/src/components/StyledText";
@@ -9,7 +9,8 @@ import { fetchGenre, fetchPopular } from "@/src/services/HomePageService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
-import IconProfile from "@/src/components/IconProfile";
+//import IconProfile from "@/src/components/IconProfile";
+import Header from "../components/Header";
 
 export default function HomeScreen() {
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
@@ -119,13 +120,7 @@ export default function HomeScreen() {
 			refreshControl={
 				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 			}>
-			<View style={styles.header}>
-				<StyledText style={styles.TitleHeader}>
-					Hello there, {currentUser.identifier}
-				</StyledText>
-				<IconProfile />
-				{/* <LogoButton /> */}
-			</View>
+			<Header title={`Hello there, ${currentUser.identifier}`} />
 
 			{movies &&
 				movies.map(({ title, movies }, index) => (

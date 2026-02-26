@@ -13,7 +13,8 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		width: "100%",
 		height: "100%",
-		zIndex: 1
+		zIndex: 1,
+		marginTop: 20
 	},
 	scrollView: {
 		flex: 1,

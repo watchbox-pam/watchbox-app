@@ -5,7 +5,9 @@ import {
 	Button,
 	Text,
 	TouchableOpacity,
-	FlatList
+	FlatList,
+	Alert,
+	Share
 } from "react-native";
 import { Menu, IconButton, Provider, Portal } from "react-native-paper";
 import {
@@ -38,6 +40,26 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 		} else {
 			console.error("Error fetching user playlists:", response.message);
 			setUserPlaylists([]);
+		}
+	};
+
+	const onShare = async () => {
+		try {
+			const result = await Share.share({
+				message:
+					"React Native | A framework for building native apps using React"
+			});
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					// shared with activity type of result.activityType
+				} else {
+					// shared
+				}
+			} else if (result.action === Share.dismissedAction) {
+				// dismissed
+			}
+		} catch (error: any) {
+			Alert.alert(error.message);
 		}
 	};
 
@@ -103,6 +125,17 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 							}}
 							title="Ajouter à une playlist"
 							leadingIcon="playlist-plus"
+							style={styles.menuItem}
+							titleStyle={styles.menuItemTitle}
+							contentStyle={styles.menuItemContent}
+						/>
+						<Menu.Item
+							onPress={() => {
+								closeMenu();
+								onShare();
+							}}
+							title="Partager"
+							leadingIcon="share-variant"
 							style={styles.menuItem}
 							titleStyle={styles.menuItemTitle}
 							contentStyle={styles.menuItemContent}

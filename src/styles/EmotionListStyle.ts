@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16
 	},
 	scrollContainer: {
-		paddingVertical: 20,
 		paddingBottom: 40
 	},
 	grid: {

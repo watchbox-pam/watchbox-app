@@ -16,6 +16,7 @@ import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
 import { router } from "expo-router";
 import StyledText from "../components/StyledText";
+import Header from "../components/Header";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
@@ -354,6 +355,7 @@ export default function SearchScreen() {
 
 	return (
 		<View style={styles.container}>
+			<Header title="Recherche" />
 			{/* Search input and button */}
 			<View style={styles.topSection}>
 				<View style={styles.searchInputContainer}>
