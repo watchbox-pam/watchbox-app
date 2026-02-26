@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { Platform } from "react-native";
+import { router } from "expo-router";
 
 const baseURL = process.env.EXPO_PUBLIC_BASE_API_URL;
 
@@ -13,6 +14,33 @@ export abstract class ApiHelper {
 	};
 
 	private static instance: AxiosInstance = axios.create(ApiHelper.config);
+
+	private static initializeInterceptors() {
+		const allowedEndpoints = ["/login", "/signup", "/base"];
+		this.instance.interceptors.response.use(
+			(response) => response,
+			async (error: any) => {
+				if (error.response?.status === 401) {
+					if (Platform.OS === "ios" || Platform.OS === "android") {
+						await SecureStore.deleteItemAsync("token");
+					} else {
+						localStorage.removeItem("token");
+					}
+
+					const requestUrl = error.config.url || "";
+					const isAllowedEndpoint = allowedEndpoints.some(
+						(endpoint) => requestUrl.includes(endpoint)
+					);
+
+					if (!isAllowedEndpoint) {
+						router.replace("/base");
+					}
+				}
+
+				return Promise.reject(error);
+			}
+		);
+	}
 
 	public static async get(url: string, options?: AxiosRequestConfig) {
 		try {
@@ -132,3 +160,5 @@ export abstract class ApiHelper {
 		}
 	}
 }
+
+ApiHelper["initializeInterceptors"]();
