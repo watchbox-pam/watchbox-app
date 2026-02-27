@@ -9,81 +9,78 @@ import useMoviesStore from "@/src/zustand/moviesStore";
 import { fetchAllMovieSections } from "../services/HomePageService";
 import WatchboxLogoAnimation from "@/src/components/WatchboxLogoAnimation";
 
+const getStoredAuth = async () => {
+	if (Platform.OS === "ios" || Platform.OS === "android") {
+		return {
+			token: await SecureStore.getItemAsync("token"),
+			id: await SecureStore.getItemAsync("id"),
+			identifier: await SecureStore.getItemAsync("identifier")
+		};
+	}
+	return {
+		token: localStorage.getItem("token"),
+		id: localStorage.getItem("id"),
+		identifier: localStorage.getItem("identifier")
+	};
+};
+
+const validateSession = async (
+	token: string,
+	id: string,
+	identifier: string,
+	signIn: Function,
+	signOut: Function
+) => {
+	try {
+		const res = await fetch("http://10.0.2.2:8000/validate-token", {
+			method: "POST",
+			headers: { Authorization: `Bearer ${token}` }
+		});
+		if (res.ok) {
+			signIn(id, identifier, token);
+		} else {
+			await signOut();
+		}
+	} catch {
+		signIn(id, identifier, token);
+	}
+};
+
 export default function Root() {
 	const [isAppReady, setIsAppReady] = useState(false);
 	const { signIn, signOut } = useSessionStore() as any;
 	const setSections = useMoviesStore((state) => state.setSections);
 
 	useEffect(() => {
-		async function prepare() {
+		(async () => {
 			try {
-				let token: string | null = null;
-				let id: string | null = null;
-				let identifier: string | null = null;
-
-				if (Platform.OS === "ios" || Platform.OS === "android") {
-					token = await SecureStore.getItemAsync("token");
-					id = await SecureStore.getItemAsync("id");
-					identifier = await SecureStore.getItemAsync("identifier");
-				} else {
-					token = localStorage.getItem("token");
-					id = localStorage.getItem("id");
-					identifier = localStorage.getItem("identifier");
-				}
+				const { token, id, identifier } = await getStoredAuth();
 
 				await Promise.all([
-					(async () => {
-						if (token && id && identifier) {
-							try {
-								const response = await fetch(
-									"https://http://10.0.2.2:8000/validate-token",
-									{
-										method: "POST",
-										headers: {
-											Authorization: `Bearer ${token}`
-										}
-									}
-								);
-								if (response.ok) {
-									signIn(id, identifier, token);
-									console.log("Utilisateur connecté");
-								} else {
-									console.log("Token invalide, déconnexion");
-									await signOut();
-								}
-							} catch (e) {
-								console.warn("⚠️ Validation échouée:", e);
-								signIn(id, identifier, token);
-							}
-						}
-					})(),
-
-					(async () => {
-						console.log("🎬 Chargement des sections...");
-						const result = await fetchAllMovieSections();
-						if (result.success) {
-							setSections(result.data);
-							console.log(
-								`✅ ${result.data.length} sections stockées dans le store`
-							);
-						} else {
-							console.log("❌ Erreur de chargement des sections");
-							setSections([]);
-						}
-					})()
+					token && id && identifier
+						? validateSession(
+								token,
+								id,
+								identifier,
+								signIn,
+								signOut
+							)
+						: Promise.resolve(),
+					fetchAllMovieSections().then(({ success, data }) =>
+						setSections(success ? data : [])
+					)
 				]);
-				await new Promise((resolve) => setTimeout(resolve, 500));
+
+				await new Promise((r) => setTimeout(r, 500));
 			} catch (e) {
 				console.warn(e);
 			} finally {
 				setIsAppReady(true);
 			}
-		}
-
-		prepare();
+		})();
 	}, []);
 
-	if (!isAppReady) {
+	if (!isAppReady)
 		return (
 			<View
 				style={{
@@ -93,18 +90,18 @@ export default function Root() {
 					backgroundColor: "#102A4C"
 				}}>
 				<StatusBar
-					translucent={false}
+					translucent={true}
 					backgroundColor="#102A4C"
 					barStyle="light-content"
 				/>
 				<WatchboxLogoAnimation />
 			</View>
 		);
-	}
+
 	return (
 		<SafeAreaProvider>
 			<StatusBar
-				translucent={false}
+				translucent={true}
 				backgroundColor="#102A4C"
 				barStyle="light-content"
 			/>
