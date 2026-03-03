@@ -113,7 +113,6 @@ export default function Index() {
 					(p) => p.title === "Historique"
 				);
 				if (historique) {
-					console.log("historique id", historique.id);
 					getMovieRuntime(historique.id)
 						.then((result) => {
 							if (result.success && result.data) {

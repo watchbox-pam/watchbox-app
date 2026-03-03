@@ -370,7 +370,6 @@ export async function deleteMediaFromPlaylist(
 export async function getMovieRuntime(playlistId: string) {
 	try {
 		const result = await ApiHelper.get(`/playlists/${playlistId}/runtime`);
-		console.log("getMovieRuntime result:", result);
 		return {
 			success: true,
 			data: result.data

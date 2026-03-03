@@ -49,8 +49,7 @@ export default function Root() {
 								} else {
 									await signOut();
 								}
-							} catch (e) {
-								console.warn("Validation échouée:", e);
+							} catch {
 								signIn(id, identifier, token);
 							}
 						}

@@ -20,8 +20,6 @@ export default function HomeScreen() {
 		setTimeout(() => setRefreshing(false), 1000);
 	}, []);
 
-	console.log("🏠 HomeScreen - sections:", movies.length);
-
 	if (movies.length === 0) {
 		return <ErrorMessage onRetry={onRefresh} />;
 	}
