@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 20,
 		marginRight: 5,
 		height: 40,
-		width: "75%"
+		width: "100%"
 	},
 	BtnSearch: {
 		width: "25%"
@@ -115,33 +115,42 @@ const styles = StyleSheet.create({
 		width: "100%"
 	},
 	viewResult: {
-		height: 175
+		height: 175,
+		width: "100%",
+		marginHorizontal: 20,
+		marginVertical: 10
 	},
 	resultatInfo: {
 		flex: 1,
-		flexDirection: "row",
-		height: 100
+		flexDirection: "row"
 	},
 	image: {
-		width: "30%",
+		aspectRatio: 2 / 3,
 		borderRadius: 10,
 		backgroundColor: "#313131"
 	},
 	resultInfo: {
-		width: "70%",
-		marginLeft: "5%"
+		width: "60%",
+		marginLeft: "5%",
+		display: "flex",
+		alignContent: "flex-start",
+		alignItems: "flex-start"
 	},
 	resultTitle: {
-		flex: 1,
 		color: "#EBDDFF",
 		fontWeight: "bold",
-		fontSize: 20,
+		fontSize: 25,
 		flexWrap: "wrap",
-		width: "90%"
+		width: "100%"
 	},
-	resultYear: {
+	resultDetails: {
 		color: "#fff",
 		fontSize: 14
+	},
+	resultDetailsOverview: {
+		color: "#fff",
+		fontSize: 14,
+		marginTop: 5
 	},
 	avis: {
 		color: "#fff"
@@ -158,6 +167,7 @@ const styles = StyleSheet.create({
 		fontSize: 30
 	},
 	sectionTitle: {
+		marginHorizontal: 20,
 		fontSize: 24,
 		color: "#fff",
 		marginVertical: 10,

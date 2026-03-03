@@ -10,7 +10,7 @@ import {
 	RefreshControl,
 	Keyboard
 } from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { searchService } from "@/src/services/SearchService";
 import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
@@ -42,6 +42,8 @@ export default function SearchScreen() {
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
 
+	const hasInteracted = useRef(false);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
@@ -49,15 +51,18 @@ export default function SearchScreen() {
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			if (searchTerm.trim().length > 0) {
+			if (!hasInteracted.current) return;
+			if (searchTerm.trim().length >= 2) {
 				fetchSuggestions();
 			} else {
 				setSuggestions([]);
 				setShowSuggestions(false);
 			}
-		}, 600);
+		}, 400);
 
-		return () => clearTimeout(timer);
+		return () => {
+			clearTimeout(timer);
+		};
 	}, [searchTerm, selectedFilter]);
 
 	// Available search filters
@@ -146,7 +151,9 @@ export default function SearchScreen() {
 			}
 
 			setSuggestions(suggestionResults);
-			setShowSuggestions(suggestionResults.length > 0);
+			if (hasInteracted.current) {
+				setShowSuggestions(suggestionResults.length > 0);
+			}
 		} catch (error) {
 			console.error("Error fetching suggestions:", error);
 			setSuggestions([]);
@@ -156,19 +163,19 @@ export default function SearchScreen() {
 	};
 
 	const handleSuggestionSelect = (item: Movie | Person) => {
+		const title = "title" in item ? item.title : item.name;
+		hasInteracted.current = false;
 		setShowSuggestions(false);
+		setSearchTerm(title);
 		Keyboard.dismiss();
-
-		if ("title" in item) {
-			router.push(`/(app)/(tabs)/movie/${item.id}`);
-		} else {
-			router.push(`/(app)/(tabs)/person/${item.id}`);
-		}
+		search(title);
 	};
 
 	// Perform search based on current filter, search term, and selected providers
-	const search = async () => {
-		if (searchTerm.trim()) {
+	const search = async (termOverride?: string) => {
+		const term = termOverride ?? searchTerm;
+		hasInteracted.current = false;
+		if (term.trim()) {
 			setShowSuggestions(false);
 			Keyboard.dismiss();
 			setIsLoading(true);
@@ -176,7 +183,7 @@ export default function SearchScreen() {
 				switch (selectedFilter) {
 					case "films":
 						const movieResults = await searchService.searchMovies(
-							searchTerm,
+							term,
 							selectedProviders.length > 0
 								? selectedProviders
 								: undefined
@@ -189,7 +196,7 @@ export default function SearchScreen() {
 
 					case "actors":
 						const actorResults =
-							await searchService.searchActors(searchTerm);
+							await searchService.searchActors(term);
 						if (actorResults.success) {
 							setActors(actorResults.data);
 							setMovies([]); // Clear movies when filtering actors
@@ -199,7 +206,7 @@ export default function SearchScreen() {
 					case "all":
 					default:
 						const allResults = await searchService.searchAll(
-							searchTerm,
+							term,
 							selectedProviders.length > 0
 								? selectedProviders
 								: undefined
@@ -277,14 +284,30 @@ export default function SearchScreen() {
 					<Text style={styles.resultTitle} numberOfLines={2}>
 						{item.title}
 					</Text>
-					<Text style={styles.resultYear}>
+					<Text style={styles.resultDetails}>
+						{item.original_title
+							? `${item.original_title}`
+							: "Titre original inconnue"}
+					</Text>
+					<Text style={styles.resultDetails}>
+						{item.runtime
+							? `${item.runtime} min`
+							: "Durée inconnue"}
+					</Text>
+					<Text style={styles.resultDetails}>
 						{item.release_date
 							? new Date(item.release_date).getFullYear()
 							: "N/A"}
 					</Text>
+					<Text
+						style={styles.resultDetailsOverview}
+						numberOfLines={5}>
+						{item.overview
+							? `${item.overview}`
+							: "Pas de description disponible."}
+					</Text>
 				</View>
 			</TouchableOpacity>
-			<View style={styles.separator}></View>
 		</View>
 	);
 
@@ -307,12 +330,12 @@ export default function SearchScreen() {
 					<Text style={styles.resultTitle} numberOfLines={2}>
 						{item.name}
 					</Text>
-					<Text style={styles.resultYear}>
+					<Text style={styles.resultDetails}>
 						{item.known_for_department || "Actor/Actress"}
 					</Text>
 				</View>
 			</TouchableOpacity>
-			<View style={styles.separator}></View>
+			{/* <View style={styles.separator}></View> */}
 		</View>
 	);
 
@@ -320,8 +343,8 @@ export default function SearchScreen() {
 		const isMovie = "title" in item;
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
 		/* const imagePath = isMovie
-			? (item as Movie).poster_path
-			: (item as Person).profile_path; */
+            ? (item as Movie).poster_path
+            : (item as Person).profile_path; */
 
 		return (
 			<TouchableOpacity
@@ -329,14 +352,14 @@ export default function SearchScreen() {
 				style={styles.suggestionItem}
 				onPress={() => handleSuggestionSelect(item)}>
 				{/* <Image
-					source={{
-						uri: imagePath
-							? `https://image.tmdb.org/t/p/w500${imagePath}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
-					style={styles.suggestionImage}
-					resizeMode="cover"
-				/> */}
+                    source={{
+                        uri: imagePath
+                            ? `https://image.tmdb.org/t/p/w500${imagePath}`
+                            : "https://via.placeholder.com/500x750?text=No+Image"
+                    }}
+                    style={styles.suggestionImage}
+                    resizeMode="cover"
+                /> */}
 				<Text style={styles.suggestionText} numberOfLines={1}>
 					{title}
 				</Text>
@@ -346,6 +369,7 @@ export default function SearchScreen() {
 
 	// Update selected filter state
 	const handleFilterSelect = (filterKey: string) => {
+		hasInteracted.current = false;
 		setSelectedFilter(filterKey);
 	};
 
@@ -361,11 +385,14 @@ export default function SearchScreen() {
 				<View style={styles.searchInputContainer}>
 					<TextInput
 						style={styles.input}
-						onChangeText={setSearchTerm}
+						onChangeText={(text) => {
+							hasInteracted.current = true;
+							setSearchTerm(text);
+						}}
 						value={searchTerm}
 						placeholder="Rechercher..."
 						placeholderTextColor="#888"
-						onSubmitEditing={search}
+						onSubmitEditing={() => search()}
 						returnKeyType="search"
 						onFocus={() => {
 							if (
@@ -393,7 +420,9 @@ export default function SearchScreen() {
 					)}
 				</View>
 
-				<TouchableOpacity onPress={search} style={styles.BtnSearch}>
+				<TouchableOpacity
+					onPress={() => search()}
+					style={styles.BtnSearch}>
 					<Text style={styles.TextSearch}>Rechercher</Text>
 				</TouchableOpacity>
 			</View>
