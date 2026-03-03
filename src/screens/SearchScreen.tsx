@@ -10,7 +10,7 @@ import {
 	RefreshControl,
 	Keyboard
 } from "react-native";
-import React, { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { searchService } from "@/src/services/SearchService";
 import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
@@ -22,7 +22,6 @@ import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
 import * as SecureStore from "expo-secure-store";
 import { ErrorMessage } from "../components/ErrorMessage";
-import { useRef as useReactRef } from "react";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -43,7 +42,7 @@ export default function SearchScreen() {
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
 
-	const hasInteracted = useReactRef(false);
+	const hasInteracted = useRef(false);
 
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(() => {
@@ -53,15 +52,17 @@ export default function SearchScreen() {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			if (!hasInteracted.current) return;
-			if (searchTerm.trim().length > 0) {
+			if (searchTerm.trim().length >= 2) {
 				fetchSuggestions();
 			} else {
 				setSuggestions([]);
 				setShowSuggestions(false);
 			}
-		}, 600);
+		}, 400);
 
-		return () => clearTimeout(timer);
+		return () => {
+			clearTimeout(timer);
+		};
 	}, [searchTerm, selectedFilter]);
 
 	// Available search filters
@@ -150,7 +151,9 @@ export default function SearchScreen() {
 			}
 
 			setSuggestions(suggestionResults);
-			setShowSuggestions(suggestionResults.length > 0);
+			if (hasInteracted.current) {
+				setShowSuggestions(suggestionResults.length > 0);
+			}
 		} catch (error) {
 			console.error("Error fetching suggestions:", error);
 			setSuggestions([]);
@@ -340,8 +343,8 @@ export default function SearchScreen() {
 		const isMovie = "title" in item;
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
 		/* const imagePath = isMovie
-			? (item as Movie).poster_path
-			: (item as Person).profile_path; */
+            ? (item as Movie).poster_path
+            : (item as Person).profile_path; */
 
 		return (
 			<TouchableOpacity
@@ -349,14 +352,14 @@ export default function SearchScreen() {
 				style={styles.suggestionItem}
 				onPress={() => handleSuggestionSelect(item)}>
 				{/* <Image
-					source={{
-						uri: imagePath
-							? `https://image.tmdb.org/t/p/w500${imagePath}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
-					style={styles.suggestionImage}
-					resizeMode="cover"
-				/> */}
+                    source={{
+                        uri: imagePath
+                            ? `https://image.tmdb.org/t/p/w500${imagePath}`
+                            : "https://via.placeholder.com/500x750?text=No+Image"
+                    }}
+                    style={styles.suggestionImage}
+                    resizeMode="cover"
+                /> */}
 				<Text style={styles.suggestionText} numberOfLines={1}>
 					{title}
 				</Text>
