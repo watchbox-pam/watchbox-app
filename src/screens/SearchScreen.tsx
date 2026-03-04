@@ -17,6 +17,7 @@ import styles from "@/src/styles/SearchStyle";
 import { router } from "expo-router";
 import StyledText from "../components/StyledText";
 import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
@@ -560,19 +561,45 @@ export default function SearchScreen() {
 										Films
 									</StyledText>
 								)}
-								{movies.map(renderMovieItem)}
+								{movies.map((movie, index) => (
+									<View key={`movie-${movie.id}`}>
+										{renderMovieItem(movie)}
+										{((index + 1) % 11 === 5 ||
+											(index + 1) % 11 === 0) && (
+											<CadrePublicitaire
+												title="🎬 Streaming Premium"
+												description="Profitez de 30 jours gratuits sur toutes les plateformes"
+												imageUrl="https://via.placeholder.com/150"
+												link="https://example.com"
+											/>
+										)}
+									</View>
+								))}
 							</View>
 						)}
 
 						{actors.length > 0 && (
-							<View>
+							<View key={`actors-section`}>
 								{/* Show section title only if filter is not strictly actors */}
 								{selectedFilter !== "actors" && (
 									<StyledText style={styles.sectionTitle}>
 										Acteurs
 									</StyledText>
 								)}
-								{actors.map(renderActorItem)}
+								{actors.map((actor, index) => (
+									<View key={`actor-${actor.id}`}>
+										{renderActorItem(actor)}
+										{((index + 1) % 11 === 5 ||
+											(index + 1) % 11 === 0) && (
+											<CadrePublicitaire
+												title="🎬 Streaming Premium"
+												description="Profitez de 30 jours gratuits sur toutes les plateformes"
+												imageUrl="https://via.placeholder.com/150"
+												link="https://example.com"
+											/>
+										)}
+									</View>
+								))}
 							</View>
 						)}
 

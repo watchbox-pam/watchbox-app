@@ -7,6 +7,7 @@ import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 
 interface Movie {
 	id: number;
