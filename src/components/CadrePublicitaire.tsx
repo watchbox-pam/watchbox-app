@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
 	},
 	adImage: {
 		width: 80,
-		height: 100,
+		aspectRatio: 2 / 3,
 		borderRadius: 8,
 		marginRight: 12
 	},
