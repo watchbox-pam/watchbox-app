@@ -11,6 +11,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
 //import IconProfile from "@/src/components/IconProfile";
 import Header from "../components/Header";
+import Quizz from "../components/QuizzButton";
 
 export default function HomeScreen() {
 	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
@@ -133,7 +134,8 @@ export default function HomeScreen() {
 							</View>
 							{movies && <CarouselPoster data={movies} />}
 						</View>
-						{((index + 1) % 11 === 5 || (index + 1) % 11 === 0) && (
+						{(index + 1) % 5 === 0 && <Quizz />}
+						{(index + 1) % 3 === 0 && (
 							<CadrePublicitaire
 								title="🎬 Streaming Premium"
 								description="Profitez de 30 jours gratuits sur toutes les plateformes"
