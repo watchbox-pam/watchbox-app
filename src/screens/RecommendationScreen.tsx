@@ -204,12 +204,6 @@ export default function RecommendationScreen() {
 					selectedEmotion={selectedEmotion}
 					onSelectEmotion={handleSelectEmotion}
 				/>
-				<CadrePublicitaire
-					title="🎬 Streaming Premium"
-					description="Profitez de 30 jours gratuits sur toutes les plateformes"
-					imageUrl="https://via.placeholder.com/150"
-					link="https://example.com"
-				/>
 			</Animated.View>
 
 			<Animated.View
