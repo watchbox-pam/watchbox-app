@@ -12,7 +12,7 @@ export default function Quizz() {
 			</Text>
 			<TouchableOpacity
 				style={styles.buttonquizz}
-				onPress={() => router.push("/quizz")}
+				//onPress={() => router.push("/quizz")}
 				activeOpacity={0.8}>
 				<View style={styles.iconQuizzButton}>
 					<MaterialIcons name="bar-chart" size={24} color="#fff" />
