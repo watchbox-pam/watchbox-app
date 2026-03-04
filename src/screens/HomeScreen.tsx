@@ -133,7 +133,7 @@ export default function HomeScreen() {
 							</View>
 							{movies && <CarouselPoster data={movies} />}
 						</View>
-						{(index + 1) % 3 === 0 && (
+						{((index + 1) % 11 === 5 || (index + 1) % 11 === 0) && (
 							<CadrePublicitaire
 								title="🎬 Streaming Premium"
 								description="Profitez de 30 jours gratuits sur toutes les plateformes"

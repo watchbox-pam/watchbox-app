@@ -7,6 +7,7 @@ import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 
 interface Movie {
 	id: number;
@@ -202,6 +203,12 @@ export default function RecommendationScreen() {
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}
 					onSelectEmotion={handleSelectEmotion}
+				/>
+				<CadrePublicitaire
+					title="🎬 Streaming Premium"
+					description="Profitez de 30 jours gratuits sur toutes les plateformes"
+					imageUrl="https://via.placeholder.com/150"
+					link="https://example.com"
 				/>
 			</Animated.View>
 

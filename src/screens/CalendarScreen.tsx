@@ -14,6 +14,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 import styles from "@/src/styles/CalendarScreenStyle";
 
 interface TimePickerModalProps {
@@ -399,6 +400,12 @@ const CalendarScreen: React.FC = () => {
 				{/* Grille du calendrier */}
 				<View style={styles.daysGrid}>{renderCalendar()}</View>
 			</Animated.View>
+			<CadrePublicitaire
+				title="🎬 Streaming Premium"
+				description="Profitez de 30 jours gratuits sur toutes les plateformes"
+				imageUrl="https://via.placeholder.com/150"
+				link="https://example.com"
+			/>
 
 			{/* Section des événements pour le jour sélectionné */}
 			{selectedDate && (
