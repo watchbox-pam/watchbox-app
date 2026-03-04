@@ -31,13 +31,13 @@ export default function EmotionList({
 						/>
 					))}
 				</View>
+				<CadrePublicitaire
+					title="🎬 Streaming Premium"
+					description="Profitez de 30 jours gratuits sur toutes les plateformes"
+					imageUrl="https://via.placeholder.com/150"
+					link="https://example.com"
+				/>
 			</ScrollView>
-			<CadrePublicitaire
-				title="🎬 Streaming Premium"
-				description="Profitez de 30 jours gratuits sur toutes les plateformes"
-				imageUrl="https://via.placeholder.com/150"
-				link="https://example.com"
-			/>
 		</View>
 	);
 }
