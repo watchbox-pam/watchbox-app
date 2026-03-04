@@ -30,13 +30,15 @@ export default function EmotionList({
 							isSelected={selectedEmotion?.id === emotion.id}
 						/>
 					))}
+					<View style={styles.ContainerAd}>
+						<CadrePublicitaire
+							title="🎬 Streaming Premium"
+							description="Profitez de 30 jours gratuits sur toutes les plateformes"
+							imageUrl="https://via.placeholder.com/150"
+							link="https://example.com"
+						/>
+					</View>
 				</View>
-				<CadrePublicitaire
-					title="🎬 Streaming Premium"
-					description="Profitez de 30 jours gratuits sur toutes les plateformes"
-					imageUrl="https://via.placeholder.com/150"
-					link="https://example.com"
-				/>
 			</ScrollView>
 		</View>
 	);
