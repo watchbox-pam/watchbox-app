@@ -1,5 +1,6 @@
 import { View, ScrollView } from "react-native";
 import EmotionCard from "./EmotionsCard";
+import CadrePublicitaire from "./CadrePublicitaire";
 import styles from "@/src/styles/EmotionListStyle";
 import Emotion from "@/src/models/Emotion";
 
@@ -31,6 +32,12 @@ export default function EmotionList({
 					))}
 				</View>
 			</ScrollView>
+			<CadrePublicitaire
+				title="🎬 Streaming Premium"
+				description="Profitez de 30 jours gratuits sur toutes les plateformes"
+				imageUrl="https://via.placeholder.com/150"
+				link="https://example.com"
+			/>
 		</View>
 	);
 }
