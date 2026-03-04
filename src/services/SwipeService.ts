@@ -10,7 +10,6 @@ export type Movie = {
 export const fetchMovies = async (count: number = 50): Promise<Movie[]> => {
 	try {
 		const response = await ApiHelper.get(`/movies/random?count=${count}`);
-		console.log("Réponse brute de l'API :", response.data);
 
 		if (!Array.isArray(response.data)) {
 			throw new Error("Données de films invalides");
