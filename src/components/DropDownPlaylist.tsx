@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
 	View,
 	Modal,
@@ -7,9 +7,10 @@ import {
 	TouchableOpacity,
 	FlatList,
 	Alert,
-	Share
+	Share,
+	ActivityIndicator
 } from "react-native";
-import { Menu, IconButton, Provider, Portal } from "react-native-paper";
+import { Menu, IconButton } from "react-native-paper";
 import {
 	addMediaToPlaylist,
 	getUserPlaylists
@@ -17,7 +18,13 @@ import {
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
 
-const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
+const DropDownPlaylist = ({
+	movieId,
+	movieTitle
+}: {
+	movieId: number;
+	movieTitle?: string;
+}) => {
 	const [visible, setVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [userPlaylists, setUserPlaylists] = useState<
@@ -27,45 +34,74 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 		null
 	); // Currently selected playlist ID
 
+	const [isFetchingPlaylists, setIsFetchingPlaylists] = useState(false); // État permettant de suivre si des listes de lecture sont récupérées
+	const [isAdding, setIsAdding] = useState(false); // État permettant de suivre si un film est en cours d'ajout à une liste de lecture
+
+	const buttonRef = useRef<View>(null); // Référence pour le bouton du menu
+	const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 }); // État pour stocker les coordonnées d'ancrage du menu
+
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	const openMenu = () => setVisible(true);
-	const closeMenu = () => setVisible(false);
+	const isMenuOpen = useRef(false);
+
+	const onButtonLayout = () => {
+		buttonRef.current?.measureInWindow((x, y, width, height) => {
+			setMenuAnchor({ x: x + width, y: y + height });
+		});
+	};
+
+	const openMenu = () => {
+		if (isMenuOpen.current) return;
+		isMenuOpen.current = true;
+		setVisible(true);
+	};
+
+	const closeMenu = () => {
+		isMenuOpen.current = false;
+		setVisible(false);
+	};
 
 	// Fetch user playlists from API
 	const fetchUserPlaylists = async (userId: string) => {
-		const response = await getUserPlaylists(userId);
-		if (response.success) {
-			setUserPlaylists(response.data || []);
-		} else {
-			console.error("Error fetching user playlists:", response.message);
-			setUserPlaylists([]);
+		setIsFetchingPlaylists(true);
+		try {
+			const response = await getUserPlaylists(userId);
+			if (response.success) {
+				setUserPlaylists(response.data || []);
+			} else {
+				console.error(
+					"Error fetching user playlists:",
+					response.message
+				);
+				setUserPlaylists([]);
+			}
+		} finally {
+			setIsFetchingPlaylists(false);
 		}
 	};
 
 	const onShare = async () => {
 		try {
+			const shareMessage = movieTitle
+				? `Je te recommande de regarder "${movieTitle}" sur WatchBox!`
+				: "Découvre ce film sur WatchBox!";
 			const result = await Share.share({
-				message:
-					"React Native | A framework for building native apps using React"
+				message: shareMessage
+				//  + `\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
 			});
 			if (result.action === Share.sharedAction) {
-				if (result.activityType) {
-					// shared with activity type of result.activityType
-				} else {
-					// shared
-				}
+				// Partage réussi
 			} else if (result.action === Share.dismissedAction) {
-				// dismissed
+				// Partage annulé
 			}
 		} catch (error: any) {
-			Alert.alert(error.message);
+			Alert.alert("Erreur", error.message);
 		}
 	};
 
 	// Open modal and load playlists for the current user
 	const openModal = async () => {
-		const userId = currentUser && currentUser.id;
+		const userId = currentUser?.id;
 		setModalVisible(true);
 		if (userId) {
 			await fetchUserPlaylists(userId);
@@ -80,29 +116,43 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 	// Add the movie to the selected playlist via API
 	const handleAddToPlaylist = async () => {
 		if (!selectedPlaylistId) {
-			alert("Please select a playlist before adding the movie.");
+			Alert.alert(
+				"Sélection requise",
+				"Veuillez sélectionner une playlist avant d'ajouter le film."
+			);
 			return;
 		}
 
-		if (movieId) {
+		if (!movieId) {
+			Alert.alert(
+				"Erreur",
+				"Identifiant du film invalide. Veuillez réessayer."
+			);
+			return;
+		}
+		setIsAdding(true);
+		try {
 			const response = await addMediaToPlaylist(
 				String(selectedPlaylistId),
 				movieId
 			);
 			if (response.success) {
-				alert("Movie added to playlist successfully!");
+				Alert.alert("Succès", "Film ajouté à la playlist !");
 				closeModal();
 			} else {
-				alert(response.message || "Failed to add movie to playlist.");
+				Alert.alert(
+					response.message ||
+						"Impossible d'ajouter le film à la playlist."
+				);
 			}
-		} else {
-			alert("Invalid movie ID. Please try again.");
+		} finally {
+			setIsAdding(false);
 		}
 	};
 
 	return (
-		<Provider>
-			<View style={styles.container}>
+		<View style={styles.container}>
+			<View ref={buttonRef} onLayout={onButtonLayout}>
 				<TouchableOpacity style={styles.button}>
 					<IconButton
 						icon="dots-vertical"
@@ -111,54 +161,60 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 						iconColor="#FFFFFF"
 					/>
 				</TouchableOpacity>
+			</View>
 
-				<Portal>
-					<Menu
-						visible={visible}
-						onDismiss={closeMenu}
-						anchor={{ x: 50, y: 50 }}
-						contentStyle={styles.menuContent}>
-						<Menu.Item
-							onPress={() => {
-								closeMenu();
-								openModal();
-							}}
-							title="Ajouter à une playlist"
-							leadingIcon="playlist-plus"
-							style={styles.menuItem}
-							titleStyle={styles.menuItemTitle}
-							contentStyle={styles.menuItemContent}
-						/>
-						<Menu.Item
-							onPress={() => {
-								closeMenu();
-								onShare();
-							}}
-							title="Partager"
-							leadingIcon="share-variant"
-							style={styles.menuItem}
-							titleStyle={styles.menuItemTitle}
-							contentStyle={styles.menuItemContent}
-						/>
-					</Menu>
-				</Portal>
+			<Menu
+				visible={visible}
+				onDismiss={closeMenu}
+				anchor={menuAnchor}
+				contentStyle={styles.menuContent}>
+				<Menu.Item
+					onPress={() => {
+						closeMenu();
+						openModal();
+					}}
+					title="Ajouter à une playlist"
+					leadingIcon="playlist-plus"
+					style={styles.menuItem}
+					titleStyle={styles.menuItemTitle}
+					contentStyle={styles.menuItemContent}
+				/>
+				<Menu.Item
+					onPress={() => {
+						closeMenu();
+						onShare();
+					}}
+					title="Partager"
+					leadingIcon="share-variant"
+					style={styles.menuItem}
+					titleStyle={styles.menuItemTitle}
+					contentStyle={styles.menuItemContent}
+				/>
+			</Menu>
 
-				<Modal
-					visible={modalVisible}
-					transparent={true}
-					animationType="slide"
-					onRequestClose={closeModal}>
+			<Modal
+				visible={modalVisible}
+				transparent={true}
+				animationType="slide"
+				onRequestClose={closeModal}>
+				<TouchableOpacity
+					style={styles.modalContainer}
+					activeOpacity={1}
+					onPress={closeModal}>
 					<TouchableOpacity
-						style={styles.modalContainer}
+						style={styles.modalContent}
 						activeOpacity={1}
-						onPress={closeModal}>
-						<TouchableOpacity
-							style={styles.modalContent}
-							activeOpacity={1}
-							onPress={(e) => e.stopPropagation()}>
-							<Text style={styles.modalTitle}>
-								Choisis une playlist
-							</Text>
+						onPress={(e) => e.stopPropagation()}>
+						<Text style={styles.modalTitle}>
+							Choisis une playlist
+						</Text>
+						{isFetchingPlaylists ? (
+							<ActivityIndicator
+								size="large"
+								color="#FFFFFF"
+								style={{ marginVertical: 20 }}
+							/>
+						) : (
 							<FlatList
 								data={userPlaylists}
 								keyExtractor={(item) => item.id}
@@ -190,18 +246,29 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 									</Text>
 								}
 							/>
-							<View style={styles.modalButtons}>
-								<Button title="Annuler" onPress={closeModal} />
+						)}
+						<View style={styles.modalButtons}>
+							<Button
+								title="Annuler"
+								onPress={closeModal}
+								disabled={isAdding}
+							/>
+							{isAdding ? (
+								<ActivityIndicator
+									size="small"
+									color="#FFFFFF"
+								/>
+							) : (
 								<Button
 									title="Ajouter"
 									onPress={handleAddToPlaylist}
 								/>
-							</View>
-						</TouchableOpacity>
+							)}
+						</View>
 					</TouchableOpacity>
-				</Modal>
-			</View>
-		</Provider>
+				</TouchableOpacity>
+			</Modal>
+		</View>
 	);
 };
 
