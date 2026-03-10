@@ -15,11 +15,10 @@ const styles = StyleSheet.create({
 		justifyContent: "center"
 	},
 	menuContent: {
-		backgroundColor: "#0A1E38",
-		borderColor: "#FFFFFF",
+		backgroundColor: "#13396A",
 		borderWidth: 1,
 		top: -30,
-		left: 55,
+		left: 45,
 		zIndex: 5,
 		borderRadius: 30,
 		paddingVertical: 0,
@@ -27,7 +26,6 @@ const styles = StyleSheet.create({
 		minWidth: 160
 	},
 	menuItem: {
-		backgroundColor: "#0A1E38",
 		paddingVertical: 10,
 		paddingHorizontal: 15,
 		borderRadius: 30
