@@ -19,11 +19,11 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
 
 const DropDownPlaylist = ({
-	movieId,
-	movieTitle
+	movieId
+	//movieTitle
 }: {
 	movieId: number;
-	movieTitle?: string;
+	//movieTitle?: string;
 }) => {
 	const [visible, setVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
@@ -38,26 +38,14 @@ const DropDownPlaylist = ({
 	const [isAdding, setIsAdding] = useState(false); // État permettant de suivre si un film est en cours d'ajout à une liste de lecture
 
 	const buttonRef = useRef<View>(null); // Référence pour le bouton du menu
-	const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 }); // État pour stocker les coordonnées d'ancrage du menu
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	const isMenuOpen = useRef(false);
-
-	const onButtonLayout = () => {
-		buttonRef.current?.measureInWindow((x, y, width, height) => {
-			setMenuAnchor({ x: x + width, y: y + height });
-		});
-	};
-
 	const openMenu = () => {
-		if (isMenuOpen.current) return;
-		isMenuOpen.current = true;
 		setVisible(true);
 	};
 
 	const closeMenu = () => {
-		isMenuOpen.current = false;
 		setVisible(false);
 	};
 
@@ -81,22 +69,22 @@ const DropDownPlaylist = ({
 	};
 
 	const onShare = async () => {
-		try {
-			const shareMessage = movieTitle
-				? `Je te recommande de regarder "${movieTitle}" sur WatchBox!`
-				: "Découvre ce film sur WatchBox!";
-			const result = await Share.share({
-				message: shareMessage
-				//  + `\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
-			});
-			if (result.action === Share.sharedAction) {
-				// Partage réussi
-			} else if (result.action === Share.dismissedAction) {
-				// Partage annulé
-			}
-		} catch (error: any) {
-			Alert.alert("Erreur", error.message);
-		}
+		// try {
+		// 	const shareMessage = movieTitle
+		// 		? `Je te recommande de regarder "${movieTitle}" sur WatchBox!`
+		// 		: "Découvre ce film sur WatchBox!";
+		// 	const result = await Share.share({
+		// 		message: shareMessage
+		// 		//  + `\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
+		// 	});
+		// 	if (result.action === Share.sharedAction) {
+		// 		// Partage réussi
+		// 	} else if (result.action === Share.dismissedAction) {
+		// 		// Partage annulé
+		// 	}
+		// } catch (error: any) {
+		// 	Alert.alert("Erreur", error.message);
+		// }
 	};
 
 	// Open modal and load playlists for the current user
@@ -152,7 +140,7 @@ const DropDownPlaylist = ({
 
 	return (
 		<View style={styles.container}>
-			<View ref={buttonRef} onLayout={onButtonLayout}>
+			<View ref={buttonRef}>
 				<TouchableOpacity style={styles.button}>
 					<IconButton
 						icon="dots-vertical"
@@ -166,7 +154,7 @@ const DropDownPlaylist = ({
 			<Menu
 				visible={visible}
 				onDismiss={closeMenu}
-				anchor={menuAnchor}
+				anchor={{ x: 0, y: 0 }}
 				contentStyle={styles.menuContent}>
 				<Menu.Item
 					onPress={() => {
