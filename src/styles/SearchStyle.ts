@@ -267,6 +267,41 @@ const styles = StyleSheet.create({
 		top: 0,
 		zIndex: 1,
 		backgroundColor: "#0A1E38"
+	},
+	actorsGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		paddingHorizontal: 10,
+		justifyContent: "space-between"
+	},
+	actorGridItem: {
+		width: "48%",
+		marginBottom: 15
+	},
+	actorCard: {
+		alignItems: "center",
+		backgroundColor: "#0F1C2E",
+		borderRadius: 10,
+		padding: 8
+	},
+	actorImage: {
+		width: "100%",
+		aspectRatio: 2 / 3,
+		borderRadius: 8,
+		backgroundColor: "#313131",
+		marginBottom: 6
+	},
+	actorName: {
+		color: "#FFFFFF",
+		fontWeight: "bold",
+		fontSize: 14,
+		textAlign: "center",
+		width: "100%"
+	},
+	actorDepartment: {
+		color: "#aaa",
+		fontSize: 12,
+		textAlign: "center"
 	}
 });
 

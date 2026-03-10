@@ -23,6 +23,7 @@ import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
 import * as SecureStore from "expo-secure-store";
 import { ErrorMessage } from "../components/ErrorMessage";
+import FallbackImage from "../components/FallbackImage";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -272,14 +273,19 @@ export default function SearchScreen() {
 			<TouchableOpacity
 				onPress={() => router.push(`/(app)/(tabs)/movie/${item.id}`)}
 				style={styles.resultatInfo}>
-				<Image
-					source={{
-						uri: item.poster_path
+				<FallbackImage
+					uri={
+						item.poster_path
 							? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
+							: null
+					}
 					style={styles.image}
-					resizeMode="cover"
+					fallbackStyle={{
+						borderWidth: 1,
+						borderColor: "#AC2821",
+						borderRadius: 10,
+						aspectRatio: 2 / 3
+					}}
 				/>
 				<View style={styles.resultInfo}>
 					<Text style={styles.resultTitle} numberOfLines={2}>
@@ -302,7 +308,8 @@ export default function SearchScreen() {
 					</Text>
 					<Text
 						style={styles.resultDetailsOverview}
-						numberOfLines={5}>
+						numberOfLines={3}
+						ellipsizeMode="tail">
 						{item.overview
 							? `${item.overview}`
 							: "Pas de description disponible."}
@@ -313,33 +320,54 @@ export default function SearchScreen() {
 	);
 
 	// Render single actor item
-	const renderActorItem = (item: Person) => (
-		<View key={item.id} style={styles.viewResult}>
-			<TouchableOpacity
-				onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
-				style={styles.resultatInfo}>
-				<Image
-					source={{
-						uri: item.profile_path
-							? `https://image.tmdb.org/t/p/w500${item.profile_path}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
-					style={styles.image}
-					resizeMode="cover"
-				/>
-				<View style={styles.resultInfo}>
-					<Text style={styles.resultTitle} numberOfLines={2}>
-						{item.name}
-					</Text>
-					<Text style={styles.resultDetails}>
-						{item.known_for_department || "Actor/Actress"}
-					</Text>
-				</View>
-			</TouchableOpacity>
-			{/* <View style={styles.separator}></View> */}
-		</View>
-	);
+	// const renderActorItem = (item: Person) => (
+	// 	<View key={item.id} style={styles.viewResult}>
+	// 		<TouchableOpacity
+	// 			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
+	// 			style={styles.resultatInfo}>
+	// 			<Image
+	// 				source={{
+	// 					uri: item.profile_path
+	// 						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
+	// 						: "https://via.placeholder.com/500x750?text=No+Image"
+	// 				}}
+	// 				style={styles.image}
+	// 				resizeMode="cover"
+	// 			/>
+	// 			<View style={styles.resultInfo}>
+	// 				<Text style={styles.resultTitle} numberOfLines={2}>
+	// 					{item.name}
+	// 				</Text>
+	// 				<Text style={styles.resultDetails}>
+	// 					{item.known_for_department || "Actor/Actress"}
+	// 				</Text>
+	// 			</View>
+	// 		</TouchableOpacity>
+	// 	</View>
+	// );
 
+	const renderActorItem = (item: Person) => (
+		<TouchableOpacity
+			key={item.id}
+			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
+			style={styles.actorCard}>
+			<FallbackImage
+				uri={
+					item.profile_path
+						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
+						: null
+				}
+				style={styles.actorImage}
+				resizeMode="cover"
+			/>
+			<Text style={styles.actorName} numberOfLines={2}>
+				{item.name}
+			</Text>
+			<Text style={styles.actorDepartment} numberOfLines={1}>
+				{item.known_for_department || "Actor/Actress"}
+			</Text>
+		</TouchableOpacity>
+	);
 	const renderSuggestionItem = (item: Movie | Person) => {
 		const isMovie = "title" in item;
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
@@ -578,9 +606,8 @@ export default function SearchScreen() {
 							</View>
 						)}
 
-						{actors.length > 0 && (
-							<View key={`actors-section`}>
-								{/* Show section title only if filter is not strictly actors */}
+						{/* {actors.length > 0 && (
+							<View key={`actors-section`}> 
 								{selectedFilter !== "actors" && (
 									<StyledText style={styles.sectionTitle}>
 										Acteurs
@@ -600,6 +627,25 @@ export default function SearchScreen() {
 										)}
 									</View>
 								))}
+							</View>
+						)} */}
+
+						{actors.length > 0 && (
+							<View key={`actors-section`}>
+								{selectedFilter !== "actors" && (
+									<StyledText style={styles.sectionTitle}>
+										Acteurs
+									</StyledText>
+								)}
+								<View style={styles.actorsGrid}>
+									{actors.map((actor) => (
+										<View
+											key={`actor-${actor.id}`}
+											style={styles.actorGridItem}>
+											{renderActorItem(actor)}
+										</View>
+									))}
+								</View>
 							</View>
 						)}
 
