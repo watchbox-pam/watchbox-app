@@ -155,7 +155,7 @@ export default function PersonScreen() {
 				<View style={styles.personInfoRow}>
 					<View style={styles.imageContainer}>
 						{!person?.profile_path ? (
-							<View style={styles.noImage}></View>
+							<View style={styles.noImage} />
 						) : (
 							<Image
 								style={styles.image}
