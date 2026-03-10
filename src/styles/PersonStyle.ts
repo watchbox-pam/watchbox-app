@@ -2,12 +2,15 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
 	headers: {
-		position: "absolute",
-		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between",
+		alignItems: "center",
 		paddingHorizontal: 25,
-		zIndex: 100
+		paddingVertical: 10,
+		zIndex: 100,
+		width: "100%",
+		position: "absolute",
+		top: 0
 	},
 	container: {
 		backgroundColor: "#0A1E38",
@@ -26,14 +29,14 @@ export const styles = StyleSheet.create({
 	},
 	image: {
 		aspectRatio: 3 / 4,
-		borderRadius: 5
+		borderRadius: 7
 	},
 	imageContainer: {
 		width: "50%"
 	},
 	noImage: {
 		aspectRatio: 3 / 4,
-		borderRadius: 5,
+		borderRadius: 7,
 		backgroundColor: "#ccc",
 		justifyContent: "center"
 	},
@@ -45,7 +48,7 @@ export const styles = StyleSheet.create({
 	personInfoRow: {
 		flexDirection: "row",
 		gap: 20,
-		paddingTop: 50
+		paddingTop: 75
 	},
 	personInfoContainer: {
 		justifyContent: "center",
@@ -56,7 +59,8 @@ export const styles = StyleSheet.create({
 	personName: {
 		fontSize: 40,
 		fontWeight: "bold",
-		textAlign: "center"
+		textAlign: "center",
+		width: "100%"
 	},
 	birthPlaceLabel: {
 		textAlign: "center"

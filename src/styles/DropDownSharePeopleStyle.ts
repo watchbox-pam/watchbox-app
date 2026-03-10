@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		zIndex: 2
+		zIndex: 2,
+		alignSelf: "flex-end"
 	},
 	button: {
 		alignItems: "center",
@@ -15,6 +16,8 @@ const styles = StyleSheet.create({
 	},
 	menuContent: {
 		backgroundColor: "#0A1E38",
+		borderColor: "#FFFFFF",
+		borderWidth: 1,
 		top: -30,
 		left: 55,
 		zIndex: 5,
@@ -23,13 +26,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 0,
 		minWidth: 160
 	},
-	menuItemContent: {
-		paddingLeft: 0,
-		flexDirection: "row",
-		alignItems: "center",
-		minWidth: 180
-	},
 	menuItem: {
+		backgroundColor: "#0A1E38",
 		paddingVertical: 10,
 		paddingHorizontal: 15,
 		borderRadius: 30
