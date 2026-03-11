@@ -1,365 +1,289 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+	useState,
+	useCallback,
+	useRef,
+	useEffect,
+	useLayoutEffect
+} from "react";
 import {
-	Text,
 	View,
-	Image,
-	Animated,
-	PanResponder,
+	Text,
+	Dimensions,
 	TouchableOpacity,
-	Dimensions
+	PanResponder,
+	ActivityIndicator
 } from "react-native";
-
-import styles from "@/src/styles/SwipeStyle";
-import { fetchMovies } from "../services/SwipeService";
+import {
+	runOnJS,
+	useSharedValue,
+	withSpring,
+	withTiming
+} from "react-native-reanimated";
 import { useRouter } from "expo-router";
+import { fetchMovies } from "../services/SwipeService";
+import SwipeCard, { Movie } from "../components/SwipeCard";
+import styles from "../styles/SwipeStyle";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height;
-const SWIPE_THRESHOLD = 120;
-const SWIPE_VERTICAL_THRESHOLD = 100;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
+const SWIPE_OUT_DURATION = 250;
 
-interface Movie {
-	id: number;
-	title: string;
-	poster_path: string | null;
-}
+type SwipeDirection = "left" | "right" | "up";
 
 export default function SwipeScreen() {
 	const [movies, setMovies] = useState<Movie[]>([]);
-	const [loading, setLoading] = useState(true);
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [likedMovies, setLikedMovies] = useState<Movie[]>([]);
-	const [dislikedMovies, setDislikedMovies] = useState<Movie[]>([]);
-	const [skippedMovies, setSkippedMovies] = useState<Movie[]>([]);
+	const [loading, setLoading] = useState(true);
 	const [isAnimating, setIsAnimating] = useState(false);
 
+	const [likedCount, setLikedCount] = useState(0);
+	const [dislikedCount, setDislikedCount] = useState(0);
+	const [skippedCount, setSkippedCount] = useState(0);
+
 	const router = useRouter();
-	const position = useRef(new Animated.ValueXY()).current;
-	const tapStartTime = useRef<number>(0);
+
+	//const [cards, setCards] = useState<Card[]>(data);
+	const translateX = useSharedValue(0);
+	const translateY = useSharedValue(0);
+	const dummyTranslate = useSharedValue(0);
+	const nextCardScale = useSharedValue(0.9);
+
+	const currentIndexRef = useRef(0);
 	const moviesRef = useRef<Movie[]>([]);
-	const currentIndexRef = useRef<number>(0);
+	const tapStartTime = useRef(0);
+	const isAnimatingRef = useRef(false);
 
 	useEffect(() => {
-		const loadMovies = async () => {
-			try {
-				const res = await fetchMovies();
-				setMovies(res);
-			} catch (error) {
-				console.error("Erreur lors du chargement des films :", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		loadMovies();
-	}, []);
+		currentIndexRef.current = currentIndex;
+	}, [currentIndex]);
 
 	useEffect(() => {
 		moviesRef.current = movies;
 	}, [movies]);
 
 	useEffect(() => {
-		currentIndexRef.current = currentIndex;
+		const load = async () => {
+			try {
+				const res = await fetchMovies();
+				setMovies(res);
+			} catch (err) {
+				console.error("Erreur lors du chargement des films :", err);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		load();
+	}, []);
+
+	useLayoutEffect(() => {
+		translateX.value = 0;
+		translateY.value = 0;
 	}, [currentIndex]);
 
-	// Reset la position quand l'index change
-	useEffect(() => {
-		if (currentIndex > 0) {
-			position.setValue({ x: 0, y: 0 });
-			setIsAnimating(false);
-		}
-	}, [currentIndex, position]);
+	const handleSwipeComplete = useCallback((direction: SwipeDirection) => {
+		const movie = moviesRef.current[currentIndexRef.current];
+		if (!movie) return;
 
-	const rotate = position.x.interpolate({
-		inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-		outputRange: ["-10deg", "0deg", "10deg"],
-		extrapolate: "clamp"
-	});
-	const likeOpacity = position.x.interpolate({
-		inputRange: [0, SCREEN_WIDTH / 4],
-		outputRange: [0, 1],
-		extrapolate: "clamp"
-	});
-	const dislikeOpacity = position.x.interpolate({
-		inputRange: [-SCREEN_WIDTH / 4, 0],
-		outputRange: [1, 0],
-		extrapolate: "clamp"
-	});
-
-	const skipOpacity = position.y.interpolate({
-		inputRange: [-SCREEN_WIDTH / 4, 0],
-		outputRange: [1, 0],
-		extrapolate: "clamp"
-	});
-
-	// Gérer le résultat d'un swipe
-	const handleSwipeComplete = (direction: string) => {
-		const item = movies[currentIndex];
-
-		if (direction === "right") {
-			setLikedMovies((prev) => [...prev, item]);
-		} else if (direction === "left") {
-			setDislikedMovies((prev) => [...prev, item]);
-		} else {
-			setSkippedMovies((prev) => [...prev, item]);
-		}
+		if (direction === "right") setLikedCount((n) => n + 1);
+		else if (direction === "left") setDislikedCount((n) => n + 1);
+		else setSkippedCount((n) => n + 1);
 
 		setCurrentIndex((prev) => prev + 1);
-		position.setValue({ x: 0, y: 0 });
-	};
+		nextCardScale.value = withSpring(0.95, { duration: 400 });
+		isAnimatingRef.current = false;
+		setIsAnimating(false);
+	}, []);
 
-	// Configuration du PanResponder pour gérer les mouvements
+	const forceSwipe = useCallback(
+		(direction: SwipeDirection) => {
+			if (isAnimatingRef.current) return;
+			isAnimatingRef.current = true;
+			setIsAnimating(true);
+
+			const targets: Record<SwipeDirection, { x: number; y: number }> = {
+				right: { x: SCREEN_WIDTH * 1.5, y: 0 },
+				left: { x: -SCREEN_WIDTH * 1.5, y: 0 },
+				up: { x: 0, y: -SCREEN_HEIGHT * 1.5 }
+			};
+
+			translateX.value = withTiming(targets[direction].x, {
+				duration: SWIPE_OUT_DURATION
+			});
+
+			translateY.value = withTiming(
+				targets[direction].y,
+				{
+					duration: SWIPE_OUT_DURATION
+				},
+				() => {
+					runOnJS(handleSwipeComplete)(direction);
+				}
+			);
+		},
+		[handleSwipeComplete]
+	);
+
+	const resetPosition = useCallback(() => {
+		translateX.value = withSpring(0, { damping: 15 });
+		translateY.value = withSpring(0, { damping: 15 });
+		nextCardScale.value = withSpring(0.95, { duration: 300 });
+	}, []);
+
 	const panResponder = useRef(
 		PanResponder.create({
 			onStartShouldSetPanResponder: () => true,
+			onMoveShouldSetPanResponder: () => true,
+
 			onPanResponderGrant: () => {
 				tapStartTime.current = Date.now();
 			},
-			onPanResponderMove: (evt, gestureState) => {
-				position.setValue({ x: gestureState.dx, y: gestureState.dy });
-			},
-			onPanResponderRelease: (evt, gestureState) => {
-				const tapDuration = Date.now() - tapStartTime.current;
 
-				// Détecter un simple tap
-				const isClick =
-					Math.abs(gestureState.dx) < 10 &&
-					Math.abs(gestureState.dy) < 10 &&
+			onPanResponderMove: (_, gesture) => {
+				if (isAnimatingRef.current) return;
+				translateX.value = gesture.dx;
+				translateY.value = gesture.dy;
+
+				const progress = Math.min(
+					Math.sqrt(gesture.dx ** 2 + gesture.dy ** 2) /
+						SWIPE_THRESHOLD,
+					1
+				);
+				nextCardScale.value = 0.95 + 0.05 * progress;
+			},
+
+			onPanResponderRelease: (_, gesture) => {
+				if (isAnimatingRef.current) return;
+				const tapDuration = Date.now() - tapStartTime.current;
+				const isTab =
+					Math.abs(gesture.dx) < 10 &&
+					Math.abs(gesture.dy) < 10 &&
 					tapDuration < 300;
 
-				if (isClick) {
-					// Utiliser les refs pour avoir les valeurs actuelles
-					const currentMovie =
-						moviesRef.current[currentIndexRef.current];
-
-					if (currentMovie) {
-						console.log("Navigating to movie:", currentMovie.id);
+				if (isTab) {
+					const movie = moviesRef.current[currentIndexRef.current];
+					if (movie) {
+						translateX.value = 0;
+						translateY.value = 0;
 						router.push({
 							pathname: "/(app)/(tabs)/movie/[id]",
-							params: { id: currentMovie.id.toString() }
+							params: { id: movie.id.toString() }
 						});
-						position.setValue({ x: 0, y: 0 });
-						return;
-					} else {
-						console.log(
-							"No movie found at index:",
-							currentIndexRef.current
-						);
 					}
+					return;
 				}
 
-				// Gestion normale du swipe
-				if (gestureState.dx > SWIPE_THRESHOLD) {
-					Animated.spring(position, {
-						toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy },
-						useNativeDriver: false
-					}).start(() => {
-						handleSwipeComplete("right");
-					});
-				} else if (gestureState.dx < -SWIPE_THRESHOLD) {
-					Animated.spring(position, {
-						toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy },
-						useNativeDriver: false
-					}).start(() => {
-						handleSwipeComplete("left");
-					});
-				} else if (gestureState.dy < -SWIPE_VERTICAL_THRESHOLD) {
-					Animated.timing(position, {
-						toValue: {
-							x: gestureState.dx,
-							y: -SCREEN_HEIGHT - 100
-						},
-						duration: 500,
-						useNativeDriver: false
-					}).start(() => {
-						handleSwipeComplete("up");
-					});
+				const absDx = Math.abs(gesture.dx);
+				const absDy = Math.abs(gesture.dy);
+
+				if (absDy > absDx) {
+					if (gesture.dy < -SWIPE_THRESHOLD) {
+						runOnJS(forceSwipe)("up");
+					} else {
+						runOnJS(resetPosition)();
+					}
 				} else {
-					Animated.spring(position, {
-						toValue: { x: 0, y: 0 },
-						friction: 4,
-						useNativeDriver: false
-					}).start();
+					if (gesture.dx > SWIPE_THRESHOLD) {
+						runOnJS(forceSwipe)("right");
+					} else if (gesture.dx < -SWIPE_THRESHOLD) {
+						runOnJS(forceSwipe)("left");
+					} else {
+						runOnJS(resetPosition)();
+					}
 				}
 			}
 		})
 	).current;
 
-	const handleButtonPress = (direction: "left" | "right" | "up") => {
-		if (currentIndex >= movies.length || isAnimating) return;
+	const handleDislike = useCallback(() => forceSwipe("left"), [forceSwipe]);
+	const handleSkip = useCallback(() => forceSwipe("up"), [forceSwipe]);
+	const handleLike = useCallback(() => forceSwipe("right"), [forceSwipe]);
 
-		setIsAnimating(true);
-		let toValue = { x: 0, y: 0 };
+	const visibleMovies = movies.slice(currentIndex, currentIndex + 3);
+	const hasEnded =
+		!loading && currentIndex >= movies.length && movies.length > 0;
+	const hasMovies =
+		!loading && movies.length > 0 && currentIndex < movies.length;
 
-		if (direction === "right") {
-			toValue = { x: SCREEN_WIDTH + 100, y: 0 };
-		} else if (direction === "left") {
-			toValue = { x: -SCREEN_WIDTH - 100, y: 0 };
-		} else if (direction === "up") {
-			toValue = { x: 0, y: -SCREEN_HEIGHT - 100 };
-		}
-
-		Animated.timing(position, {
-			toValue,
-			duration: 2000,
-			useNativeDriver: false
-		}).start(() => {
-			handleSwipeComplete(direction);
-			setIsAnimating(false);
-		});
-	};
-
-	const renderCurrentCard = () => {
-		if (currentIndex >= movies.length) return null;
-
-		const movie = movies[currentIndex];
-		const posterUri = movie.poster_path
-			? movie.poster_path.startsWith("http")
-				? movie.poster_path
-				: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-			: "https://via.placeholder.com/300x450?text=Pas+d'image";
-
+	if (loading) {
 		return (
-			<Animated.View
-				key={`current-${movie.id}-${currentIndex}`}
-				style={[
-					styles.card,
-					{
-						transform: [
-							{ translateX: position.x },
-							{ translateY: position.y },
-							{ rotate }
-						],
-						zIndex: 100
-					}
-				]}
-				{...panResponder.panHandlers}>
-				<Image source={{ uri: posterUri }} style={styles.posterImage} />
-				<Text style={styles.movieTitle}>{movie.title}</Text>
-
-				<Animated.View
-					style={[styles.likeLabel, { opacity: likeOpacity }]}>
-					<Text style={styles.likeLabelText}>LIKE</Text>
-				</Animated.View>
-
-				<Animated.View
-					style={[styles.skipLabel, { opacity: skipOpacity }]}>
-					<Text style={styles.skipLabelText}>Pas Vu</Text>
-				</Animated.View>
-
-				<Animated.View
-					style={[styles.dislikeLabel, { opacity: dislikeOpacity }]}>
-					<Text style={styles.dislikeLabelText}>NOPE</Text>
-				</Animated.View>
-			</Animated.View>
+			<View style={styles.centered}>
+				<ActivityIndicator size="large" color="#818cf8" />
+				<Text style={styles.loadingText}>Chargement des films...</Text>
+			</View>
 		);
-	};
+	}
 
-	const renderBackgroundCards = () => {
-		const cards = [];
-		const maxBackgroundCards = 2;
-
-		for (let i = 1; i <= maxBackgroundCards; i++) {
-			const index = currentIndex + i;
-			if (index >= movies.length) continue;
-
-			const movie = movies[index];
-			const posterUri = movie.poster_path
-				? movie.poster_path.startsWith("http")
-					? movie.poster_path
-					: `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-				: "https://via.placeholder.com/300x450?text=Pas+d'image";
-
-			const cardScale = 0.95 - i * 0.05;
-			const imageOpacity = 0.8 - i * 0.2; // Opacité pour l'image seulement
-			const cardOffset = i * 8;
-
-			cards.push(
-				<View
-					key={`bg-${movie.id}-${index}`}
-					style={[
-						styles.card,
-						{
-							transform: [
-								{ scale: cardScale },
-								{ translateY: cardOffset }
-							],
-							zIndex: 10 - i
-						}
-					]}>
-					<Image
-						source={{ uri: posterUri }}
-						style={[
-							styles.posterImage,
-							{ opacity: imageOpacity } // Appliquer l'opacité seulement à l'image
-						]}
-					/>
-					{/* Le titre reste complètement invisible pour les cartes d'arrière-plan */}
-					<View style={{ opacity: 1 }}>
-						<Text style={styles.movieTitle}>{movie.title}</Text>
-					</View>
-				</View>
-			);
-		}
-
-		return cards;
-	};
-
-	const renderCards = () => {
-		if (movies.length === 0) {
-			return (
-				<View style={styles.endContainer}>
-					<Text style={styles.endText}>Aucun film disponible.</Text>
-				</View>
-			);
-		}
-
-		if (currentIndex >= movies.length) {
-			return (
-				<View style={styles.endContainer}>
-					<Text style={styles.endText}>Plus de films à swiper !</Text>
-					<Text style={styles.endText}>
-						Aimés: {likedMovies.length} | Pas aimés:{" "}
-						{dislikedMovies.length} | Pas vus:{" "}
-						{skippedMovies.length}
-					</Text>
-				</View>
-			);
-		}
-
+	if (movies.length === 0) {
 		return (
-			<>
-				{renderBackgroundCards()}
-				{renderCurrentCard()}
-			</>
+			<View style={styles.centered}>
+				<Text style={styles.endText}>Aucun film disponible</Text>
+			</View>
 		);
-	};
+	}
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.cardContainer}>{renderCards()}</View>
+			<View style={styles.cardContainer}>
+				{hasEnded ? (
+					<View style={styles.centered}>
+						<Text style={styles.endTitle}>C'est tout !</Text>
+						<Text style={styles.endStats}>
+							👍 {likedCount} · 👎 {dislikedCount} · 🤔
+							{skippedCount}
+						</Text>
+					</View>
+				) : (
+					[...visibleMovies].reverse().map((movie, ReverseIndex) => {
+						const index = visibleMovies.length - 1 - ReverseIndex;
+						return (
+							<SwipeCard
+								key={`${movie.id}-${currentIndex + index}`}
+								movie={movie}
+								index={index}
+								totalCards={visibleMovies.length}
+								panHandlers={
+									index === 0 ? panResponder.panHandlers : {}
+								}
+								translateX={
+									index === 0 ? translateX : dummyTranslate
+								}
+								translateY={
+									index === 0 ? translateY : dummyTranslate
+								}
+								nextCardScale={
+									index === 1 ? nextCardScale : dummyTranslate
+								}
+							/>
+						);
+					})
+				)}
+			</View>
 
-			{!loading && currentIndex < movies.length && (
-				<View style={styles.buttonsContainer}>
+			{hasMovies && (
+				<View style={styles.buttonContainer}>
 					<TouchableOpacity
-						style={styles.dislikeButton}
-						onPress={() => handleButtonPress("left")}
-						disabled={isAnimating}>
-						<Text style={styles.buttonText}>👎</Text>
+						style={(styles.btn, styles.dislikeBtn)}
+						onPress={handleDislike}
+						disabled={isAnimating}
+						activeOpacity={0.8}>
+						<Text style={styles.btnIcon}>👎</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={styles.skipButton}
-						onPress={() => handleButtonPress("up")}
-						disabled={isAnimating}>
-						<Text style={styles.buttonText}>🤔</Text>
+						style={(styles.btn, styles.skipBtn)}
+						onPress={handleSkip}
+						disabled={isAnimating}
+						activeOpacity={0.8}>
+						<Text style={styles.btnIcon}>🤔</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={styles.likeButton}
-						onPress={() => handleButtonPress("right")}
-						disabled={isAnimating}>
-						<Text style={styles.buttonText}>👍</Text>
+						style={(styles.btn, styles.likeBtn)}
+						onPress={handleLike}
+						disabled={isAnimating}
+						activeOpacity={0.8}>
+						<Text style={styles.btnIcon}>👍</Text>
 					</TouchableOpacity>
 				</View>
 			)}
