@@ -15,20 +15,20 @@ const styles = StyleSheet.create({
 		elevation: 8,
 		overflow: "hidden"
 	},
-	posterImage: { width: "100%", height: "78%" },
-	cardFooter: {
-		flex: 1,
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-		justifyContent: "center"
-	},
-	cardTitle: {
-		fontSize: 17,
-		fontWeight: "700",
-		color: "#ffffff",
-		marginBottom: 2
-	},
-	cardMeta: { fontSize: 13, color: "#9ca3af" },
+	posterImage: { aspectRatio: 2 / 3, width: "100%", height: "100%" },
+	// cardFooter: {
+	// 	flex: 1,
+	// 	paddingHorizontal: 16,
+	// 	paddingVertical: 12,
+	// 	justifyContent: "center"
+	// },
+	// cardTitle: {
+	// 	fontSize: 17,
+	// 	fontWeight: "700",
+	// 	color: "#ffffff",
+	// 	marginBottom: 2
+	// },
+	// cardMeta: { fontSize: 13, color: "#9ca3af" },
 	label: {
 		position: "absolute",
 		paddingHorizontal: 14,

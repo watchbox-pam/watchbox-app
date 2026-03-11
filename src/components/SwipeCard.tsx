@@ -169,14 +169,14 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 				</>
 			)}
 
-			<View style={styles.cardFooter}>
+			{/* <View style={styles.cardFooter}>
 				<Text style={styles.cardTitle} numberOfLines={1}>
 					{movie.title}
 				</Text>
 				{movie.runtime ? (
 					<Text style={styles.cardMeta}>{movie.runtime} min</Text>
 				) : null}
-			</View>
+			</View> */}
 		</Animated.View>
 	);
 };

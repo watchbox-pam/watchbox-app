@@ -41,44 +41,62 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
-		gap: 24,
+		gap: 30,
 		paddingBottom: 48,
 		paddingTop: 16
 	},
-	btn: {
-		width: 64,
-		height: 64,
-		borderRadius: 32,
+	actionBtn: {
+		width: 110,
+		height: 80,
+		borderRadius: 18,
 		justifyContent: "center",
 		alignItems: "center",
 		shadowColor: "#000",
-		shadowOffset: {
-			width: 0,
-			height: 4
-		},
-		shadowOpacity: 0.3,
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.25,
 		shadowRadius: 8,
 		elevation: 6
 	},
+	skipBtn: {
+		width: 75,
+		height: 75,
+		borderRadius: 50,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#fbbf2415",
+		borderWidth: 2,
+		borderColor: "#fbbf24"
+	},
 	dislikeBtn: {
-		backgroundColor: "#1f1f35",
+		width: 110,
+		height: 62,
+		borderRadius: 14,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#ef444420",
 		borderWidth: 2,
 		borderColor: "#ef4444"
 	},
-	skipBtn: {
-		width: 54,
-		height: 54,
-		borderRadius: 27,
-		backgroundColor: "#1f1f35",
-		borderWidth: 2,
-		borderColor: "#fbbf24" // "#f59e0b"
-	},
 	likeBtn: {
-		backgroundColor: "#1f1f35",
+		width: 110,
+		height: 62,
+		borderRadius: 14,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#22c55e20",
 		borderWidth: 2,
-		borderColor: "#22c55e" //"#34d399"
+		borderColor: "#22c55e"
 	},
-	btnIcon: { fontSize: 26 }
+	btnIcon: {
+		fontSize: 22,
+		lineHeight: 26
+	},
+	btnLabel: {
+		fontSize: 10,
+		fontWeight: "800",
+		letterSpacing: 1.5
+	},
+	btnText: { fontSize: 26, color: "#ffffff", fontWeight: "700" }
 });
 
 export default styles;

@@ -23,6 +23,7 @@ import { useRouter } from "expo-router";
 import { fetchMovies } from "../services/SwipeService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
@@ -208,7 +209,7 @@ export default function SwipeScreen() {
 	if (loading) {
 		return (
 			<View style={styles.centered}>
-				<ActivityIndicator size="large" color="#818cf8" />
+				<ActivityIndicator size="large" color="#FFFFFF" />
 				<Text style={styles.loadingText}>Chargement des films...</Text>
 			</View>
 		);
@@ -263,27 +264,46 @@ export default function SwipeScreen() {
 			{hasMovies && (
 				<View style={styles.buttonContainer}>
 					<TouchableOpacity
-						style={(styles.btn, styles.dislikeBtn)}
+						style={styles.dislikeBtn}
 						onPress={handleDislike}
 						disabled={isAnimating}
 						activeOpacity={0.8}>
-						<Text style={styles.btnIcon}>👎</Text>
+						<Text style={styles.btnIcon}>
+							<Ionicons name="close" size={28} color="#ef4444" />
+						</Text>
+						<Text style={[styles.btnLabel, { color: "#ef4444" }]}>
+							NOPE
+						</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={(styles.btn, styles.skipBtn)}
+						style={styles.skipBtn}
 						onPress={handleSkip}
 						disabled={isAnimating}
 						activeOpacity={0.8}>
-						<Text style={styles.btnIcon}>🤔</Text>
+						<Text style={styles.btnIcon}>
+							<Ionicons
+								name="eye-off"
+								size={24}
+								color="#fbbf24"
+							/>
+						</Text>
+						<Text style={[styles.btnLabel, { color: "#fbbf24" }]}>
+							UNSEE
+						</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={(styles.btn, styles.likeBtn)}
+						style={styles.likeBtn}
 						onPress={handleLike}
 						disabled={isAnimating}
 						activeOpacity={0.8}>
-						<Text style={styles.btnIcon}>👍</Text>
+						<Text style={styles.btnIcon}>
+							<Ionicons name="heart" size={28} color="#22c55e" />
+						</Text>
+						<Text style={[styles.btnLabel, { color: "#22c55e" }]}>
+							LIKE
+						</Text>
 					</TouchableOpacity>
 				</View>
 			)}
