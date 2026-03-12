@@ -80,21 +80,24 @@ export default function SwipeScreen() {
 	useLayoutEffect(() => {
 		translateX.value = 0;
 		translateY.value = 0;
-	}, [currentIndex]);
+	}, [currentIndex, translateX, translateY]);
 
-	const handleSwipeComplete = useCallback((direction: SwipeDirection) => {
-		const movie = moviesRef.current[currentIndexRef.current];
-		if (!movie) return;
+	const handleSwipeComplete = useCallback(
+		(direction: SwipeDirection) => {
+			const movie = moviesRef.current[currentIndexRef.current];
+			if (!movie) return;
 
-		if (direction === "right") setLikedCount((n) => n + 1);
-		else if (direction === "left") setDislikedCount((n) => n + 1);
-		else setSkippedCount((n) => n + 1);
+			if (direction === "right") setLikedCount((n) => n + 1);
+			else if (direction === "left") setDislikedCount((n) => n + 1);
+			else setSkippedCount((n) => n + 1);
 
-		setCurrentIndex((prev) => prev + 1);
-		nextCardScale.value = withSpring(0.95, { duration: 400 });
-		isAnimatingRef.current = false;
-		setIsAnimating(false);
-	}, []);
+			setCurrentIndex((prev) => prev + 1);
+			nextCardScale.value = withSpring(0.95, { duration: 400 });
+			isAnimatingRef.current = false;
+			setIsAnimating(false);
+		},
+		[nextCardScale]
+	);
 
 	const forceSwipe = useCallback(
 		(direction: SwipeDirection) => {
@@ -122,14 +125,14 @@ export default function SwipeScreen() {
 				}
 			);
 		},
-		[handleSwipeComplete]
+		[handleSwipeComplete, translateX, translateY]
 	);
 
 	const resetPosition = useCallback(() => {
 		translateX.value = withSpring(0, { damping: 15 });
 		translateY.value = withSpring(0, { damping: 15 });
 		nextCardScale.value = withSpring(0.95, { duration: 300 });
-	}, []);
+	}, [nextCardScale, translateX, translateY]);
 
 	const panResponder = useRef(
 		PanResponder.create({
@@ -229,10 +232,78 @@ export default function SwipeScreen() {
 				{hasEnded ? (
 					<View style={styles.centered}>
 						<Text style={styles.endTitle}>C'est tout !</Text>
-						<Text style={styles.endStats}>
-							👍 {likedCount} · 👎 {dislikedCount} · 🤔
-							{skippedCount}
-						</Text>
+						<View style={styles.endStats}>
+							<View style={styles.endText}>
+								<Text style={styles.btnIconEndStats}>
+									<Ionicons
+										name="heart"
+										size={50}
+										color="#22c55e"
+									/>
+								</Text>
+								<Text
+									style={[
+										styles.btnLabelEndStats,
+										{ color: "#22c55e" }
+									]}>
+									LIKE
+								</Text>
+								<Text
+									style={[
+										styles.LabelEndStats,
+										{ color: "#22c55e" }
+									]}>
+									{likedCount}
+								</Text>
+							</View>
+							<View style={styles.endText}>
+								<Text style={styles.btnIconEndStats}>
+									<Ionicons
+										name="eye-off"
+										size={50}
+										color="#fbbf24"
+									/>
+								</Text>
+								<Text
+									style={[
+										styles.btnLabelEndStats,
+										{ color: "#fbbf24" }
+									]}>
+									UNSEE
+								</Text>
+								<Text
+									style={[
+										styles.LabelEndStats,
+										{ color: "#fbbf24" }
+									]}>
+									{skippedCount}
+								</Text>
+							</View>
+							<View style={styles.endText}>
+								<Text style={styles.btnIconEndStats}>
+									<Ionicons
+										name="close"
+										size={50}
+										color="#ef4444"
+									/>
+								</Text>
+								<Text
+									style={[
+										styles.btnLabelEndStats,
+										{ color: "#ef4444" }
+									]}>
+									NOPE
+								</Text>
+								<Text
+									style={[
+										styles.LabelEndStats,
+										,
+										{ color: "#ef4444" }
+									]}>
+									{dislikedCount}
+								</Text>
+							</View>
+						</View>
 					</View>
 				) : (
 					[...visibleMovies].reverse().map((movie, ReverseIndex) => {

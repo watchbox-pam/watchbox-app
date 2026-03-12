@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
-		gap: 12
+		gap: 30
 	},
 	cardContainer: {
 		flex: 1,
@@ -30,12 +30,28 @@ const styles = StyleSheet.create({
 		color: "#ffffff"
 	},
 	endStats: {
-		fontSize: 18,
-		color: "#9ca3af"
+		flexDirection: "row"
+	},
+	btnIconEndStats: {
+		fontSize: 32,
+		lineHeight: 36
 	},
 	endText: {
-		fontSize: 18,
-		color: "#9ca3af"
+		width: 120,
+		height: 120,
+		justifyContent: "space-evenly",
+		alignItems: "center",
+		flexDirection: "column"
+	},
+	btnLabelEndStats: {
+		fontSize: 15,
+		fontWeight: "800",
+		letterSpacing: 1.5
+	},
+	LabelEndStats: {
+		fontSize: 25,
+		fontWeight: "bold",
+		letterSpacing: 1.5
 	},
 	buttonContainer: {
 		flexDirection: "row",

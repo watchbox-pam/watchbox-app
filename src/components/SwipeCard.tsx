@@ -1,5 +1,6 @@
 import React, { FC, memo, useEffect } from "react";
 import { View, Text, Dimensions, Image } from "react-native";
+//import FallBackImage from "../components/FallbackImage";
 import Animated, {
 	Easing,
 	Extrapolation,
@@ -33,6 +34,7 @@ const ROTATION_RANGE = 15;
 
 const getPosterUri = (poster_path: string | null): string => {
 	if (!poster_path) {
+		//return <FallbackImage>;
 	}
 	if (poster_path.startsWith("http")) return poster_path;
 	return `https://image.tmdb.org/t/p/w500${poster_path}`;
@@ -67,7 +69,7 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 			duration: 300,
 			easing: Easing.out(Easing.quad)
 		});
-	}, [index, isTopCard, isSecondCard]);
+	}, [index, isTopCard, isSecondCard, cardScale, cardOpacity]);
 
 	const animationStyle = useAnimatedStyle(() => {
 		const currentX = isTopCard ? translateX.value : 0;
@@ -169,7 +171,10 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 				</>
 			)}
 
-			{/* <View style={styles.cardFooter}>
+			{/* A GARDER AU CAS OU
+
+			Descritpion et titre du film sous le film (le poster parle d'elle même et l'aspectRatio ne sera plus respecter si ajouter (deformement des posters))
+			<View style={styles.cardFooter}>
 				<Text style={styles.cardTitle} numberOfLines={1}>
 					{movie.title}
 				</Text>
