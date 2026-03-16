@@ -15,8 +15,9 @@ const styles = StyleSheet.create({
 	},
 	menuContent: {
 		backgroundColor: "#0A1E38",
-		top: -30,
-		left: -35,
+		borderWidth: 1,
+		top: 30,
+		left: 130,
 		zIndex: 5,
 		borderRadius: 30,
 		paddingVertical: 0,
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
 	menuItemContent: {
 		paddingLeft: 0,
 		flexDirection: "row",
-		alignItems: "center",
+		//alignItems: "center",
 		minWidth: 180
 	},
 	menuItem: {

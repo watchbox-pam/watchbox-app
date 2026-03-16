@@ -9,6 +9,7 @@ import ReadMore from "../components/ReadMore";
 import PersonMediaList from "../components/PersonMediaList";
 import { fetchPerson } from "@/src/services/PersonService";
 import { ErrorMessage } from "../components/ErrorMessage";
+import DropDownSharePeople from "../components/DropDownSharePeople";
 
 export default function PersonScreen() {
 	const [loading, setLoading] = useState(true);
@@ -147,13 +148,14 @@ export default function PersonScreen() {
 			}>
 			<View style={styles.headers}>
 				<BackButton />
+				<DropDownSharePeople />
 			</View>
 
 			<View>
 				<View style={styles.personInfoRow}>
 					<View style={styles.imageContainer}>
 						{!person?.profile_path ? (
-							<View style={styles.noImage}></View>
+							<View style={styles.noImage} />
 						) : (
 							<Image
 								style={styles.image}

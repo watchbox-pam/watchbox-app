@@ -9,7 +9,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: "#13396A",
 		padding: 10,
-		borderRadius: 50
+		borderRadius: 50,
+		width: 45,
+		height: 45
 	}
 });
 
