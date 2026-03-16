@@ -1,10 +1,11 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import styles from "@/src/styles/BasePageStyle";
 import StyledText from "@/src/components/StyledText";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { checkLogin } from "@/src/services/LandingService";
 import useSessionStore from "@/src/zustand/sessionStore";
+import * as SecureStore from "expo-secure-store";
 
 export default function BaseScreen() {
 	// Retrieve the signIn function from the session store
@@ -13,6 +14,21 @@ export default function BaseScreen() {
 
 	// Check if the user is already logged in
 	const checkUserLogin = async () => {
+		let verificationCodeToken: string | null;
+		if (Platform.OS === "ios" || Platform.OS === "android") {
+			verificationCodeToken = await SecureStore.getItemAsync(
+				"verification_code_token"
+			);
+		} else {
+			verificationCodeToken = await SecureStore.getItemAsync(
+				"verification_code_token"
+			);
+		}
+
+		if (verificationCodeToken !== null) {
+			router.replace("/userVerification");
+		}
+
 		const result = await checkLogin();
 		if (result !== null) {
 			signIn(result?.id, result?.identifier, result?.token);

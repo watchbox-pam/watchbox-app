@@ -78,18 +78,14 @@ export async function registerUser(user: UserSignup) {
 		if (result.success) {
 			// Store credentials securely depending on platform
 			if (Platform.OS === "ios" || Platform.OS === "android") {
-				await SecureStore.setItemAsync("id", result.data.user_id);
-				await SecureStore.setItemAsync("identifier", user.username);
 				await SecureStore.setItemAsync(
-					"token",
-					JSON.stringify(result.data.token)
+					"verification_code_token",
+					result.data.verification_code_token
 				);
 			} else {
-				localStorage.setItem("id", result.data.user_id);
-				localStorage.setItem("identifier", user.username);
 				localStorage.setItem(
-					"token",
-					JSON.stringify(result.data.token)
+					"verification_code_token",
+					result.data.verification_code_token
 				);
 			}
 
