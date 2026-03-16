@@ -15,7 +15,12 @@ const styles = StyleSheet.create({
 		elevation: 8,
 		overflow: "hidden"
 	},
-	posterImage: { aspectRatio: 2 / 3, width: "100%", height: "100%" },
+	posterImage: {
+		aspectRatio: 2 / 3,
+		width: "100%",
+		height: "100%",
+		margin: "auto"
+	},
 	// cardFooter: {
 	// 	flex: 1,
 	// 	paddingHorizontal: 16,

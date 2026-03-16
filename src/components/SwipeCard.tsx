@@ -139,7 +139,7 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 			style={[
 				styles.card,
 				animationStyle,
-				{ width: SCREEN_WIDTH * 0.9, height: SCREEN_HEIGHT * 0.62 }
+				{ height: SCREEN_HEIGHT * 0.62 }
 			]}
 			{...panHandlers}>
 			<Image
