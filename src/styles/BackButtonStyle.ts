@@ -2,9 +2,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		alignSelf: "flex-start",
-		marginBottom: 20,
-		marginLeft: 5
+		marginLeft: 5,
+		marginVertical: 3
 	},
 	button: {
 		alignItems: "center",
