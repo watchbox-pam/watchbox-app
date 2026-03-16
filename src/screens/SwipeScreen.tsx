@@ -343,7 +343,7 @@ export default function SwipeScreen() {
 							<Ionicons name="close" size={28} color="#ef4444" />
 						</Text>
 						<Text style={[styles.btnLabel, { color: "#ef4444" }]}>
-							NOPE
+							J'AIME PAS
 						</Text>
 					</TouchableOpacity>
 
@@ -360,7 +360,7 @@ export default function SwipeScreen() {
 							/>
 						</Text>
 						<Text style={[styles.btnLabel, { color: "#fbbf24" }]}>
-							UNSEE
+							PAS VUE
 						</Text>
 					</TouchableOpacity>
 
@@ -373,7 +373,7 @@ export default function SwipeScreen() {
 							<Ionicons name="heart" size={28} color="#22c55e" />
 						</Text>
 						<Text style={[styles.btnLabel, { color: "#22c55e" }]}>
-							LIKE
+							J'AIME
 						</Text>
 					</TouchableOpacity>
 				</View>
