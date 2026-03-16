@@ -348,9 +348,7 @@ export async function deleteMediaFromPlaylist(
 	}
 
 	try {
-		const result = await ApiHelper.delete(
-			`/playlists/${playlistId}/media/${mediaId}`
-		);
+		await ApiHelper.delete(`/playlists/${playlistId}/media/${mediaId}`);
 		return {
 			success: true,
 			message: "Média supprimé de la playlist avec succès"

@@ -1,5 +1,5 @@
-import { FlatList, View, Image } from "react-native";
-import { Link } from "expo-router";
+import { FlatList, View, Image, Pressable } from "react-native";
+import { router } from "expo-router";
 import styles from "@/src/styles/CarouselPosterStyle";
 
 // Horizontal poster carousel component
@@ -17,12 +17,17 @@ export default function CarouselPoster({ data }: any) {
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={({ item }) => (
-					<Link
-						style={styles.imageContainer}
-						href={{
-							pathname: "/movie/[id]",
-							params: { id: item.id.toString() }
-						}}>
+					<Pressable
+						style={({ pressed }) => [
+							styles.imageContainer,
+							pressed && { opacity: 0.8 }
+						]}
+						onPress={() =>
+							router.push({
+								pathname: "/(app)/(tabs)/movie/[id]",
+								params: { id: item.id.toString() }
+							})
+						}>
 						<Image
 							source={{
 								uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`
@@ -30,7 +35,7 @@ export default function CarouselPoster({ data }: any) {
 							style={styles.image}
 							resizeMode="cover"
 						/>
-					</Link>
+					</Pressable>
 				)}
 			/>
 		</View>

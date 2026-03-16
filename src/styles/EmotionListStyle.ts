@@ -8,13 +8,16 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16
 	},
 	scrollContainer: {
-		paddingVertical: 20,
 		paddingBottom: 40
 	},
 	grid: {
 		flexDirection: "row",
 		flexWrap: "wrap",
 		justifyContent: "space-between"
+	},
+	ContainerAd: {
+		width: "100%",
+		height: 300
 	}
 });
 

@@ -14,11 +14,11 @@ export default function UserVerificationScreen() {
 	const [code, setCode] = useState<string>("");
 
 	const sendCode = async () => {
+		if (code === "" || code.length !== 6) return;
 		const result = await sendUserVerificationCode(code);
 		if (result) {
-			//alert("Un code de vérification a été envoyé à votre adresse mail");
-			//signIn(result.message.id, username, result.message.token);
-			router.replace("/login");
+			console.log(result);
+			router.replace("/");
 			return;
 		} else {
 			alert("Non");
@@ -29,13 +29,13 @@ export default function UserVerificationScreen() {
 		<SafeAreaView style={styles.container}>
 			<TextInput
 				style={styles.input}
-				placeholder="Pseudo"
+				placeholder="Code"
 				placeholderTextColor="#fff"
 				onChangeText={setCode}
 			/>
 			<View style={styles.btnSignUp}>
 				<TouchableOpacity style={styles.button} onPress={sendCode}>
-					<Text style={styles.buttonText}>Créez votre compte</Text>
+					<Text style={styles.buttonText}>Vérifiez votre compte</Text>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>

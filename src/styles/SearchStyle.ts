@@ -5,13 +5,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#0A1E38",
 		margin: 0,
-		padding: 10
+		padding: 0,
+		paddingTop: 20
 	},
 	topSection: {
-		width: "100%",
+		marginHorizontal: 10,
+		width: "auto",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginVertical: 10,
+		marginBottom: 10,
 		backgroundColor: "#fff",
 		borderWidth: 1,
 		borderRadius: 8
@@ -21,7 +23,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 20,
 		marginRight: 5,
 		height: 40,
-		width: "75%"
+		width: "100%"
 	},
 	BtnSearch: {
 		width: "25%"
@@ -30,7 +32,52 @@ const styles = StyleSheet.create({
 		color: "#000",
 		margin: "auto"
 	},
+
+	searchInputContainer: {
+		flex: 1,
+		position: "relative"
+	},
+	suggestionsContainer: {
+		position: "absolute",
+		top: "100%",
+		left: 0,
+		right: 0,
+		backgroundColor: "#1a1a1a",
+		borderRadius: 8,
+		marginTop: 4,
+		maxHeight: 300,
+		zIndex: 1000,
+		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84
+	},
+	suggestionItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		padding: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: "#333"
+	},
+	suggestionImage: {
+		width: 40,
+		height: 60,
+		borderRadius: 4,
+		marginRight: 12
+	},
+	suggestionText: {
+		flex: 1,
+		color: "#fff",
+		fontSize: 14
+	},
+	suggestionLoadingContainer: {
+		padding: 20,
+		alignItems: "center"
+	},
+
 	filterSection: {
+		margin: 10,
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
@@ -68,33 +115,42 @@ const styles = StyleSheet.create({
 		width: "100%"
 	},
 	viewResult: {
-		height: 175
+		height: 175,
+		width: "100%",
+		marginHorizontal: 20,
+		marginVertical: 10
 	},
 	resultatInfo: {
 		flex: 1,
-		flexDirection: "row",
-		height: 100
+		flexDirection: "row"
 	},
 	image: {
-		width: "30%",
+		aspectRatio: 2 / 3,
 		borderRadius: 10,
 		backgroundColor: "#313131"
 	},
 	resultInfo: {
-		width: "70%",
-		marginLeft: "5%"
+		width: "60%",
+		marginLeft: "5%",
+		display: "flex",
+		alignContent: "flex-start",
+		alignItems: "flex-start"
 	},
 	resultTitle: {
-		flex: 1,
 		color: "#EBDDFF",
 		fontWeight: "bold",
-		fontSize: 20,
+		fontSize: 25,
 		flexWrap: "wrap",
-		width: "90%"
+		width: "100%"
 	},
-	resultYear: {
+	resultDetails: {
 		color: "#fff",
 		fontSize: 14
+	},
+	resultDetailsOverview: {
+		color: "#fff",
+		fontSize: 14,
+		marginTop: 5
 	},
 	avis: {
 		color: "#fff"
@@ -111,6 +167,7 @@ const styles = StyleSheet.create({
 		fontSize: 30
 	},
 	sectionTitle: {
+		marginHorizontal: 20,
 		fontSize: 24,
 		color: "#fff",
 		marginVertical: 10,
@@ -210,6 +267,41 @@ const styles = StyleSheet.create({
 		top: 0,
 		zIndex: 1,
 		backgroundColor: "#0A1E38"
+	},
+	actorsGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		paddingHorizontal: 10,
+		justifyContent: "space-between"
+	},
+	actorGridItem: {
+		width: "48%",
+		marginBottom: 15
+	},
+	actorCard: {
+		alignItems: "center",
+		backgroundColor: "#0F1C2E",
+		borderRadius: 10,
+		padding: 8
+	},
+	actorImage: {
+		width: "100%",
+		aspectRatio: 2 / 3,
+		borderRadius: 8,
+		backgroundColor: "#313131",
+		marginBottom: 6
+	},
+	actorName: {
+		color: "#FFFFFF",
+		fontWeight: "bold",
+		fontSize: 14,
+		textAlign: "center",
+		width: "100%"
+	},
+	actorDepartment: {
+		color: "#aaa",
+		fontSize: 12,
+		textAlign: "center"
 	}
 });
 

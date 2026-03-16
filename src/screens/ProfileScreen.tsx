@@ -27,6 +27,11 @@ import {
 import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
 
+interface UserProfile {
+	username: string;
+	[key: string]: any;
+}
+
 export default function Index() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [playlistTitle, setPlaylistTitle] = useState("");
@@ -34,7 +39,7 @@ export default function Index() {
 	const [totalMovies, setTotalMovies] = useState(0);
 	const [totalRuntime, setTotalRuntime] = useState(0);
 
-	const [profileData, setProfileData] = useState(null);
+	const [profileData, setProfileData] = useState<UserProfile | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const currentUser = useSessionStore((state: any) => state.user);

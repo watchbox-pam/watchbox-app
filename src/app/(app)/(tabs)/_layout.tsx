@@ -4,7 +4,7 @@ import { View } from "react-native";
 import useSessionStore from "@/src/zustand/sessionStore";
 
 export default function TabLayout() {
-	const isLoggedIn = useSessionStore((state) => state.isLoggedIn);
+	const isLoggedIn = useSessionStore((state: any) => state.isLoggedIn);
 
 	if (!isLoggedIn) {
 		return <Redirect href="/base" />;
@@ -13,7 +13,7 @@ export default function TabLayout() {
 	return (
 		<View style={{ flex: 1, backgroundColor: "#0A1E38" }}>
 			<Tabs
-				backBehavior={"history"}
+				backBehavior={"fullHistory"}
 				screenOptions={{
 					tabBarActiveTintColor: "#AC2821",
 					tabBarInactiveTintColor: "#F5EFF7",
@@ -21,7 +21,7 @@ export default function TabLayout() {
 						backgroundColor: "#313131",
 						borderTopEndRadius: 50,
 						borderTopStartRadius: 50,
-						height: 80,
+						height: 83,
 						paddingTop: 10,
 						paddingRight: 20,
 						paddingLeft: 20,
@@ -86,8 +86,22 @@ export default function TabLayout() {
 					}}
 				/>
 				<Tabs.Screen
+					name="calendar"
+					options={{
+						title: "Calendar",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="calendar-today"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
 					name="profile"
 					options={{
+						href: null,
 						title: "Profil",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
@@ -145,6 +159,34 @@ export default function TabLayout() {
 					options={{
 						href: null,
 						title: "Params",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="person"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
+					name="movie/[id]"
+					options={{
+						href: null,
+						title: "Movie",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="movie"
+								color={color}
+							/>
+						)
+					}}
+				/>
+				<Tabs.Screen
+					name="person/[id]"
+					options={{
+						href: null,
+						title: "Person",
 						tabBarIcon: ({ color }) => (
 							<MaterialIcons
 								size={28}

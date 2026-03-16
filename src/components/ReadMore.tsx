@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 import StyledText from "./StyledText";
 import styles from "@/src/styles/ReadMoreStyle";
 
-export default function ReadMore({ data }: { data: any }) {
+export default function ReadMore({ data }: { readonly data: any }) {
 	const [showFullBio, setShowFullBio] = useState(false);
 
 	return (

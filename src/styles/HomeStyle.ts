@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
@@ -10,19 +10,6 @@ const styles = StyleSheet.create({
 	contentContainer: {
 		alignItems: "center",
 		paddingVertical: 20
-	},
-	header: {
-		width: "100%",
-		alignItems: "center",
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 25,
-		marginTop: Platform.OS === "ios" ? 30 : 0
-	},
-	TitleHeader: {
-		color: "#ffffff",
-		marginBottom: 20,
-		fontSize: 28
 	},
 	WatchList: {
 		width: "99%",

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { Link } from "expo-router";
 import {
 	View,
@@ -9,6 +9,7 @@ import {
 	ActivityIndicator,
 	RefreshControl
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import StyledText from "./StyledText";
 import styles from "@/src/styles/MovieListStyle";
 
@@ -53,7 +54,7 @@ const MovieList: React.FC<MovieListProps> = ({
 	const renderMovieItem = ({ item }: { item: Movie }) => (
 		<Link
 			href={{
-				pathname: "/movie/[id]",
+				pathname: "/(app)/(tabs)/movie/[id]",
 				params: { id: item.id }
 			}}
 			style={styles.movieCard}>
@@ -92,7 +93,7 @@ const MovieList: React.FC<MovieListProps> = ({
 					]}
 					onPress={onBack}
 					activeOpacity={0.7}>
-					<Text style={styles.backButtonText}>←</Text>
+					<Ionicons name="arrow-back" size={24} color="#ffffff" />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>
 					Films pour: {selectedEmotion?.label || ""}

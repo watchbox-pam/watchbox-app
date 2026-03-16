@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
 		marginRight: 5
 	},
 	tag: {
-		fontSize: 10
+		fontSize: 13
 	}
 });
 

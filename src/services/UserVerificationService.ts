@@ -16,8 +16,15 @@ export async function sendUserVerificationCode(code: string): Promise<boolean> {
 			code: code,
 			token: token
 		});
+		if (result.data) {
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				await SecureStore.deleteItemAsync("verification_code_token");
+			} else {
+				localStorage.removeItem("verification_code_token");
+			}
+		}
 
-		return result.success;
+		return result.data;
 	} catch (error: any) {
 		console.error(error);
 		return false;

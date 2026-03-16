@@ -7,19 +7,23 @@ import {
 	TouchableOpacity,
 	View,
 	ActivityIndicator,
-	RefreshControl
+	RefreshControl,
+	Keyboard
 } from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { searchService } from "@/src/services/SearchService";
 import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
 import { router } from "expo-router";
 import StyledText from "../components/StyledText";
+import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
 import * as SecureStore from "expo-secure-store";
 import { ErrorMessage } from "../components/ErrorMessage";
+import FallbackImage from "../components/FallbackImage";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -30,6 +34,9 @@ export default function SearchScreen() {
 	const [selectedFilter, setSelectedFilter] = useState("all");
 	const [error, setError] = useState(false);
 	const [searchError, setSearchError] = useState(false);
+	const [suggestions, setSuggestions] = useState<(Movie | Person)[]>([]);
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
 	// State variables for providers
 	const [allProviders, setAllProviders] = useState<Provider[]>([]);
@@ -37,10 +44,28 @@ export default function SearchScreen() {
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
 
+	const hasInteracted = useRef(false);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 	}, []);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			if (!hasInteracted.current) return;
+			if (searchTerm.trim().length >= 2) {
+				fetchSuggestions();
+			} else {
+				setSuggestions([]);
+				setShowSuggestions(false);
+			}
+		}, 400);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [searchTerm, selectedFilter]);
 
 	// Available search filters
 	const filters = [
@@ -85,15 +110,82 @@ export default function SearchScreen() {
 		}
 	};
 
+	const fetchSuggestions = async () => {
+		setIsLoadingSuggestions(true);
+		try {
+			let suggestionResults: (Movie | Person)[] = [];
+
+			switch (selectedFilter) {
+				case "films":
+					const movieResults = await searchService.searchMovies(
+						searchTerm,
+						selectedProviders.length > 0
+							? selectedProviders
+							: undefined
+					);
+					if (movieResults.success) {
+						suggestionResults = movieResults.data.slice(0, 5);
+					}
+					break;
+
+				case "actors":
+					const actorResults =
+						await searchService.searchActors(searchTerm);
+					if (actorResults.success) {
+						suggestionResults = actorResults.data.slice(0, 5);
+					}
+					break;
+
+				case "all":
+				default:
+					const allResults = await searchService.searchAll(
+						searchTerm,
+						selectedProviders.length > 0
+							? selectedProviders
+							: undefined
+					);
+					if (allResults.success) {
+						const movies = allResults.data.movies || [];
+						const people = allResults.data.people || [];
+						suggestionResults = [...movies, ...people].slice(0, 5);
+					}
+					break;
+			}
+
+			setSuggestions(suggestionResults);
+			if (hasInteracted.current) {
+				setShowSuggestions(suggestionResults.length > 0);
+			}
+		} catch (error) {
+			console.error("Error fetching suggestions:", error);
+			setSuggestions([]);
+		} finally {
+			setIsLoadingSuggestions(false);
+		}
+	};
+
+	const handleSuggestionSelect = (item: Movie | Person) => {
+		const title = "title" in item ? item.title : item.name;
+		hasInteracted.current = false;
+		setShowSuggestions(false);
+		setSearchTerm(title);
+		Keyboard.dismiss();
+		search(title);
+	};
+
 	// Perform search based on current filter, search term, and selected providers
-	const search = async () => {
-		if (searchTerm.trim()) {
+	const search = async (termOverride?: string) => {
+		const term = termOverride ?? searchTerm;
+		hasInteracted.current = false;
+		if (term.trim()) {
+			setShowSuggestions(false);
+			Keyboard.dismiss();
 			setIsLoading(true);
 			try {
 				switch (selectedFilter) {
 					case "films":
 						const movieResults = await searchService.searchMovies(
-							searchTerm,
+							term,
 							selectedProviders.length > 0
 								? selectedProviders
 								: undefined
@@ -106,7 +198,7 @@ export default function SearchScreen() {
 
 					case "actors":
 						const actorResults =
-							await searchService.searchActors(searchTerm);
+							await searchService.searchActors(term);
 						if (actorResults.success) {
 							setActors(actorResults.data);
 							setMovies([]); // Clear movies when filtering actors
@@ -116,7 +208,7 @@ export default function SearchScreen() {
 					case "all":
 					default:
 						const allResults = await searchService.searchAll(
-							searchTerm,
+							term,
 							selectedProviders.length > 0
 								? selectedProviders
 								: undefined
@@ -179,62 +271,134 @@ export default function SearchScreen() {
 	const renderMovieItem = (item: Movie) => (
 		<View key={item.id} style={styles.viewResult}>
 			<TouchableOpacity
-				onPress={() => router.push(`/movie/${item.id}`)}
+				onPress={() => router.push(`/(app)/(tabs)/movie/${item.id}`)}
 				style={styles.resultatInfo}>
-				<Image
-					source={{
-						uri: item.poster_path
+				<FallbackImage
+					uri={
+						item.poster_path
 							? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
+							: null
+					}
 					style={styles.image}
-					resizeMode="cover"
+					fallbackStyle={{
+						borderWidth: 1,
+						borderColor: "#AC2821",
+						borderRadius: 10,
+						aspectRatio: 2 / 3
+					}}
 				/>
 				<View style={styles.resultInfo}>
 					<Text style={styles.resultTitle} numberOfLines={2}>
 						{item.title}
 					</Text>
-					<Text style={styles.resultYear}>
+					<Text style={styles.resultDetails}>
+						{item.original_title
+							? `${item.original_title}`
+							: "Titre original inconnue"}
+					</Text>
+					<Text style={styles.resultDetails}>
+						{item.runtime
+							? `${item.runtime} min`
+							: "Durée inconnue"}
+					</Text>
+					<Text style={styles.resultDetails}>
 						{item.release_date
 							? new Date(item.release_date).getFullYear()
 							: "N/A"}
 					</Text>
+					<Text
+						style={styles.resultDetailsOverview}
+						numberOfLines={3}
+						ellipsizeMode="tail">
+						{item.overview
+							? `${item.overview}`
+							: "Pas de description disponible."}
+					</Text>
 				</View>
 			</TouchableOpacity>
-			<View style={styles.separator}></View>
 		</View>
 	);
 
 	// Render single actor item
+	// const renderActorItem = (item: Person) => (
+	// 	<View key={item.id} style={styles.viewResult}>
+	// 		<TouchableOpacity
+	// 			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
+	// 			style={styles.resultatInfo}>
+	// 			<Image
+	// 				source={{
+	// 					uri: item.profile_path
+	// 						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
+	// 						: "https://via.placeholder.com/500x750?text=No+Image"
+	// 				}}
+	// 				style={styles.image}
+	// 				resizeMode="cover"
+	// 			/>
+	// 			<View style={styles.resultInfo}>
+	// 				<Text style={styles.resultTitle} numberOfLines={2}>
+	// 					{item.name}
+	// 				</Text>
+	// 				<Text style={styles.resultDetails}>
+	// 					{item.known_for_department || "Actor/Actress"}
+	// 				</Text>
+	// 			</View>
+	// 		</TouchableOpacity>
+	// 	</View>
+	// );
+
 	const renderActorItem = (item: Person) => (
-		<View key={item.id} style={styles.viewResult}>
-			<TouchableOpacity
-				onPress={() => router.push(`/person/${item.id}`)}
-				style={styles.resultatInfo}>
-				<Image
-					source={{
-						uri: item.profile_path
-							? `https://image.tmdb.org/t/p/w500${item.profile_path}`
-							: "https://via.placeholder.com/500x750?text=No+Image"
-					}}
-					style={styles.image}
-					resizeMode="cover"
-				/>
-				<View style={styles.resultInfo}>
-					<Text style={styles.resultTitle} numberOfLines={2}>
-						{item.name}
-					</Text>
-					<Text style={styles.resultYear}>
-						{item.known_for_department || "Actor/Actress"}
-					</Text>
-				</View>
-			</TouchableOpacity>
-			<View style={styles.separator}></View>
-		</View>
+		<TouchableOpacity
+			key={item.id}
+			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
+			style={styles.actorCard}>
+			<FallbackImage
+				uri={
+					item.profile_path
+						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
+						: null
+				}
+				style={styles.actorImage}
+				resizeMode="cover"
+			/>
+			<Text style={styles.actorName} numberOfLines={2}>
+				{item.name}
+			</Text>
+			<Text style={styles.actorDepartment} numberOfLines={1}>
+				{item.known_for_department || "Actor/Actress"}
+			</Text>
+		</TouchableOpacity>
 	);
+	const renderSuggestionItem = (item: Movie | Person) => {
+		const isMovie = "title" in item;
+		const title = isMovie ? (item as Movie).title : (item as Person).name;
+		/* const imagePath = isMovie
+            ? (item as Movie).poster_path
+            : (item as Person).profile_path; */
+
+		return (
+			<TouchableOpacity
+				key={item.id}
+				style={styles.suggestionItem}
+				onPress={() => handleSuggestionSelect(item)}>
+				{/* <Image
+                    source={{
+                        uri: imagePath
+                            ? `https://image.tmdb.org/t/p/w500${imagePath}`
+                            : "https://via.placeholder.com/500x750?text=No+Image"
+                    }}
+                    style={styles.suggestionImage}
+                    resizeMode="cover"
+                /> */}
+				<Text style={styles.suggestionText} numberOfLines={1}>
+					{title}
+				</Text>
+			</TouchableOpacity>
+		);
+	};
 
 	// Update selected filter state
 	const handleFilterSelect = (filterKey: string) => {
+		hasInteracted.current = false;
 		setSelectedFilter(filterKey);
 	};
 
@@ -244,16 +408,50 @@ export default function SearchScreen() {
 
 	return (
 		<View style={styles.container}>
+			<Header title="Recherche" />
 			{/* Search input and button */}
 			<View style={styles.topSection}>
-				<TextInput
-					style={styles.input}
-					onChangeText={setSearchTerm}
-					value={searchTerm}
-					placeholder="Rechercher..."
-					placeholderTextColor="#888"
-				/>
-				<TouchableOpacity onPress={search} style={styles.BtnSearch}>
+				<View style={styles.searchInputContainer}>
+					<TextInput
+						style={styles.input}
+						onChangeText={(text) => {
+							hasInteracted.current = true;
+							setSearchTerm(text);
+						}}
+						value={searchTerm}
+						placeholder="Rechercher..."
+						placeholderTextColor="#888"
+						onSubmitEditing={() => search()}
+						returnKeyType="search"
+						onFocus={() => {
+							if (
+								searchTerm.trim().length > 0 &&
+								suggestions.length > 0
+							) {
+								setShowSuggestions(true);
+							}
+						}}
+					/>
+					{/* Suggestions dropdown */}
+					{showSuggestions && (
+						<View style={styles.suggestionsContainer}>
+							{isLoadingSuggestions ? (
+								<View style={styles.suggestionLoadingContainer}>
+									<ActivityIndicator
+										size="small"
+										color="#fff"
+									/>
+								</View>
+							) : (
+								suggestions.map(renderSuggestionItem)
+							)}
+						</View>
+					)}
+				</View>
+
+				<TouchableOpacity
+					onPress={() => search()}
+					style={styles.BtnSearch}>
 					<Text style={styles.TextSearch}>Rechercher</Text>
 				</TouchableOpacity>
 			</View>
@@ -369,7 +567,7 @@ export default function SearchScreen() {
 				{/* No search term message */}
 				{!searchTerm.trim() && (
 					<StyledText style={styles.NoResult}>
-						Veuillez entrer un terme de recherche
+						Veuillez entrer une recherche
 					</StyledText>
 				)}
 
@@ -391,19 +589,63 @@ export default function SearchScreen() {
 										Films
 									</StyledText>
 								)}
-								{movies.map(renderMovieItem)}
+								{movies.map((movie, index) => (
+									<View key={`movie-${movie.id}`}>
+										{renderMovieItem(movie)}
+										{((index + 1) % 11 === 5 ||
+											(index + 1) % 11 === 0) && (
+											<CadrePublicitaire
+												title="🎬 Streaming Premium"
+												description="Profitez de 30 jours gratuits sur toutes les plateformes"
+												imageUrl="https://via.placeholder.com/150"
+												link="https://example.com"
+											/>
+										)}
+									</View>
+								))}
 							</View>
 						)}
 
-						{actors.length > 0 && (
-							<View>
-								{/* Show section title only if filter is not strictly actors */}
+						{/* {actors.length > 0 && (
+							<View key={`actors-section`}> 
 								{selectedFilter !== "actors" && (
 									<StyledText style={styles.sectionTitle}>
 										Acteurs
 									</StyledText>
 								)}
-								{actors.map(renderActorItem)}
+								{actors.map((actor, index) => (
+									<View key={`actor-${actor.id}`}>
+										{renderActorItem(actor)}
+										{((index + 1) % 11 === 5 ||
+											(index + 1) % 11 === 0) && (
+											<CadrePublicitaire
+												title="🎬 Streaming Premium"
+												description="Profitez de 30 jours gratuits sur toutes les plateformes"
+												imageUrl="https://via.placeholder.com/150"
+												link="https://example.com"
+											/>
+										)}
+									</View>
+								))}
+							</View>
+						)} */}
+
+						{actors.length > 0 && (
+							<View key={`actors-section`}>
+								{selectedFilter !== "actors" && (
+									<StyledText style={styles.sectionTitle}>
+										Acteurs
+									</StyledText>
+								)}
+								<View style={styles.actorsGrid}>
+									{actors.map((actor) => (
+										<View
+											key={`actor-${actor.id}`}
+											style={styles.actorGridItem}>
+											{renderActorItem(actor)}
+										</View>
+									))}
+								</View>
 							</View>
 						)}
 

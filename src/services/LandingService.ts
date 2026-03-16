@@ -11,15 +11,9 @@ export async function checkLogin() {
 		let id: string | null;
 		let identifier: string | null;
 		let token: string | null;
-		let verificationCodeToken: string | null;
 
 		// Retrieve stored data depending on platform
 		if (Platform.OS === "ios" || Platform.OS === "android") {
-			verificationCodeToken = await SecureStore.getItemAsync(
-				"verification_code_token"
-			);
-			if (verificationCodeToken !== null) {
-			}
 			id = await SecureStore.getItemAsync("id");
 			identifier = await SecureStore.getItemAsync("identifier");
 			token = await SecureStore.getItemAsync("token");

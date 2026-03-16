@@ -1,19 +1,9 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-	Image,
-	ScrollView,
-	View,
-	TouchableOpacity,
-	Modal,
-	Button,
-	Text,
-	RefreshControl
-} from "react-native";
+import { Image, ScrollView, View, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
-import { Menu, Provider } from "react-native-paper";
-import { Picker } from "@react-native-picker/picker";
+import { Provider } from "react-native-paper";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";
@@ -147,14 +137,6 @@ export default function MovieScreen() {
 						/>
 					</View>
 					<View style={styles.infoDiv} testID="movie-info">
-						{media?.age_restriction && (
-							<Tag style={styles.tagContainer}>
-								<StyledText style={styles.textTag}>
-									{media?.age_restriction}
-								</StyledText>
-							</Tag>
-						)}
-
 						<StyledText
 							style={styles.title}
 							numberOfLines={2}
@@ -164,18 +146,23 @@ export default function MovieScreen() {
 						</StyledText>
 
 						<StyledText style={styles.text}>
-							{media?.release_date
-								? `${media.release_date} • `
-								: ""}
 							{media?.runtime
 								? convertMinutesToHours(Number(media?.runtime))
-								: "duration inconnue"}
+								: "duration inconnue"}{" "}
+							•
+							{media?.release_date
+								? ` ${new Date(media.release_date).toLocaleDateString("fr-FR")}`
+								: ""}
 						</StyledText>
 
-						{media?.director?.name && (
-							<StyledText style={styles.text}>
-								par {media?.director.name}
-							</StyledText>
+						{media?.age_restriction && (
+							<Tag style={styles.tagAgeContainer}>
+								<StyledText style={styles.textTag}>
+									{media?.age_restriction === "TP"
+										? "Tout public"
+										: `+${media?.age_restriction}`}
+								</StyledText>
+							</Tag>
 						)}
 
 						<TagList

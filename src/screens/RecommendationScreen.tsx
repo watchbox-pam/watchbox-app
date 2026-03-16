@@ -1,17 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-	Animated,
-	StatusBar,
-	SafeAreaView,
-	ScrollView,
-	RefreshControl
-} from "react-native";
+import { Animated, StatusBar, View } from "react-native";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
 import Emotion from "@/src/models/Emotion";
 import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
+import Header from "../components/Header";
+import CadrePublicitaire from "../components/CadrePublicitaire";
 
 interface Movie {
 	id: number;
@@ -196,12 +192,13 @@ export default function RecommendationScreen() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View style={styles.container}>
 			<StatusBar barStyle="light-content" />
 
 			<Animated.View
 				style={[styles.overlayContainer, { opacity: emotionsOpacity }]}
 				pointerEvents={selectedEmotion ? "none" : "auto"}>
+				<Header title="Recommandations" />
 				<EmotionsList
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}
@@ -223,6 +220,6 @@ export default function RecommendationScreen() {
 					onRefresh={onRefresh}
 				/>
 			</Animated.View>
-		</SafeAreaView>
+		</View>
 	);
 }
