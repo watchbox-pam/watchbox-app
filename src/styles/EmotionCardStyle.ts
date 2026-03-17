@@ -5,9 +5,8 @@ const styles = StyleSheet.create({
 		width: "48%",
 		aspectRatio: 1.6,
 		borderRadius: 10,
-		padding: 10,
+		overflow: "hidden",
 		marginBottom: 16,
-		justifyContent: "space-between",
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.3,
@@ -21,18 +20,24 @@ const styles = StyleSheet.create({
 		shadowRadius: 8,
 		elevation: 8
 	},
+	imageBackground: {
+		flex: 1,
+		width: "100%",
+		height: "100%"
+	},
+	image: {
+		borderRadius: 10
+	},
+	gradient: {
+		flex: 1,
+		justifyContent: "flex-end",
+		padding: 10
+	},
 	title: {
 		fontSize: 20,
 		fontWeight: "bold",
 		fontFamily: "Oswald",
-		color: "white",
-		marginBottom: 8
-	},
-	emoji: {
-		fontSize: 60,
-		alignSelf: "flex-end",
-		transform: "rotate(15deg)",
-		opacity: 0.9
+		color: "white"
 	}
 });
 

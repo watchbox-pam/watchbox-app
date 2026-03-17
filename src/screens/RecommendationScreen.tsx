@@ -22,8 +22,9 @@ const emotions: Emotion[] = [
 		value: "romantisme",
 		startAngle: -22.5,
 		endAngle: 22.5,
-		color: "#FF9AAA",
-		emoji: "🩷"
+		image: require("../assets/images/Emotion/titanic.png"),
+		gradient: ["#FF9AAA", "#FF6F91"],
+		color: "#FF6F91"
 	},
 	{
 		id: 2,
@@ -32,7 +33,8 @@ const emotions: Emotion[] = [
 		startAngle: 22.5,
 		endAngle: 67.5,
 		color: "#4CAF50",
-		emoji: "😯"
+		image: require("../assets/images/Emotion/jurassic-park.jpg"),
+		gradient: ["#A8E6CF", "#4CAF50"]
 	},
 	{
 		id: 3,
@@ -40,8 +42,9 @@ const emotions: Emotion[] = [
 		value: "excitation",
 		startAngle: 67.5,
 		endAngle: 112.5,
-		color: "#FF9800",
-		emoji: "🫨"
+		image: require("../assets/images/Emotion/avengers.jpg"),
+		gradient: ["#FFD180", "#FF9800"],
+		color: "#FF9800"
 	},
 	{
 		id: 4,
@@ -49,8 +52,9 @@ const emotions: Emotion[] = [
 		value: "frisson",
 		startAngle: 112.5,
 		endAngle: 157.5,
-		color: "#D32F2F",
-		emoji: "😨"
+		image: require("../assets/images/Emotion/the-shining.png"),
+		gradient: ["#EF9A9A", "#D32F2F"],
+		color: "#D32F2F"
 	},
 	{
 		id: 5,
@@ -58,8 +62,9 @@ const emotions: Emotion[] = [
 		value: "nostalgie",
 		startAngle: 157.5,
 		endAngle: 202.5,
-		color: "#9E9E9E",
-		emoji: "😌"
+		image: require("../assets/images/Emotion/forrest-gump.png"),
+		gradient: ["#E0E0E0", "#9E9E9E"],
+		color: "#9E9E9E"
 	},
 	{
 		id: 6,
@@ -67,8 +72,9 @@ const emotions: Emotion[] = [
 		value: "reflexion",
 		startAngle: 202.5,
 		endAngle: 247.5,
-		color: "#212121",
-		emoji: "🤓"
+		image: require("../assets/images/Emotion/oppenheimer.jpeg"),
+		gradient: ["#616161", "#212121"],
+		color: "#212121"
 	},
 	{
 		id: 7,
@@ -76,8 +82,9 @@ const emotions: Emotion[] = [
 		value: "melancolie",
 		startAngle: 247.5,
 		endAngle: 292.5,
-		color: "#2196F3",
-		emoji: "🥲"
+		image: require("../assets/images/Emotion/up.jpg"),
+		gradient: ["#90CAF9", "#2196F3"],
+		color: "#2196F3"
 	},
 	{
 		id: 8,
@@ -85,8 +92,9 @@ const emotions: Emotion[] = [
 		value: "rire",
 		startAngle: 292.5,
 		endAngle: 337.5,
-		color: "#ffd53b",
-		emoji: "😂"
+		image: require("../assets/images/Emotion/asterix.png"),
+		gradient: ["#FFF176", "#FFD600"],
+		color: "#FFD600"
 	}
 ];
 

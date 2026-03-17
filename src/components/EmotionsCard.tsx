@@ -1,4 +1,5 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, ImageBackground } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import styles from "@/src/styles/EmotionCardStyle";
 import Emotion from "@/src/models/Emotion";
 
@@ -15,15 +16,22 @@ export default function EmotionCard({
 }: EmotionCardProps) {
 	return (
 		<TouchableOpacity
-			style={[
-				styles.card,
-				{ backgroundColor: emotion.color },
-				isSelected && styles.selectedCard
-			]}
+			style={[styles.card, isSelected && styles.selectedCard]}
 			onPress={() => onPress(emotion)}
 			activeOpacity={0.7}>
-			<Text style={styles.emoji}>{emotion.emoji}</Text>
-			<Text style={styles.title}>{emotion.label}</Text>
+			<ImageBackground
+				source={emotion.image}
+				style={styles.imageBackground}
+				imageStyle={styles.image}>
+				<LinearGradient
+					colors={[
+						emotion.gradient[0] + "00",
+						emotion.gradient[1] + "80"
+					]}
+					style={styles.gradient}>
+					<Text style={styles.title}>{emotion.label}</Text>
+				</LinearGradient>
+			</ImageBackground>
 		</TouchableOpacity>
 	);
 }
