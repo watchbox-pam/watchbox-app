@@ -7,7 +7,7 @@ import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 import Header from "../components/Header";
-import CadrePublicitaire from "../components/CadrePublicitaire";
+import useSessionStore from "@/src/zustand/sessionStore";
 
 interface Movie {
 	id: number;
@@ -91,6 +91,8 @@ const emotions: Emotion[] = [
 ];
 
 export default function RecommendationScreen() {
+	// @ts-ignore
+	const { user } = useSessionStore();
 	const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(
 		null
 	);
@@ -100,17 +102,12 @@ export default function RecommendationScreen() {
 	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
 	const [refreshing, setRefreshing] = useState(false);
+
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 	}, []);
 
 	useEffect(() => {
-		/**
-		 * Why this if in useEffect ?
-		 * 1. useEffect is executed when the component is initially mounted (the first time it is rendered), at this point selectedEmotion is null
-		 * 2. The useEffect is also executed after a resetAnimation(), which sets selectedEmotion to null
-		 * 3. Without this condition, you would have useless calls to fetchMoviesByEmotion() with a null value
-		 */
 		if (selectedEmotion) {
 			fetchMoviesByEmotion();
 			animateTransition();
@@ -120,13 +117,7 @@ export default function RecommendationScreen() {
 		}
 	}, [selectedEmotion, refreshing]);
 
-	/**
-	 * 	Animation function for the transition between the list of emotions and the results
-	 */
 	const animateTransition = () => {
-		/**
-		 *  Simultaneous execution of the 2 animations
-		 */
 		Animated.parallel([
 			Animated.timing(emotionsOpacity, {
 				toValue: 0,
@@ -143,9 +134,6 @@ export default function RecommendationScreen() {
 	};
 
 	const resetAnimation = () => {
-		/**
-		 *  Simultaneous execution of the 2 animations
-		 */
 		Animated.parallel([
 			Animated.timing(emotionsOpacity, {
 				toValue: 1,
@@ -164,15 +152,10 @@ export default function RecommendationScreen() {
 		});
 	};
 
-	/**
-	 * Asynchronous function to retrieve films based on the selected emotion
-	 */
 	const fetchMoviesByEmotion = async (): Promise<void> => {
 		if (!selectedEmotion) return;
-
 		setLoading(true);
 		setError(null);
-
 		try {
 			const response = await fetchRecommendations(selectedEmotion.value);
 			if (response.success) {
@@ -187,10 +170,6 @@ export default function RecommendationScreen() {
 		}
 	};
 
-	const handleSelectEmotion = (emotion: Emotion) => {
-		setSelectedEmotion(emotion);
-	};
-
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle="light-content" />
@@ -202,7 +181,7 @@ export default function RecommendationScreen() {
 				<EmotionsList
 					emotions={emotions}
 					selectedEmotion={selectedEmotion}
-					onSelectEmotion={handleSelectEmotion}
+					onSelectEmotion={setSelectedEmotion}
 				/>
 			</Animated.View>
 
@@ -214,6 +193,7 @@ export default function RecommendationScreen() {
 					loading={loading}
 					error={error}
 					selectedEmotion={selectedEmotion}
+					userId={user.id}
 					onRetry={fetchMoviesByEmotion}
 					onBack={resetAnimation}
 					refreshing={refreshing}
