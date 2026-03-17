@@ -7,6 +7,7 @@ import MovieList from "../components/MovieList";
 import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 import Header from "../components/Header";
+import useSessionStore from "@/src/zustand/sessionStore";
 
 interface Movie {
 	id: number;
@@ -98,6 +99,8 @@ const emotions: Emotion[] = [
 ];
 
 export default function RecommendationScreen() {
+	// @ts-ignore
+	const { user } = useSessionStore();
 	const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(
 		null
 	);
@@ -107,6 +110,7 @@ export default function RecommendationScreen() {
 	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
 	const [refreshing, setRefreshing] = useState(false);
+
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 	}, []);
@@ -221,6 +225,7 @@ export default function RecommendationScreen() {
 					loading={loading}
 					error={error}
 					selectedEmotion={selectedEmotion}
+					userId={user.id}
 					onRetry={fetchMoviesByEmotion}
 					onBack={resetAnimation}
 					refreshing={refreshing}
