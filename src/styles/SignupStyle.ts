@@ -47,6 +47,19 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontWeight: "bold",
 		fontSize: 17
+	},
+	linkContainer: {
+		marginTop: 15,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	linkText: {
+		color: "#fff"
+	},
+	linkRedirection: {
+		fontWeight: "bold",
+		color: "#AC2128",
+		textDecorationLine: "underline"
 	}
 });
 
