@@ -1,6 +1,5 @@
 import React, { FC, memo, useEffect } from "react";
-import { View, Text, Dimensions, Image } from "react-native";
-//import FallBackImage from "../components/FallbackImage";
+import { Text, Dimensions, Image } from "react-native";
 import Animated, {
 	Easing,
 	Extrapolation,
@@ -32,10 +31,8 @@ interface SwipeCardViewProps {
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const ROTATION_RANGE = 15;
 
-const getPosterUri = (poster_path: string | null): string => {
-	if (!poster_path) {
-		//return <FallbackImage>;
-	}
+const getPosterUri = (poster_path: string | null): string | null => {
+	if (!poster_path) return null;
 	if (poster_path.startsWith("http")) return poster_path;
 	return `https://image.tmdb.org/t/p/w500${poster_path}`;
 };
@@ -153,19 +150,19 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 					<Animated.View
 						style={[styles.label, styles.likeLabel, likeStyle]}>
 						<Text style={[styles.labelText, styles.likeLabelText]}>
-							LIKE
+							J'AIME
 						</Text>
 					</Animated.View>
 					<Animated.View
 						style={[styles.label, styles.nopeLabel, nopeStyle]}>
 						<Text style={[styles.labelText, styles.nopeLabelText]}>
-							NOPE
+							J'AIME PAS
 						</Text>
 					</Animated.View>
 					<Animated.View
 						style={[styles.label, styles.skipLabel, skipStyle]}>
 						<Text style={[styles.labelText, styles.skipLabelText]}>
-							UNSEE
+							PAS VU
 						</Text>
 					</Animated.View>
 				</>

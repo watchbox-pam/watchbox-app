@@ -236,24 +236,25 @@ export default function SwipeScreen() {
 							<View style={styles.endText}>
 								<Text style={styles.btnIconEndStats}>
 									<Ionicons
-										name="heart"
+										name="close"
 										size={50}
-										color="#22c55e"
+										color="#ef4444"
 									/>
 								</Text>
 								<Text
 									style={[
 										styles.btnLabelEndStats,
-										{ color: "#22c55e" }
+										{ color: "#ef4444" }
 									]}>
-									LIKE
+									J'AIME PAS
 								</Text>
 								<Text
 									style={[
 										styles.LabelEndStats,
-										{ color: "#22c55e" }
+										,
+										{ color: "#ef4444" }
 									]}>
-									{likedCount}
+									{dislikedCount}
 								</Text>
 							</View>
 							<View style={styles.endText}>
@@ -269,7 +270,7 @@ export default function SwipeScreen() {
 										styles.btnLabelEndStats,
 										{ color: "#fbbf24" }
 									]}>
-									UNSEE
+									PAS VU
 								</Text>
 								<Text
 									style={[
@@ -282,25 +283,24 @@ export default function SwipeScreen() {
 							<View style={styles.endText}>
 								<Text style={styles.btnIconEndStats}>
 									<Ionicons
-										name="close"
+										name="heart"
 										size={50}
-										color="#ef4444"
+										color="#22c55e"
 									/>
 								</Text>
 								<Text
 									style={[
 										styles.btnLabelEndStats,
-										{ color: "#ef4444" }
+										{ color: "#22c55e" }
 									]}>
-									NOPE
+									J'AIME
 								</Text>
 								<Text
 									style={[
 										styles.LabelEndStats,
-										,
-										{ color: "#ef4444" }
+										{ color: "#22c55e" }
 									]}>
-									{dislikedCount}
+									{likedCount}
 								</Text>
 							</View>
 						</View>
@@ -360,7 +360,7 @@ export default function SwipeScreen() {
 							/>
 						</Text>
 						<Text style={[styles.btnLabel, { color: "#fbbf24" }]}>
-							PAS VUE
+							PAS VU
 						</Text>
 					</TouchableOpacity>
 
