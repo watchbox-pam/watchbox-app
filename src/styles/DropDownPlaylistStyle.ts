@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
 	menuItemContent: {
 		paddingLeft: 0,
 		flexDirection: "row",
-		//alignItems: "center",
 		minWidth: 180
 	},
 	menuItem: {
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
 		alignItems: "center"
 	},
 	modalTitle: {
-		fontSize: 18,
+		fontSize: 40,
 		color: "#FFFFFF",
 		fontWeight: "bold",
 		marginBottom: 10
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
 	},
 	playlistText: {
 		color: "#FFFFFF",
-		fontSize: 16
+		fontSize: 20
 	},
 	selectedItem: {
 		backgroundColor: "#4A90E2",
