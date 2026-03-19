@@ -297,22 +297,9 @@ export default function SearchScreen() {
 							: "Titre original inconnue"}
 					</Text>
 					<Text style={styles.resultDetails}>
-						{item.runtime
-							? `${item.runtime} min`
-							: "Durée inconnue"}
-					</Text>
-					<Text style={styles.resultDetails}>
 						{item.release_date
 							? new Date(item.release_date).getFullYear()
 							: "N/A"}
-					</Text>
-					<Text
-						style={styles.resultDetailsOverview}
-						numberOfLines={3}
-						ellipsizeMode="tail">
-						{item.overview
-							? `${item.overview}`
-							: "Pas de description disponible."}
 					</Text>
 				</View>
 			</TouchableOpacity>
