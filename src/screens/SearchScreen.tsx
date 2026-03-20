@@ -579,7 +579,7 @@ export default function SearchScreen() {
 								{movies.map((movie, index) => (
 									<View key={`movie-${movie.id}`}>
 										{renderMovieItem(movie)}
-										{((index + 1) % 11 === 5 ||
+										{/* {((index + 1) % 11 === 5 ||
 											(index + 1) % 11 === 0) && (
 											<CadrePublicitaire
 												title="🎬 Streaming Premium"
@@ -587,7 +587,7 @@ export default function SearchScreen() {
 												imageUrl="https://via.placeholder.com/150"
 												link="https://example.com"
 											/>
-										)}
+										)} */}
 									</View>
 								))}
 							</View>

@@ -212,7 +212,7 @@ export default function SwipeScreen() {
 	if (loading) {
 		return (
 			<View style={styles.centered}>
-				<ActivityIndicator size="large" color="#FFFFFF" />
+				<ActivityIndicator size="large" color="#0A1E38" />
 				<Text style={styles.loadingText}>Chargement des films...</Text>
 			</View>
 		);

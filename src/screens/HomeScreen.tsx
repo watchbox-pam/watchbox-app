@@ -135,14 +135,14 @@ export default function HomeScreen() {
 							{movies && <CarouselPoster data={movies} />}
 						</View>
 						{(index + 1) % 5 === 0 && <Quizz />}
-						{(index + 1) % 3 === 0 && (
+						{/* {(index + 1) % 3 === 0 && (
 							<CadrePublicitaire
 								title="🎬 Streaming Premium"
 								description="Profitez de 30 jours gratuits sur toutes les plateformes"
 								imageUrl="https://via.placeholder.com/150"
 								link="https://example.com"
 							/>
-						)}
+						)} */}
 					</View>
 				))}
 		</ScrollView>
