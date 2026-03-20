@@ -400,12 +400,12 @@ const CalendarScreen: React.FC = () => {
 				{/* Grille du calendrier */}
 				<View style={styles.daysGrid}>{renderCalendar()}</View>
 			</Animated.View>
-			<CadrePublicitaire
+			{/* <CadrePublicitaire
 				title="🎬 Streaming Premium"
 				description="Profitez de 30 jours gratuits sur toutes les plateformes"
 				imageUrl="https://via.placeholder.com/150"
 				link="https://example.com"
-			/>
+			/> */}
 
 			{/* Section des événements pour le jour sélectionné */}
 			{selectedDate && (

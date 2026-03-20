@@ -8,7 +8,8 @@ import {
 	FlatList,
 	Alert,
 	Share,
-	ActivityIndicator
+	ActivityIndicator,
+	Dimensions
 } from "react-native";
 import { Menu, IconButton } from "react-native-paper";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
+import MovieScreen from "@/src/screens/MovieScreen";
 
 const DropDownPlaylist = ({
 	movieId
@@ -41,10 +43,20 @@ const DropDownPlaylist = ({
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	const openMenu = () => {
-		setVisible(true);
-	};
+	const MENU_WIDTH = 220; // Largeur approximative du menu, à ajuster selon le style
+	const MENU_HEIGHT = 220; // Largeur approximative du menu, à ajuster selon le style
+	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
 
+	const openMenu = () => {
+		const screenWidth = Dimensions.get("window").width;
+		buttonRef.current?.measure(() => {
+			setMenuPosition({
+				x: screenWidth - MENU_WIDTH + 40, // Ajuster la position horizontale pour que le menu soit aligné à droite
+				y: screenWidth - MENU_HEIGHT - 140 // Ajuster la position verticale pour que le menu soit visible
+			}); // Positionner le menu juste en dessous du bouton
+			setVisible(true);
+		});
+	};
 	const closeMenu = () => {
 		setVisible(false);
 	};
@@ -69,22 +81,23 @@ const DropDownPlaylist = ({
 	};
 
 	const onShare = async () => {
-		// try {
-		// 	const shareMessage = movieTitle
-		// 		? `Je te recommande de regarder "${movieTitle}" sur WatchBox!`
-		// 		: "Découvre ce film sur WatchBox!";
-		// 	const result = await Share.share({
-		// 		message: shareMessage
-		// 		//  + `\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
-		// 	});
-		// 	if (result.action === Share.sharedAction) {
-		// 		// Partage réussi
-		// 	} else if (result.action === Share.dismissedAction) {
-		// 		// Partage annulé
-		// 	}
-		// } catch (error: any) {
-		// 	Alert.alert("Erreur", error.message);
-		// }
+		try {
+			const shareMessage = movieId
+				? `Je te recommande de regarder "${movieId}" sur WatchBox!`
+				: "Découvre ce film sur WatchBox!";
+			const result = await Share.share({
+				message:
+					shareMessage +
+					`\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
+			});
+			if (result.action === Share.sharedAction) {
+				// Partage réussi
+			} else if (result.action === Share.dismissedAction) {
+				// Partage annulé
+			}
+		} catch (error: any) {
+			Alert.alert("Erreur", error.message);
+		}
 	};
 
 	// Open modal and load playlists for the current user
@@ -154,7 +167,7 @@ const DropDownPlaylist = ({
 			<Menu
 				visible={visible}
 				onDismiss={closeMenu}
-				anchor={{ x: 0, y: 0 }}
+				anchor={menuPosition}
 				contentStyle={styles.menuContent}>
 				<Menu.Item
 					onPress={() => {
@@ -200,7 +213,9 @@ const DropDownPlaylist = ({
 							<ActivityIndicator
 								size="large"
 								color="#FFFFFF"
-								style={{ marginVertical: 20 }}
+								style={{
+									marginVertical: 20
+								}}
 							/>
 						) : (
 							<FlatList
@@ -229,7 +244,10 @@ const DropDownPlaylist = ({
 									</TouchableOpacity>
 								)}
 								ListEmptyComponent={
-									<Text style={{ color: "#FFFFFF" }}>
+									<Text
+										style={{
+											color: "#FFFFFF"
+										}}>
 										Aucune playlist trouvée.
 									</Text>
 								}
