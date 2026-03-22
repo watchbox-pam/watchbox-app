@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.watchbox.watchbox",
+      "sha256_cert_fingerprints": [
+          "D6:82:5D:6E:BA:21:33:5E:19:3C:F4:F4:A6:1A:0B:67:55:28:50:0A:D3:F1:A1:4D:39:EC:92:0C:5E:B7:A8:A9",
+          "CD:3F:F5:7F:22:E0:77:67:84:3C:58:07:62:E4:37:C0:25:67:B6:FC:DA:20:B7:1C:D1:C0:E1:34:01:8E:9D:69"
+      ]
+    }
+  }
+]

@@ -1,0 +1,57 @@
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
+import CommentSection from "../components/CommentSection";
+import styles from "@/src/styles/CommentaryStyle";
+import { Link } from "expo-router";
+import { getReviewsByMedia } from "@/src/services/ReviewService";
+import StyledText from "../components/StyledText";
+
+const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
+	// Controls whether to show only user's comments or all comments
+	const [isMyComments, setIsMyComments] = useState(true);
+	// Stores the list of reviews fetched from the backend
+	const [reviews, setReviews] = useState([]);
+
+	// Toggle between "my comments" and "all comments"
+	// not sure why this is needed, commented out
+	/* const handleSwitch = () => {
+		setIsMyComments((prevState) => !prevState);
+	}; */
+
+	// Fetch reviews for the current media by its ID
+	const fetchReviews = async () => {
+		try {
+			const result = await getReviewsByMedia(parseInt(mediaId));
+			if (result.success) {
+				setReviews(result.data);
+			}
+		} catch (error: any) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchReviews();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	return (
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Text style={styles.CommentTitle}>Commentaires</Text>
+				<Link
+					style={styles.addComment}
+					href={`/(app)/(tabs)/review/${mediaId}`}>
+					Ajouter une review
+				</Link>
+			</View>
+			{reviews.length > 0 ? (
+				<CommentSection isMyComments={isMyComments} reviews={reviews} />
+			) : (
+				<StyledText style={styles.coms}>Aucun commentaire</StyledText>
+			)}
+		</View>
+	);
+};
+
+export default CommentaryScreen;

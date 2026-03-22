@@ -31,8 +31,27 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
 
 app-example
+
+.idea
+.vscode
+
+bun.lockb
+package-lock.json
+yarn.lock
+
+#exceptions
+.swp
+
+android/
+ios/
+
+bun.lock
+*.apk
+*.aab
+*.ipa
