@@ -44,6 +44,7 @@ export default function MovieScreen() {
 			setLoading(true);
 
 			const response = await fetchMovieDetails(+id);
+			console.log("MEDIA DATA:", JSON.stringify(response.data, null, 2));
 			if (response.success && response.data) {
 				setMedia(response.data);
 			} else {
@@ -183,6 +184,7 @@ export default function MovieScreen() {
 						<StyledText>ou regarder ?</StyledText>
 						<CarouselProviders
 							providers={media?.providers}
+							link={media?.providers_link}
 							testID="carousel-providers"
 						/>
 					</View>
@@ -250,7 +252,15 @@ export type MovieProps = {
 	runtime: string;
 	release_date: number;
 	genres: string[];
-	providers: string[];
+	providers:
+		| {
+				provider_id: number;
+				provider_name: string;
+				logo_path: string;
+				display_priority: number;
+		  }[]
+		| null;
+	providers_link: string | null;
 	overview: string;
 	casting: {
 		adult: boolean;
