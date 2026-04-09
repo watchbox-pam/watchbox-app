@@ -15,7 +15,6 @@ export default function ForgotPasswordScreen() {
 
 	const sendPasswordReset = async () => {
 		const result = await sendPasswordResetEmail(email);
-		console.log(result);
 		if (result) {
 			alert(
 				"Un lien de réinitialisation a été envoyé à votre adresse mail"
@@ -23,7 +22,7 @@ export default function ForgotPasswordScreen() {
 			router.replace("/login");
 			return;
 		} else {
-			alert(result);
+			alert("Une erreur est survenue");
 		}
 	};
 

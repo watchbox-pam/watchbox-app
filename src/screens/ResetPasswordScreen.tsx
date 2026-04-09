@@ -8,8 +8,10 @@ import {
 import styles from "@/src/styles/UserVerificationStyle";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { checkPasswordResetTokenValidity } from "@/src/services/PasswordResetService";
-import UserSignup from "@/src/models/UserSignup";
+import {
+	checkPasswordResetTokenValidity,
+	resetUserPassword
+} from "@/src/services/PasswordResetService";
 import UserPassword from "@/src/models/UserPassword";
 
 export default function ResetPasswordScreen() {
@@ -17,6 +19,7 @@ export default function ResetPasswordScreen() {
 
 	const [password, setPassword] = useState<string>("");
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
+	const [userId, setUserId] = useState<string>("");
 
 	const verifyUserToken = async () => {
 		if (token === "") {
@@ -24,22 +27,27 @@ export default function ResetPasswordScreen() {
 			router.replace("/");
 		}
 		const result = await checkPasswordResetTokenValidity(token);
-		if (!result) {
+		if (!result || result === "") {
 			alert("Ce lien n'est pas valide");
 			router.replace("/");
+		} else {
+			setUserId(result);
 		}
 	};
 
 	const resetPassword = async () => {
 		const passwordtoReset: UserPassword = {
-			token: token,
+			id: userId,
 			password: password,
-			confirmPassword: confirmPassword
+			confirmPassword: confirmPassword,
+			token: token
 		};
-		const result = await resetUserPassword(token);
-		if (!result) {
-			alert("Ce lien n'est pas valide");
+		const result = await resetUserPassword(passwordtoReset);
+		if (result.success) {
+			alert("Votre mot de passe a bien été mis à jour");
 			router.replace("/");
+		} else {
+			alert(result.message);
 		}
 	};
 
@@ -64,9 +72,9 @@ export default function ResetPasswordScreen() {
 				onChangeText={setConfirmPassword}
 			/>
 			<View style={styles.btnSignUp}>
-				<TouchableOpacity style={styles.button} onPress={sendCode}>
+				<TouchableOpacity style={styles.button} onPress={resetPassword}>
 					<Text style={styles.buttonText}>
-						Réinitialiser votre compte
+						Réinitialiser votre mot de passe
 					</Text>
 				</TouchableOpacity>
 			</View>

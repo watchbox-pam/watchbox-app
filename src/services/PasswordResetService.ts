@@ -7,7 +7,7 @@ export async function sendPasswordResetEmail(email: string): Promise<boolean> {
 		const result = await ApiHelper.post(`/users/forgot-password`, {
 			email
 		});
-		return result.data;
+		return result.success;
 	} catch (error: any) {
 		console.error(error);
 		return false;
@@ -56,7 +56,8 @@ export async function resetUserPassword(data: UserPassword) {
 
 		// Prepare registration data and call API
 		const result = await ApiHelper.post("/users/reset-password", {
-			id: data.id,
+			user_id: data.id,
+			token: data.token,
 			password: hashedPassword,
 			salt: salt
 		});
