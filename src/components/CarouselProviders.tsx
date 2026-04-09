@@ -5,6 +5,7 @@ import {
 	Image,
 	TouchableOpacity,
 	Linking,
+	Platform,
 	Alert
 } from "react-native";
 import styles from "@/src/styles/CarouselProvidersStyle";
@@ -20,13 +21,24 @@ export default function CarouselProviders({
 	tagStyle?: any;
 	testID?: string;
 }) {
-	const handlePress = async () => {
-		if (!link) return;
-		const supported = await Linking.canOpenURL(link);
-		if (supported) {
-			await Linking.openURL(link);
+	const handlePress = async (item: any) => {
+		const deeplink =
+			Platform.OS === "ios" ? item.deeplink_ios : item.deeplink_android;
+		if (deeplink) {
+			const canOpen = await Linking.canOpenURL(deeplink);
+			if (canOpen) {
+				await Linking.openURL(deeplink);
+				return;
+			}
+		}
+		const fallback = item.web_url ?? link;
+		if (fallback) {
+			await Linking.openURL(fallback);
 		} else {
-			Alert.alert("Lien non supporté", "Impossible d'ouvrir le lien.");
+			Alert.alert(
+				"Lien indisponible",
+				"Impossible d'ouvrir cette plateforme"
+			);
 		}
 	};
 	return (
@@ -38,9 +50,8 @@ export default function CarouselProviders({
 				testID={testID ?? "carousel-providers"}
 				renderItem={({ item }) => (
 					<TouchableOpacity
-						onPress={handlePress}
-						activeOpacity={link ? 0.7 : 1}
-						disabled={!link}>
+						onPress={() => handlePress(item)}
+						activeOpacity={0.7}>
 						<View style={styles.imageContainer}>
 							<Image
 								source={{
