@@ -65,36 +65,55 @@ const styles = StyleSheet.create({
 	columnWrapper: {
 		justifyContent: "space-between"
 	},
-	movieCard: {
-		flex: 1,
-		margin: 8,
-		borderRadius: 8,
-		overflow: "hidden",
-		maxWidth: "47%"
+	// Carte film
+	card: {
+		width: "48%",
+		marginVertical: 6,
+		borderRadius: 10,
+		overflow: "hidden"
 	},
-	imagePosterContainer: {
-		width: "100%",
-		aspectRatio: 2 / 3,
-		overflow: "hidden",
-		borderRadius: 8
+	// Overlay like/dislike
+	overlay: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: "rgba(0,0,0,0.85)",
+		alignItems: "center",
+		justifyContent: "center"
 	},
+	feedbackButtons: {
+		flexDirection: "row",
+		gap: 20
+	},
+	feedbackBtn: {
+		width: 55,
+		height: 55,
+		borderRadius: 28,
+		alignItems: "center",
+		justifyContent: "center"
+	},
+	dislikeBtn: {
+		backgroundColor: "#ff4444"
+	},
+	feedbackConfirm: {
+		alignItems: "center",
+		justifyContent: "center"
+	},
+	// Poster
 	poster: {
+		width: "100%",
 		aspectRatio: 2 / 3
 	},
 	noPoster: {
 		width: "100%",
-		height: 200,
+		aspectRatio: 2 / 3,
 		backgroundColor: "#0f2c53",
 		justifyContent: "center",
 		alignItems: "center"
 	},
 	noPosterText: {
-		color: "#ffffff"
-	},
-	movieTitle: {
-		padding: 10,
-		fontSize: 14,
-		fontWeight: "600",
 		color: "#ffffff"
 	}
 });

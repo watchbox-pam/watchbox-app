@@ -13,6 +13,7 @@ import {
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { postFeedback } from "@/src/services/ReviewService";
+import styles from "@/src/styles/MovieListStyle";
 
 interface Movie {
 	id: number;
@@ -37,15 +38,7 @@ interface MovieListProps {
 	onBack: () => void;
 	refreshing: boolean;
 	onRefresh: () => void;
-	/**
-	 * Called when a movie is removed from the list (parent state update)
-	 * This ensures the parent state is synchronized
-	 */
 	onMovieRemoved: (movieId: number) => void;
-	/**
-	 * Called after a movie has been rated (like/dislike),
-	 * typically used to refetch recommendations and keep 10 movies.
-	 */
 	onRated: () => void;
 }
 
@@ -92,16 +85,9 @@ const MovieItem = ({
 		setFeedbackSent(type);
 
 		try {
-			// 1) Persist feedback so backend can learn & exclude (history)
 			await postFeedback(item.id, userId, rating);
-
-			// 2) Remove from parent state immediately (sync the count)
 			onMovieRemoved(item.id);
-
-			// 3) Remove locally for animation
 			onRemove(item.id);
-
-			// 4) Hide overlay then refetch to fill back to 10 movies
 			setTimeout(() => {
 				onHide();
 				onRated();
@@ -113,7 +99,7 @@ const MovieItem = ({
 	};
 
 	return (
-		<View style={cardStyles.card}>
+		<View style={styles.card}>
 			<Link
 				href={{
 					pathname: "/(app)/(tabs)/movie/[id]",
@@ -136,9 +122,6 @@ const MovieItem = ({
 							<Text style={styles.noPosterText}>Pas d'image</Text>
 						</View>
 					)}
-					<Text style={styles.movieTitle} numberOfLines={2}>
-						{item.title}
-					</Text>
 				</TouchableOpacity>
 			</Link>
 
@@ -148,13 +131,13 @@ const MovieItem = ({
 					activeOpacity={1}
 					onPress={onHide}>
 					<Animated.View
-						style={[cardStyles.overlay, { opacity: fadeAnim }]}>
+						style={[styles.overlay, { opacity: fadeAnim }]}>
 						{feedbackSent === null ? (
-							<View style={cardStyles.feedbackButtons}>
+							<View style={styles.feedbackButtons}>
 								<TouchableOpacity
 									style={[
-										cardStyles.feedbackBtn,
-										cardStyles.dislikeBtn
+										styles.feedbackBtn,
+										styles.dislikeBtn
 									]}
 									onPress={() => handleFeedback("dislike")}>
 									<Ionicons
@@ -163,10 +146,9 @@ const MovieItem = ({
 										color="#fff"
 									/>
 								</TouchableOpacity>
-
 								<TouchableOpacity
 									style={[
-										cardStyles.feedbackBtn,
+										styles.feedbackBtn,
 										{ backgroundColor: emotionColor }
 									]}
 									onPress={() => handleFeedback("like")}>
@@ -178,7 +160,7 @@ const MovieItem = ({
 								</TouchableOpacity>
 							</View>
 						) : (
-							<View style={cardStyles.feedbackConfirm}>
+							<View style={styles.feedbackConfirm}>
 								<Ionicons
 									name={
 										feedbackSent === "like"
@@ -302,89 +284,5 @@ const MovieList: React.FC<MovieListProps> = ({
 		</View>
 	);
 };
-
-const cardStyles = StyleSheet.create({
-	card: {
-		width: "48%",
-		marginVertical: 6,
-		borderRadius: 10,
-		overflow: "hidden",
-		backgroundColor: "#1a1a1a",
-		minHeight: 250
-	},
-	overlay: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: "rgba(0,0,0,0.85)",
-		alignItems: "center",
-		justifyContent: "center"
-	},
-	feedbackButtons: { flexDirection: "row", gap: 20 },
-	feedbackBtn: {
-		width: 55,
-		height: 55,
-		borderRadius: 28,
-		alignItems: "center",
-		justifyContent: "center"
-	},
-	dislikeBtn: { backgroundColor: "#ff4444" },
-	feedbackConfirm: { alignItems: "center", justifyContent: "center" }
-});
-
-const styles = StyleSheet.create({
-	container: { flex: 1 },
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		backgroundColor: "#0A1E38"
-	},
-	headerTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		color: "#fff",
-		flex: 1,
-		textAlign: "center",
-		marginRight: 44
-	},
-	backButton: {
-		width: 44,
-		height: 44,
-		borderRadius: 30,
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	moviesList: { padding: 10, paddingBottom: 60 },
-	columnWrapper: { justifyContent: "space-between" },
-	poster: { width: "100%", aspectRatio: 2 / 3 },
-	noPoster: {
-		width: "100%",
-		height: 200,
-		backgroundColor: "#0f2c53",
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	noPosterText: { color: "#fff" },
-	movieTitle: { padding: 10, fontSize: 14, fontWeight: "600", color: "#fff" },
-	loadingContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	loadingText: { marginTop: 10, color: "#fff" },
-	errorContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 20
-	},
-	errorText: { color: "#ff6b6b", textAlign: "center", marginBottom: 20 },
-	retryButton: {
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		borderRadius: 4
-	},
-	retryButtonText: { color: "#fff", fontWeight: "600" }
-});
 
 export default MovieList;
