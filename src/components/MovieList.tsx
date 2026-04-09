@@ -37,6 +37,16 @@ interface MovieListProps {
 	onBack: () => void;
 	refreshing: boolean;
 	onRefresh: () => void;
+	/**
+	 * Called when a movie is removed from the list (parent state update)
+	 * This ensures the parent state is synchronized
+	 */
+	onMovieRemoved: (movieId: number) => void;
+	/**
+	 * Called after a movie has been rated (like/dislike),
+	 * typically used to refetch recommendations and keep 10 movies.
+	 */
+	onRated: () => void;
 }
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -45,7 +55,9 @@ const MovieItem = ({
 	item,
 	emotionColor,
 	userId,
-	onDislike,
+	onRemove,
+	onMovieRemoved,
+	onRated,
 	isVisible,
 	onShow,
 	onHide
@@ -53,7 +65,9 @@ const MovieItem = ({
 	item: Movie;
 	emotionColor: string;
 	userId: string;
-	onDislike: (movieId: number) => void;
+	onRemove: (movieId: number) => void;
+	onMovieRemoved: (movieId: number) => void;
+	onRated: () => void;
 	isVisible: boolean;
 	onShow: () => void;
 	onHide: () => void;
@@ -71,22 +85,27 @@ const MovieItem = ({
 		}).start(() => {
 			if (!isVisible) setFeedbackSent(null);
 		});
-	}, [isVisible]);
+	}, [isVisible, fadeAnim]);
 
 	const handleFeedback = async (type: "like" | "dislike") => {
 		const rating = type === "like" ? 8 : 2;
 		setFeedbackSent(type);
 
 		try {
+			// 1) Persist feedback so backend can learn & exclude (history)
 			await postFeedback(item.id, userId, rating);
-			if (type === "dislike") {
-				setTimeout(() => {
-					onHide();
-					onDislike(item.id);
-				}, 500);
-			} else {
-				setTimeout(onHide, 800);
-			}
+
+			// 2) Remove from parent state immediately (sync the count)
+			onMovieRemoved(item.id);
+
+			// 3) Remove locally for animation
+			onRemove(item.id);
+
+			// 4) Hide overlay then refetch to fill back to 10 movies
+			setTimeout(() => {
+				onHide();
+				onRated();
+			}, 600);
 		} catch (err) {
 			console.error("Erreur feedback:", err);
 			onHide();
@@ -191,7 +210,9 @@ const MovieList: React.FC<MovieListProps> = ({
 	onRetry,
 	onBack,
 	refreshing,
-	onRefresh
+	onRefresh,
+	onMovieRemoved,
+	onRated
 }) => {
 	const [visibleMovies, setVisibleMovies] = useState<Movie[]>(movies);
 	const [activeMovieId, setActiveMovieId] = useState<number | null>(null);
@@ -200,7 +221,7 @@ const MovieList: React.FC<MovieListProps> = ({
 		setVisibleMovies(movies);
 	}, [movies]);
 
-	const handleDislike = (movieId: number) => {
+	const handleRemove = (movieId: number) => {
 		setVisibleMovies((prev) => prev.filter((m) => m.id !== movieId));
 		if (activeMovieId === movieId) setActiveMovieId(null);
 	};
@@ -210,7 +231,9 @@ const MovieList: React.FC<MovieListProps> = ({
 			item={item}
 			emotionColor={selectedEmotion?.color ?? "#ffffff"}
 			userId={userId}
-			onDislike={handleDislike}
+			onRemove={handleRemove}
+			onMovieRemoved={onMovieRemoved}
+			onRated={onRated}
 			isVisible={activeMovieId === item.id}
 			onShow={() => setActiveMovieId(item.id)}
 			onHide={() => setActiveMovieId(null)}

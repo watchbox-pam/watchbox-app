@@ -99,8 +99,6 @@ const emotions: Emotion[] = [
 ];
 
 export default function RecommendationScreen() {
-	// @ts-ignore
-	const { user } = useSessionStore();
 	const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(
 		null
 	);
@@ -110,6 +108,9 @@ export default function RecommendationScreen() {
 	const [emotionsOpacity] = useState(new Animated.Value(1));
 	const [resultsOpacity] = useState(new Animated.Value(0));
 	const [refreshing, setRefreshing] = useState(false);
+
+	const currentUser = useSessionStore((state: any) => state.user);
+	const userId: string = currentUser?.id;
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
@@ -127,8 +128,10 @@ export default function RecommendationScreen() {
 			animateTransition();
 		}
 		if (refreshing) {
+			if (selectedEmotion) fetchMoviesByEmotion();
 			setRefreshing(false);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEmotion, refreshing]);
 
 	/**
@@ -198,6 +201,46 @@ export default function RecommendationScreen() {
 		}
 	};
 
+	/**
+	 * Remove a movie from the list (called when user likes/dislikes)
+	 * FIX: This ensures the parent state is updated, not just the child local state
+	 */
+	const removeMovie = (movieId: number): void => {
+		setMovies((prev) => prev.filter((m) => m.id !== movieId));
+	};
+
+	/**
+	 * Fetch one more movie to replace the one that was just rated
+	 * FIX: Now the count is accurate because movies is updated immediately via removeMovie()
+	 */
+	const fetchOneMoreMovie = async (): Promise<void> => {
+		if (!selectedEmotion) return;
+
+		const excludeIds = movies.map((m) => m.id);
+
+		try {
+			const response = await fetchRecommendations(selectedEmotion.value, {
+				limit: 1,
+				excludeIds
+			});
+
+			if (
+				response.success &&
+				Array.isArray(response.data) &&
+				response.data.length > 0
+			) {
+				const next: Movie = response.data[0];
+
+				setMovies((prev) => {
+					// Only add if we haven't reached 10 movies and it's not a duplicate
+					if (prev.length >= 10) return prev;
+					if (prev.some((m) => m.id === next.id)) return prev;
+					return [...prev, next];
+				});
+			}
+		} catch {}
+	};
+
 	const handleSelectEmotion = (emotion: Emotion) => {
 		setSelectedEmotion(emotion);
 	};
@@ -225,11 +268,13 @@ export default function RecommendationScreen() {
 					loading={loading}
 					error={error}
 					selectedEmotion={selectedEmotion}
-					userId={user.id}
+					userId={userId}
 					onRetry={fetchMoviesByEmotion}
 					onBack={resetAnimation}
 					refreshing={refreshing}
 					onRefresh={onRefresh}
+					onMovieRemoved={removeMovie}
+					onRated={fetchOneMoreMovie}
 				/>
 			</Animated.View>
 		</View>
