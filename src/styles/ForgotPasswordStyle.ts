@@ -25,31 +25,23 @@ const styles = StyleSheet.create({
 		letterSpacing: 1,
 		color: "rgba(255,255,255,0.4)",
 		textTransform: "uppercase",
-		marginBottom: 12
-	},
-	codeRow: {
-		flexDirection: "row",
-		gap: 10,
 		marginBottom: 8
 	},
-	codeBox: {
-		flex: 1,
-		aspectRatio: 1,
+	inputWrapper: {
+		flexDirection: "row",
+		alignItems: "center",
 		backgroundColor: "rgba(255,255,255,0.06)",
 		borderWidth: 1,
 		borderColor: "rgba(255,255,255,0.1)",
-		borderRadius: 10,
-		alignItems: "center",
-		justifyContent: "center"
+		borderRadius: 12,
+		paddingHorizontal: 14,
+		height: 52,
+		gap: 10
 	},
-	codeBoxActive: {
-		borderColor: "#AC2128",
-		backgroundColor: "rgba(172,33,40,0.1)"
-	},
-	codeText: {
+	input: {
+		flex: 1,
 		color: "#fff",
-		fontSize: 20,
-		fontWeight: "500"
+		fontSize: 15
 	},
 	button: {
 		backgroundColor: "#AC2128",
