@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
 		flexWrap: "wrap"
 	},
 	personName: {
-		fontSize: 40,
+		fontSize: 30,
 		fontWeight: "bold",
 		textAlign: "center",
 		width: "100%"

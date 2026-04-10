@@ -38,7 +38,7 @@ const RadialMenu = () => {
 	// Icon names (intended to be emotion labels or icons)
 	const icons = [
 		"Frisson",
-		"Excitation",
+		"Adrénaline",
 		"Émerveillement",
 		"Rire",
 		"Romantisme",

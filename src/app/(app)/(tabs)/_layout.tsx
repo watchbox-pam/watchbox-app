@@ -196,6 +196,20 @@ export default function TabLayout() {
 						)
 					}}
 				/>
+				<Tabs.Screen
+					name="review/[id]"
+					options={{
+						href: null,
+						title: "Review",
+						tabBarIcon: ({ color }) => (
+							<MaterialIcons
+								size={28}
+								name="review"
+								color={color}
+							/>
+						)
+					}}
+				/>
 			</Tabs>
 		</View>
 	);

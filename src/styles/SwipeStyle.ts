@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
@@ -11,17 +11,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
+		backgroundColor: "#0A1E38",
 		gap: 30
 	},
 	cardContainer: {
 		flex: 1,
 		width: "100%",
 		alignItems: "center",
-		justifyContent: "center"
+		justifyContent: "center",
+		backgroundColor: "#0A1E38"
 	},
 	loadingText: {
 		marginTop: 16,
-		color: "#9ca3af",
+		color: "#AC2128",
 		fontSize: 15
 	},
 	endTitle: {
