@@ -10,7 +10,7 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import UserSignup from "@/src/models/UserSignup";
 import useSessionStore from "@/src/zustand/sessionStore";
-import { router } from "expo-router";
+import { router, Link } from "expo-router";
 
 export default function SignupScreen() {
 	const [username, setUsername] = useState<string>("");
@@ -106,6 +106,15 @@ export default function SignupScreen() {
 				<TouchableOpacity style={styles.button} onPress={signupUser}>
 					<Text style={styles.buttonText}>Créez votre compte</Text>
 				</TouchableOpacity>
+			</View>
+
+			<View style={styles.linkContainer}>
+				<Text style={styles.linkText}>
+					Vous avez déjà un compte ? &nbsp;
+					<Link href="/login" style={styles.linkRedirection}>
+						Connectez vous
+					</Link>
+				</Text>
 			</View>
 		</View>
 	);
