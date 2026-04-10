@@ -1,10 +1,4 @@
-import {
-	SafeAreaView,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import styles from "@/src/styles/UserVerificationStyle";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -34,25 +28,17 @@ export default function UserVerificationScreen() {
 			</Text>
 
 			<Text style={styles.inputLabel}>Code de vérification</Text>
-			<View style={styles.codeRow}>
-				{Array.from({ length: 6 }).map((_, i) => (
-					<View
-						key={i}
-						style={[
-							styles.codeBox,
-							i < code.length && styles.codeBoxActive
-						]}>
-						<Text style={styles.codeText}>{code[i] ?? "–"}</Text>
-					</View>
-				))}
+			<View style={styles.inputWrapper}>
+				<TextInput
+					style={styles.input}
+					placeholder="123456"
+					placeholderTextColor="rgba(255,255,255,0.25)"
+					keyboardType="number-pad"
+					maxLength={6}
+					onChangeText={setCode}
+					value={code}
+				/>
 			</View>
-
-			<TextInput
-				keyboardType="number-pad"
-				maxLength={6}
-				onChangeText={setCode}
-				style={{ position: "absolute", opacity: 0 }}
-			/>
 
 			<TouchableOpacity style={styles.button} onPress={sendCode}>
 				<Text style={styles.buttonText}>Vérifier mon compte →</Text>

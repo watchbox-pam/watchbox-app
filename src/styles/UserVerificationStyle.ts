@@ -27,6 +27,22 @@ const styles = StyleSheet.create({
 		textTransform: "uppercase",
 		marginBottom: 12
 	},
+	inputWrapper: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: "rgba(255,255,255,0.06)",
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.1)",
+		borderRadius: 12,
+		paddingHorizontal: 14,
+		height: 52,
+		gap: 10
+	},
+	input: {
+		flex: 1,
+		color: "#fff",
+		fontSize: 15
+	},
 	codeRow: {
 		flexDirection: "row",
 		gap: 10,
