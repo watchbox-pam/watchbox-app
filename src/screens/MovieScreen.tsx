@@ -44,7 +44,6 @@ export default function MovieScreen() {
 			setLoading(true);
 
 			const response = await fetchMovieDetails(+id);
-			console.log("MEDIA DATA:", JSON.stringify(response.data, null, 2));
 			if (response.success && response.data) {
 				setMedia(response.data);
 			} else {
