@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
 	View,
 	Image,
@@ -44,144 +44,151 @@ interface MovieListProps {
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-const MovieItem = ({
-	item,
-	emotionColor,
-	userId,
-	onRemove,
-	onMovieRemoved,
-	onRated,
-	isVisible,
-	onShow,
-	onHide
-}: {
-	item: Movie;
-	emotionColor: string;
-	userId: string;
-	onRemove: (movieId: number) => void;
-	onMovieRemoved: (movieId: number) => void;
-	onRated: () => void;
-	isVisible: boolean;
-	onShow: () => void;
-	onHide: () => void;
-}) => {
-	const [feedbackSent, setFeedbackSent] = useState<"like" | "dislike" | null>(
-		null
-	);
-	const fadeAnim = useState(new Animated.Value(0))[0];
+const MovieItem = React.memo(
+	({
+		item,
+		emotionColor,
+		userId,
+		onRemove,
+		onMovieRemoved,
+		onRated,
+		isVisible,
+		onShow,
+		onHide
+	}: {
+		item: Movie;
+		emotionColor: string;
+		userId: string;
+		onRemove: (movieId: number) => void;
+		onMovieRemoved: (movieId: number) => void;
+		onRated: () => void;
+		isVisible: boolean;
+		onShow: () => void;
+		onHide: () => void;
+	}) => {
+		const [feedbackSent, setFeedbackSent] = useState<
+			"like" | "dislike" | null
+		>(null);
+		// Correction : useRef au lieu de useState pour Animated.Value
+		const fadeAnim = useRef(new Animated.Value(0)).current;
 
-	useEffect(() => {
-		Animated.timing(fadeAnim, {
-			toValue: isVisible ? 1 : 0,
-			duration: 200,
-			useNativeDriver: true
-		}).start(() => {
-			if (!isVisible) setFeedbackSent(null);
-		});
-	}, [isVisible, fadeAnim]);
+		useEffect(() => {
+			Animated.timing(fadeAnim, {
+				toValue: isVisible ? 1 : 0,
+				duration: 200,
+				useNativeDriver: true
+			}).start(() => {
+				if (!isVisible) setFeedbackSent(null);
+			});
+		}, [isVisible, fadeAnim]);
 
-	const handleFeedback = async (type: "like" | "dislike") => {
-		const rating = type === "like" ? 8 : 2;
-		setFeedbackSent(type);
+		const handleFeedback = async (type: "like" | "dislike") => {
+			const rating = type === "like" ? 8 : 2;
+			setFeedbackSent(type);
 
-		try {
-			await postFeedback(item.id, userId, rating);
-			onMovieRemoved(item.id);
-			onRemove(item.id);
-			setTimeout(() => {
+			try {
+				await postFeedback(item.id, userId, rating);
+				onMovieRemoved(item.id);
+				onRemove(item.id);
+				setTimeout(() => {
+					onHide();
+					onRated();
+				}, 600);
+			} catch (err) {
+				console.error("Erreur feedback:", err);
 				onHide();
-				onRated();
-			}, 600);
-		} catch (err) {
-			console.error("Erreur feedback:", err);
-			onHide();
-		}
-	};
+			}
+		};
 
-	return (
-		<View style={styles.card}>
-			<Link
-				href={{
-					pathname: "/(app)/(tabs)/movie/[id]",
-					params: { id: item.id }
-				}}
-				asChild>
-				<TouchableOpacity
-					onLongPress={onShow}
-					activeOpacity={0.9}
-					style={{ flex: 1 }}>
-					{item.poster_path ? (
-						<Image
-							source={{
-								uri: `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
-							}}
-							style={styles.poster}
-						/>
-					) : (
-						<View style={styles.noPoster}>
-							<Text style={styles.noPosterText}>Pas d'image</Text>
-						</View>
-					)}
-				</TouchableOpacity>
-			</Link>
-
-			{isVisible && (
-				<TouchableOpacity
-					style={StyleSheet.absoluteFill}
-					activeOpacity={1}
-					onPress={onHide}>
-					<Animated.View
-						style={[styles.overlay, { opacity: fadeAnim }]}>
-						{feedbackSent === null ? (
-							<View style={styles.feedbackButtons}>
-								<TouchableOpacity
-									style={[
-										styles.feedbackBtn,
-										styles.dislikeBtn
-									]}
-									onPress={() => handleFeedback("dislike")}>
-									<Ionicons
-										name="close"
-										size={32}
-										color="#fff"
-									/>
-								</TouchableOpacity>
-								<TouchableOpacity
-									style={[
-										styles.feedbackBtn,
-										{ backgroundColor: emotionColor }
-									]}
-									onPress={() => handleFeedback("like")}>
-									<Ionicons
-										name="heart"
-										size={32}
-										color="#fff"
-									/>
-								</TouchableOpacity>
-							</View>
+		return (
+			<View style={styles.card}>
+				<Link
+					href={{
+						pathname: "/(app)/(tabs)/movie/[id]",
+						params: { id: item.id }
+					}}
+					asChild>
+					<TouchableOpacity
+						onLongPress={onShow}
+						activeOpacity={0.9}
+						style={{ flex: 1 }}>
+						{item.poster_path ? (
+							<Image
+								source={{
+									uri: `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
+								}}
+								style={styles.poster}
+							/>
 						) : (
-							<View style={styles.feedbackConfirm}>
-								<Ionicons
-									name={
-										feedbackSent === "like"
-											? "heart"
-											: "close-circle"
-									}
-									size={56}
-									color={
-										feedbackSent === "like"
-											? emotionColor
-											: "#ff4444"
-									}
-								/>
+							<View style={styles.noPoster}>
+								<Text style={styles.noPosterText}>
+									Pas d'image
+								</Text>
 							</View>
 						)}
-					</Animated.View>
-				</TouchableOpacity>
-			)}
-		</View>
-	);
-};
+					</TouchableOpacity>
+				</Link>
+
+				{isVisible && (
+					<TouchableOpacity
+						style={StyleSheet.absoluteFill}
+						activeOpacity={1}
+						onPress={onHide}>
+						<Animated.View
+							style={[styles.overlay, { opacity: fadeAnim }]}>
+							{feedbackSent === null ? (
+								<View style={styles.feedbackButtons}>
+									<TouchableOpacity
+										style={[
+											styles.feedbackBtn,
+											styles.dislikeBtn
+										]}
+										onPress={() =>
+											handleFeedback("dislike")
+										}>
+										<Ionicons
+											name="close"
+											size={32}
+											color="#fff"
+										/>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={[
+											styles.feedbackBtn,
+											{ backgroundColor: emotionColor }
+										]}
+										onPress={() => handleFeedback("like")}>
+										<Ionicons
+											name="heart"
+											size={32}
+											color="#fff"
+										/>
+									</TouchableOpacity>
+								</View>
+							) : (
+								<View style={styles.feedbackConfirm}>
+									<Ionicons
+										name={
+											feedbackSent === "like"
+												? "heart"
+												: "close-circle"
+										}
+										size={56}
+										color={
+											feedbackSent === "like"
+												? emotionColor
+												: "#ff4444"
+										}
+									/>
+								</View>
+							)}
+						</Animated.View>
+					</TouchableOpacity>
+				)}
+			</View>
+		);
+	}
+);
 
 const MovieList: React.FC<MovieListProps> = ({
 	movies,
@@ -203,23 +210,43 @@ const MovieList: React.FC<MovieListProps> = ({
 		setVisibleMovies(movies);
 	}, [movies]);
 
-	const handleRemove = (movieId: number) => {
+	const handleRemove = useCallback((movieId: number) => {
 		setVisibleMovies((prev) => prev.filter((m) => m.id !== movieId));
-		if (activeMovieId === movieId) setActiveMovieId(null);
-	};
+		setActiveMovieId((current) => (current === movieId ? null : current));
+	}, []);
 
-	const renderMovieItem = ({ item }: { item: Movie }) => (
-		<MovieItem
-			item={item}
-			emotionColor={selectedEmotion?.color ?? "#ffffff"}
-			userId={userId}
-			onRemove={handleRemove}
-			onMovieRemoved={onMovieRemoved}
-			onRated={onRated}
-			isVisible={activeMovieId === item.id}
-			onShow={() => setActiveMovieId(item.id)}
-			onHide={() => setActiveMovieId(null)}
-		/>
+	const handleShow = useCallback((id: number) => {
+		setActiveMovieId(id);
+	}, []);
+
+	const handleHide = useCallback(() => {
+		setActiveMovieId(null);
+	}, []);
+
+	const renderMovieItem = useCallback(
+		({ item }: { item: Movie }) => (
+			<MovieItem
+				item={item}
+				emotionColor={selectedEmotion?.color ?? "#ffffff"}
+				userId={userId}
+				onRemove={handleRemove}
+				onMovieRemoved={onMovieRemoved}
+				onRated={onRated}
+				isVisible={activeMovieId === item.id}
+				onShow={() => handleShow(item.id)}
+				onHide={handleHide}
+			/>
+		),
+		[
+			selectedEmotion,
+			userId,
+			handleRemove,
+			onMovieRemoved,
+			onRated,
+			activeMovieId,
+			handleShow,
+			handleHide
+		]
 	);
 
 	return (

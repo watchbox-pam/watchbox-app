@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Animated, StatusBar, View } from "react-native";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Animated, StatusBar, View, ActivityIndicator } from "react-native";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
 import Emotion from "@/src/models/Emotion";
@@ -32,9 +32,9 @@ const emotions: Emotion[] = [
 		value: "emerveillement",
 		startAngle: 22.5,
 		endAngle: 67.5,
-		color: "#4CAF50",
 		image: require("../assets/images/Emotion/jurassic-park.jpg"),
-		gradient: ["#A8E6CF", "#4CAF50"]
+		gradient: ["#A8E6CF", "#4CAF50"],
+		color: "#4CAF50"
 	},
 	{
 		id: 3,
@@ -103,117 +103,108 @@ export default function RecommendationScreen() {
 		null
 	);
 	const [movies, setMovies] = useState<Movie[]>([]);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [emotionsOpacity] = useState(new Animated.Value(1));
-	const [resultsOpacity] = useState(new Animated.Value(0));
 	const [refreshing, setRefreshing] = useState(false);
+	const [isTransitioning, setIsTransitioning] = useState(false);
 
 	const currentUser = useSessionStore((state: any) => state.user);
 	const userId: string = currentUser?.id;
 
-	const onRefresh = useCallback(() => {
-		setRefreshing(true);
-	}, []);
+	const opacity = useRef(new Animated.Value(1)).current;
+	const scaleRef = useRef(new Animated.Value(1)).current;
 
-	useEffect(() => {
-		/**
-		 * Why this if in useEffect ?
-		 * 1. useEffect is executed when the component is initially mounted (the first time it is rendered), at this point selectedEmotion is null
-		 * 2. The useEffect is also executed after a resetAnimation(), which sets selectedEmotion to null
-		 * 3. Without this condition, you would have useless calls to fetchMoviesByEmotion() with a null value
-		 */
-		if (selectedEmotion) {
-			fetchMoviesByEmotion();
-			animateTransition();
-		}
-		if (refreshing) {
-			if (selectedEmotion) fetchMoviesByEmotion();
-			setRefreshing(false);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedEmotion, refreshing]);
-
-	/**
-	 * 	Animation function for the transition between the list of emotions and the results
-	 */
-	const animateTransition = () => {
-		/**
-		 *  Simultaneous execution of the 2 animations
-		 */
-		Animated.parallel([
-			Animated.timing(emotionsOpacity, {
-				toValue: 0,
-				duration: 500,
-				useNativeDriver: true
+	const animateFade = useCallback(
+		(toValue: number, duration: number = 300) =>
+			new Promise<void>((resolve) => {
+				Animated.timing(opacity, {
+					toValue,
+					duration,
+					useNativeDriver: true
+				}).start(() => resolve());
 			}),
-			Animated.timing(resultsOpacity, {
-				toValue: 1,
-				duration: 500,
-				delay: 300,
-				useNativeDriver: true
-			})
-		]).start();
-	};
+		[opacity]
+	);
 
-	const resetAnimation = () => {
-		/**
-		 *  Simultaneous execution of the 2 animations
-		 */
-		Animated.parallel([
-			Animated.timing(emotionsOpacity, {
-				toValue: 1,
-				duration: 500,
-				useNativeDriver: true
+	const animateScale = useCallback(
+		(toValue: number, duration: number = 200) =>
+			new Promise<void>((resolve) => {
+				Animated.timing(scaleRef, {
+					toValue,
+					duration,
+					useNativeDriver: true
+				}).start(() => resolve());
 			}),
-			Animated.timing(resultsOpacity, {
-				toValue: 0,
-				duration: 300,
-				useNativeDriver: true
-			})
-		]).start(() => {
-			setSelectedEmotion(null);
-			setMovies([]);
-			setError(null);
-		});
-	};
+		[scaleRef]
+	);
 
-	/**
-	 * Asynchronous function to retrieve films based on the selected emotion
-	 */
-	const fetchMoviesByEmotion = async (): Promise<void> => {
-		if (!selectedEmotion) return;
-
-		setLoading(true);
+	const fetchMoviesByEmotion = useCallback(async (emotion: Emotion) => {
 		setError(null);
-
 		try {
-			const response = await fetchRecommendations(selectedEmotion.value);
+			const response = await fetchRecommendations(emotion.value);
+
 			if (response.success) {
 				setMovies(response.data);
 			} else {
 				setError("Impossible de charger les recommandations.");
 			}
-		} catch (err) {
+		} catch {
 			setError("Impossible de charger les recommandations.");
-		} finally {
-			setLoading(false);
 		}
-	};
+	}, []);
 
-	/**
-	 * Remove a movie from the list (called when user likes/dislikes)
-	 * FIX: This ensures the parent state is updated, not just the child local state
-	 */
-	const removeMovie = (movieId: number): void => {
+	const handleSelectEmotion = useCallback(
+		async (emotion: Emotion) => {
+			setLoading(true);
+			setIsTransitioning(true);
+
+			await Promise.all([animateFade(0, 250), animateScale(0.95, 250)]);
+
+			setSelectedEmotion(emotion);
+
+			await fetchMoviesByEmotion(emotion);
+
+			setIsTransitioning(false);
+
+			opacity.setValue(0);
+			scaleRef.setValue(0.95);
+
+			await Promise.all([animateFade(1, 300), animateScale(1, 300)]);
+
+			setLoading(false);
+		},
+		[animateFade, animateScale, fetchMoviesByEmotion, opacity, scaleRef]
+	);
+
+	const onRefresh = useCallback(async () => {
+		if (!selectedEmotion) return;
+		setRefreshing(true);
+		try {
+			await fetchMoviesByEmotion(selectedEmotion);
+		} finally {
+			setRefreshing(false);
+		}
+	}, [selectedEmotion, fetchMoviesByEmotion]);
+
+	const handleBack = useCallback(async () => {
+		setMovies([]);
+
+		await Promise.all([animateFade(0, 250), animateScale(0.95, 250)]);
+
+		setSelectedEmotion(null);
+		setError(null);
+
+		opacity.setValue(0);
+		scaleRef.setValue(0.95);
+
+		await Promise.all([animateFade(1, 300), animateScale(1, 300)]);
+	}, [animateFade, animateScale, opacity, scaleRef]);
+
+	const removeMovie = useCallback((movieId: number) => {
 		setMovies((prev) => prev.filter((m) => m.id !== movieId));
-	};
+	}, []);
 
-	/**
-	 * Fetch one more movie to replace the one that was just rated
-	 * FIX: Now the count is accurate because movies is updated immediately via removeMovie()
-	 */
-	const fetchOneMoreMovie = async (): Promise<void> => {
+	const fetchOneMoreMovie = useCallback(async () => {
 		if (!selectedEmotion) return;
 
 		const excludeIds = movies.map((m) => m.id);
@@ -224,58 +215,61 @@ export default function RecommendationScreen() {
 				excludeIds
 			});
 
-			if (
-				response.success &&
-				Array.isArray(response.data) &&
-				response.data.length > 0
-			) {
-				const next: Movie = response.data[0];
+			if (response.success && response.data?.length > 0) {
+				const next = response.data[0];
 
 				setMovies((prev) => {
-					// Only add if we haven't reached 10 movies and it's not a duplicate
 					if (prev.length >= 10) return prev;
 					if (prev.some((m) => m.id === next.id)) return prev;
 					return [...prev, next];
 				});
 			}
 		} catch {}
-	};
-
-	const handleSelectEmotion = (emotion: Emotion) => {
-		setSelectedEmotion(emotion);
-	};
+	}, [selectedEmotion, movies]);
 
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle="light-content" />
 
-			<Animated.View
-				style={[styles.overlayContainer, { opacity: emotionsOpacity }]}
-				pointerEvents={selectedEmotion ? "none" : "auto"}>
-				<Header title="Recommandations" />
-				<EmotionsList
-					emotions={emotions}
-					selectedEmotion={selectedEmotion}
-					onSelectEmotion={handleSelectEmotion}
-				/>
-			</Animated.View>
+			{loading && (
+				<View style={styles.loadingOverlay}>
+					<ActivityIndicator size="large" color="#fff" />
+				</View>
+			)}
 
 			<Animated.View
-				style={[styles.overlayContainer, { opacity: resultsOpacity }]}
-				pointerEvents={selectedEmotion ? "auto" : "none"}>
-				<MovieList
-					movies={movies}
-					loading={loading}
-					error={error}
-					selectedEmotion={selectedEmotion}
-					userId={userId}
-					onRetry={fetchMoviesByEmotion}
-					onBack={resetAnimation}
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-					onMovieRemoved={removeMovie}
-					onRated={fetchOneMoreMovie}
-				/>
+				style={[
+					{ flex: 1 },
+					{
+						opacity,
+						transform: [{ scale: scaleRef }]
+					}
+				]}>
+				{!selectedEmotion ? (
+					<>
+						<Header title="Recommandations" />
+						<EmotionsList
+							emotions={emotions}
+							selectedEmotion={selectedEmotion}
+							onSelectEmotion={handleSelectEmotion}
+							isTransitioning={isTransitioning}
+						/>
+					</>
+				) : (
+					<MovieList
+						movies={movies}
+						loading={loading}
+						error={error}
+						selectedEmotion={selectedEmotion}
+						userId={userId}
+						onRetry={() => fetchMoviesByEmotion(selectedEmotion)}
+						onBack={handleBack}
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+						onMovieRemoved={removeMovie}
+						onRated={fetchOneMoreMovie}
+					/>
+				)}
 			</Animated.View>
 		</View>
 	);
