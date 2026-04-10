@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 		letterSpacing: 1,
 		color: "rgba(255,255,255,0.4)",
 		textTransform: "uppercase",
-		marginBottom: 12
+		marginBottom: 8
 	},
 	inputWrapper: {
 		flexDirection: "row",
@@ -42,30 +42,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		color: "#fff",
 		fontSize: 15
-	},
-	codeRow: {
-		flexDirection: "row",
-		gap: 10,
-		marginBottom: 8
-	},
-	codeBox: {
-		flex: 1,
-		aspectRatio: 1,
-		backgroundColor: "rgba(255,255,255,0.06)",
-		borderWidth: 1,
-		borderColor: "rgba(255,255,255,0.1)",
-		borderRadius: 10,
-		alignItems: "center",
-		justifyContent: "center"
-	},
-	codeBoxActive: {
-		borderColor: "#AC2128",
-		backgroundColor: "rgba(172,33,40,0.1)"
-	},
-	codeText: {
-		color: "#fff",
-		fontSize: 20,
-		fontWeight: "500"
 	},
 	button: {
 		backgroundColor: "#AC2128",
