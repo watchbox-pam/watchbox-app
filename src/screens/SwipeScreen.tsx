@@ -43,7 +43,6 @@ export default function SwipeScreen() {
 
 	const router = useRouter();
 
-	//const [cards, setCards] = useState<Card[]>(data);
 	const translateX = useSharedValue(0);
 	const translateY = useSharedValue(0);
 	const dummyTranslate = useSharedValue(0);
@@ -82,6 +81,7 @@ export default function SwipeScreen() {
 		translateY.value = 0;
 	}, [currentIndex, translateX, translateY]);
 
+	// Runs on JS thread — no runOnJS needed
 	const handleSwipeComplete = useCallback(
 		(direction: SwipeDirection) => {
 			const movie = moviesRef.current[currentIndexRef.current];
@@ -150,12 +150,13 @@ export default function SwipeScreen() {
 
 				const progress = Math.min(
 					Math.sqrt(gesture.dx ** 2 + gesture.dy ** 2) /
-						SWIPE_THRESHOLD,
+					SWIPE_THRESHOLD,
 					1
 				);
 				nextCardScale.value = 0.95 + 0.05 * progress;
 			},
 
+			// PanResponder callbacks are already on the JS thread — no runOnJS needed
 			onPanResponderRelease: (_, gesture) => {
 				if (isAnimatingRef.current) return;
 				const tapDuration = Date.now() - tapStartTime.current;
@@ -182,17 +183,17 @@ export default function SwipeScreen() {
 
 				if (absDy > absDx) {
 					if (gesture.dy < -SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("up");
+						forceSwipe("up");
 					} else {
-						runOnJS(resetPosition)();
+						resetPosition();
 					}
 				} else {
 					if (gesture.dx > SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("right");
+						forceSwipe("right");
 					} else if (gesture.dx < -SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("left");
+						forceSwipe("left");
 					} else {
-						runOnJS(resetPosition)();
+						resetPosition();
 					}
 				}
 			}

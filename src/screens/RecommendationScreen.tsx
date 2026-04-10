@@ -38,8 +38,8 @@ const emotions: Emotion[] = [
 	},
 	{
 		id: 3,
-		label: "EXCITATION",
-		value: "excitation",
+		label: "ADRÉNALINE",
+		value: "adrenaline",
 		startAngle: 67.5,
 		endAngle: 112.5,
 		image: require("../assets/images/Emotion/avengers.jpg"),
