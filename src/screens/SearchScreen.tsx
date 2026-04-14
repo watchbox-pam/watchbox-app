@@ -71,7 +71,7 @@ export default function SearchScreen() {
 	const filters = [
 		{ key: "all", label: "Tous" },
 		{ key: "films", label: "Films" },
-		{ key: "actors", label: "Acteurs" }
+		{ key: "actors", label: "Personnes" }
 	];
 
 	// Load providers and selected providers when component mounts
@@ -592,7 +592,7 @@ export default function SearchScreen() {
 							<View key={`actors-section`}>
 								{selectedFilter !== "actors" && (
 									<StyledText style={styles.sectionTitle}>
-										Acteurs
+										Personnes
 									</StyledText>
 								)}
 								<View style={styles.actorsGrid}>
