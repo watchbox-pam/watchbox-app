@@ -113,48 +113,23 @@ export default function SearchScreen() {
 	const fetchSuggestions = async () => {
 		setIsLoadingSuggestions(true);
 		try {
-			let suggestionResults: (Movie | Person)[] = [];
+			const results = await searchService.getSuggestions(
+				searchTerm,
+				selectedProviders.length > 0 ? selectedProviders : undefined
+			);
+			if (results.success) {
+				const seenTitles = new Set<string>();
+				const unique = results.data.filter((item: any) => {
+					const title = item.title || item.name;
+					if (seenTitles.has(title)) return false;
+					seenTitles.add(title);
+					return true;
+				});
 
-			switch (selectedFilter) {
-				case "films":
-					const movieResults = await searchService.searchMovies(
-						searchTerm,
-						selectedProviders.length > 0
-							? selectedProviders
-							: undefined
-					);
-					if (movieResults.success) {
-						suggestionResults = movieResults.data.slice(0, 5);
-					}
-					break;
-
-				case "actors":
-					const actorResults =
-						await searchService.searchActors(searchTerm);
-					if (actorResults.success) {
-						suggestionResults = actorResults.data.slice(0, 5);
-					}
-					break;
-
-				case "all":
-				default:
-					const allResults = await searchService.searchAll(
-						searchTerm,
-						selectedProviders.length > 0
-							? selectedProviders
-							: undefined
-					);
-					if (allResults.success) {
-						const movies = allResults.data.movies || [];
-						const people = allResults.data.people || [];
-						suggestionResults = [...movies, ...people].slice(0, 5);
-					}
-					break;
-			}
-
-			setSuggestions(suggestionResults);
-			if (hasInteracted.current) {
-				setShowSuggestions(suggestionResults.length > 0);
+				setSuggestions(unique);
+				if (hasInteracted.current) {
+					setShowSuggestions(unique.length > 0);
+				}
 			}
 		} catch (error) {
 			console.error("Error fetching suggestions:", error);
@@ -358,24 +333,13 @@ export default function SearchScreen() {
 	const renderSuggestionItem = (item: Movie | Person) => {
 		const isMovie = "title" in item;
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
-		/* const imagePath = isMovie
-            ? (item as Movie).poster_path
-            : (item as Person).profile_path; */
+		const uniqueKey = `${item.media_type}-${item.id}`;
 
 		return (
 			<TouchableOpacity
-				key={item.id}
+				key={uniqueKey}
 				style={styles.suggestionItem}
 				onPress={() => handleSuggestionSelect(item)}>
-				{/* <Image
-                    source={{
-                        uri: imagePath
-                            ? `https://image.tmdb.org/t/p/w500${imagePath}`
-                            : "https://via.placeholder.com/500x750?text=No+Image"
-                    }}
-                    style={styles.suggestionImage}
-                    resizeMode="cover"
-                /> */}
 				<Text style={styles.suggestionText} numberOfLines={1}>
 					{title}
 				</Text>
@@ -422,6 +386,10 @@ export default function SearchScreen() {
 					{/* Suggestions dropdown */}
 					{showSuggestions && (
 						<View style={styles.suggestionsContainer}>
+							{console.log(
+								"rendu suggestions:",
+								suggestions.length
+							)}
 							{isLoadingSuggestions ? (
 								<View style={styles.suggestionLoadingContainer}>
 									<ActivityIndicator
