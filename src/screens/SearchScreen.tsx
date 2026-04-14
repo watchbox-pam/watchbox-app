@@ -386,10 +386,6 @@ export default function SearchScreen() {
 					{/* Suggestions dropdown */}
 					{showSuggestions && (
 						<View style={styles.suggestionsContainer}>
-							{console.log(
-								"rendu suggestions:",
-								suggestions.length
-							)}
 							{isLoadingSuggestions ? (
 								<View style={styles.suggestionLoadingContainer}>
 									<ActivityIndicator
