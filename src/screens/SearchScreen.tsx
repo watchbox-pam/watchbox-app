@@ -140,7 +140,10 @@ export default function SearchScreen() {
 	};
 
 	const handleSuggestionSelect = (item: Movie | Person) => {
-		const title = "title" in item ? item.title : item.name;
+		const title =
+			item.media_type === "movie"
+				? (item as Movie).title
+				: (item as Person).name;
 		hasInteracted.current = false;
 		setShowSuggestions(false);
 		setSearchTerm(title);
@@ -175,8 +178,12 @@ export default function SearchScreen() {
 						const actorResults =
 							await searchService.searchActors(term);
 						if (actorResults.success) {
-							setActors(actorResults.data);
-							setMovies([]); // Clear movies when filtering actors
+							const sortedActors = actorResults.data.sort(
+								(a: Person, b: Person) =>
+									(b.popularity ?? 0) - (a.popularity ?? 0)
+							);
+							setActors(sortedActors);
+							setMovies([]);
 						}
 						break;
 
@@ -331,7 +338,7 @@ export default function SearchScreen() {
 		</TouchableOpacity>
 	);
 	const renderSuggestionItem = (item: Movie | Person) => {
-		const isMovie = "title" in item;
+		const isMovie = item.media_type === "movie";
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
 		const uniqueKey = `${item.media_type}-${item.id}`;
 
