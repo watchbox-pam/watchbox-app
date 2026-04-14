@@ -24,6 +24,7 @@ import Provider from "@/src/models/Provider";
 import * as SecureStore from "expo-secure-store";
 import { ErrorMessage } from "../components/ErrorMessage";
 import FallbackImage from "../components/FallbackImage";
+import Entypo from "@expo/vector-icons/Entypo";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -390,6 +391,19 @@ export default function SearchScreen() {
 							}
 						}}
 					/>
+					{/* Bouton Clear */}
+					{searchTerm.length > 0 && (
+						<TouchableOpacity
+							style={styles.clearButton}
+							onPress={() => {
+								setSearchTerm("");
+								setSuggestions([]);
+								setShowSuggestions(false);
+								hasInteracted.current = false;
+							}}>
+							<Entypo name="cross" size={20} color="black" />
+						</TouchableOpacity>
+					)}
 					{/* Suggestions dropdown */}
 					{showSuggestions && (
 						<View style={styles.suggestionsContainer}>

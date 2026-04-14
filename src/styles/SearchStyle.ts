@@ -25,14 +25,21 @@ const styles = StyleSheet.create({
 		height: 40,
 		width: "100%"
 	},
+	clearButton: {
+		position: "absolute",
+		right: 0,
+		top: "40%",
+		transform: [{ translateY: -10 }],
+		padding: 4
+	},
 	BtnSearch: {
 		width: "25%"
 	},
 	TextSearch: {
 		color: "#000",
-		margin: "auto"
+		margin: "auto",
+		fontSize: 18
 	},
-
 	searchInputContainer: {
 		flex: 1,
 		position: "relative"
