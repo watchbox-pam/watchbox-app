@@ -400,6 +400,8 @@ export default function SearchScreen() {
 								setSuggestions([]);
 								setShowSuggestions(false);
 								hasInteracted.current = false;
+								setMovies([]);
+								setActors([]);
 							}}>
 							<Entypo name="cross" size={20} color="black" />
 						</TouchableOpacity>
