@@ -24,11 +24,11 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	loadingOverlay: {
-	...StyleSheet.absoluteFillObject,
-	justifyContent: "center",
-	alignItems: "center",
-	zIndex: 1000
-}
+		...StyleSheet.absoluteFillObject,
+		justifyContent: "center",
+		alignItems: "center",
+		zIndex: 1000
+	}
 });
 
 export default styles;

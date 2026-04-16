@@ -1,8 +1,17 @@
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+	SafeAreaView,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
+} from "react-native";
 import styles from "@/src/styles/ForgotPasswordStyle";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { checkPasswordResetTokenValidity, resetUserPassword } from "@/src/services/PasswordResetService";
+import {
+	checkPasswordResetTokenValidity,
+	resetUserPassword
+} from "@/src/services/PasswordResetService";
 import UserPassword from "@/src/models/UserPassword";
 
 export default function ResetPasswordScreen() {
@@ -32,7 +41,7 @@ export default function ResetPasswordScreen() {
 			id: userId,
 			password,
 			confirmPassword,
-			token,
+			token
 		};
 		const result = await resetUserPassword(passwordToReset);
 		if (result.success) {
@@ -56,7 +65,9 @@ export default function ResetPasswordScreen() {
 
 			<Text style={styles.inputLabel}>Mot de passe</Text>
 			<View style={[styles.inputWrapper, { marginBottom: 16 }]}>
-				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>🔑</Text>
+				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
+					🔑
+				</Text>
 				<TextInput
 					style={styles.input}
 					placeholder="Nouveau mot de passe"
@@ -69,7 +80,9 @@ export default function ResetPasswordScreen() {
 
 			<Text style={styles.inputLabel}>Confirmation</Text>
 			<View style={styles.inputWrapper}>
-				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>🔑</Text>
+				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
+					🔑
+				</Text>
 				<TextInput
 					style={styles.input}
 					placeholder="Confirmez le mot de passe"

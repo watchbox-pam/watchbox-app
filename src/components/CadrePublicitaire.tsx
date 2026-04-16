@@ -1,6 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Linking, Image } from "react-native";
-import { StyleSheet } from "react-native";
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	Linking,
+	Image,
+	StyleSheet
+} from "react-native";
 
 type CadrePublicitaireProps = {
 	title?: string;

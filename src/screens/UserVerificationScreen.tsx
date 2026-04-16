@@ -1,4 +1,10 @@
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+	SafeAreaView,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
+} from "react-native";
 import styles from "@/src/styles/UserVerificationStyle";
 import { router } from "expo-router";
 import { useState } from "react";
