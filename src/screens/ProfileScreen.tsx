@@ -7,14 +7,14 @@ import {
 	Modal,
 	TextInput,
 	Button,
-	RefreshControl
+	RefreshControl,
+	TouchableOpacity
 } from "react-native";
 import styles from "../styles/ProfileScreenStyle";
 import { LinearGradient } from "expo-linear-gradient";
 import DropDownButton from "../components/DropDownButton";
 import TraitGradiant from "../components/TraitGradiant";
 import Stats from "../components/Stats";
-import { TouchableOpacity } from "react-native";
 import CarouselWatchList from "../components/CarouselWatchList";
 import { getUserProfile } from "../services/ProfileService";
 import useSessionStore from "../zustand/sessionStore";

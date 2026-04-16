@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Image, ScrollView, View, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
-import { Provider } from "react-native-paper";
+import { Provider, ActivityIndicator } from "react-native-paper";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";
@@ -13,7 +13,6 @@ import CarouselProviders from "@/src/components/CarouselProviders";
 import CarouselCasting from "@/src/components/CarouselCasting";
 
 import styles from "@/src/styles/MovieDetailStyle";
-import { ActivityIndicator } from "react-native-paper";
 import CommentaryScreen from "@/src/screens/CommentaryScreen";
 import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 import useSessionStore from "../zustand/sessionStore";

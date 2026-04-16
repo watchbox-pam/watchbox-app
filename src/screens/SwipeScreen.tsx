@@ -24,6 +24,7 @@ import { fetchMovies } from "../services/SwipeService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
+import MovieLoader from "../components/MovieLoader";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
@@ -150,7 +151,7 @@ export default function SwipeScreen() {
 
 				const progress = Math.min(
 					Math.sqrt(gesture.dx ** 2 + gesture.dy ** 2) /
-					SWIPE_THRESHOLD,
+						SWIPE_THRESHOLD,
 					1
 				);
 				nextCardScale.value = 0.95 + 0.05 * progress;
@@ -211,12 +212,7 @@ export default function SwipeScreen() {
 		!loading && movies.length > 0 && currentIndex < movies.length;
 
 	if (loading) {
-		return (
-			<View style={styles.centered}>
-				<ActivityIndicator size="large" color="#0A1E38" />
-				<Text style={styles.loadingText}>Chargement des films...</Text>
-			</View>
-		);
+		return <MovieLoader />;
 	}
 
 	if (movies.length === 0) {
