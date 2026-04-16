@@ -80,5 +80,24 @@ export const searchService = {
 				data: []
 			};
 		}
+	},
+
+	getSuggestions: async (searchTerm: string, providers?: number[]) => {
+		try {
+			const params = new URLSearchParams({ query: searchTerm });
+			if (providers?.length) {
+				providers.forEach((id) =>
+					params.append("providers", String(id))
+				);
+			}
+			return await ApiHelper.get(
+				`/search/suggestions?${params.toString()}`
+			);
+		} catch (error) {
+			return {
+				success: false,
+				data: []
+			};
+		}
 	}
 };

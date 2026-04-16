@@ -13,6 +13,7 @@ type Movie = {
 	status: string;
 	title: string;
 	video: string;
+	media_type: string;
 };
 
 export default Movie;
