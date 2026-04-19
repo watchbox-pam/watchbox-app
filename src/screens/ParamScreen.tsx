@@ -9,6 +9,7 @@ import ProvidersSection from "../components/Param/ProvidersSection";
 import DeleteAccountModal from "../components/Param/DeleteAccountModal";
 import ClearCacheModal from "../components/Param/ClearCacheModal";
 import { useSettings } from "@/src/components/Param/useSettings";
+import Toast from "react-native-toast-message";
 
 const ParamScreen: React.FC = () => {
 	const {
@@ -123,10 +124,11 @@ const ParamScreen: React.FC = () => {
 				onConfirm={async () => {
 					await clearCache();
 					setShowClearCacheModal(false);
-					Alert.alert(
-						"Cache vidé",
-						"Le cache a été vidé avec succès !"
-					);
+					Toast.show({
+						type: "success",
+						text1: "Cache vidé",
+						text2: "Le cache a été vidé avec succès !"
+					});
 				}}
 				cacheSize={cacheSize}
 			/>

@@ -5,6 +5,7 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import UserProfile from "@/src/models/UserProfile";
 import { deleteAccount, getUserProfile } from "@/src/services/ProfileService";
 import { providerService } from "@/src/services/ProviderService";
+import Toast from "react-native-toast-message";
 
 type Provider = {
 	id: number;
@@ -53,7 +54,11 @@ export const useSettings = () => {
 				setHistory(!result.data.history_private);
 				setAdultContent(result.data.adult_content);
 			} else {
-				Alert.alert("Erreur", "Impossible de charger le profil");
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: "Impossible de charger le profil"
+				});
 			}
 		} catch (error) {
 			console.error(error);
@@ -135,12 +140,24 @@ export const useSettings = () => {
 			const result = await deleteAccount();
 			if (result.success) {
 				await signOut();
-				Alert.alert("Compte supprimé", result.message);
+				Toast.show({
+					type: "error",
+					text1: "Compte supprimé",
+					text2: result.message
+				});
 			} else {
-				Alert.alert("Erreur", result.message);
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: result.message
+				});
 			}
 		} catch {
-			Alert.alert("Erreur", "Une erreur inattendue est survenue");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Une erreur inattendue est survenue"
+			});
 		} finally {
 			setIsDeletingAccount(false);
 		}

@@ -13,6 +13,7 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import { useRouter } from "expo-router";
 import Playlist from "../models/Playlist";
 import styles from "@/src/styles/DropDownModifyPlaylistStyle";
+import Toast from "react-native-toast-message";
 
 interface DropDownModifyPlaylistProps {
 	playlistId: string;
@@ -70,12 +71,19 @@ const DropDownModifyPlaylist = ({
 			setEditModalVisible(false);
 			if (onUpdate)
 				onUpdate({ title: editedTitle, is_private: isPrivate });
-			alert("Playlist mise à jour avec succès");
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: "Playlist mise à jour avec succès"
+			});
 		} else {
-			alert(
-				result.message ||
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2:
+					result.message ||
 					"Erreur lors de la mise à jour de la playlist."
-			);
+			});
 		}
 	};
 
@@ -85,12 +93,19 @@ const DropDownModifyPlaylist = ({
 
 		if (result.success) {
 			router.push("/");
-			alert("Playlist supprimée avec succès");
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: "Playlist supprimée avec succès"
+			});
 		} else {
-			alert(
-				result.message ||
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2:
+					result.message ||
 					"Erreur lors de la suppression de la playlist."
-			);
+			});
 		}
 	};
 

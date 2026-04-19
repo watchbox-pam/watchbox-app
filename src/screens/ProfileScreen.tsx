@@ -26,6 +26,7 @@ import {
 } from "@/src/services/PlaylistService";
 import { ActivityIndicator } from "react-native-paper";
 import { ErrorMessage } from "../components/ErrorMessage";
+import Toast from "react-native-toast-message";
 
 interface UserProfile {
 	username: string;
@@ -57,7 +58,11 @@ export default function Index() {
 	const handleSavePlaylist = async () => {
 		const userId = currentUser && currentUser.id;
 		if (!userId) {
-			alert("User is not logged in.");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Utilisateur non connecté"
+			});
 			return;
 		}
 
@@ -72,16 +77,23 @@ export default function Index() {
 		const result = await createPlaylist(playlistToInsert);
 
 		if (result.success) {
-			alert(result.message || "Playlist created successfully!");
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: result.message || "Playlist créée avec succès !"
+			});
 			setModalVisible(false);
 			setPlaylistTitle("");
 			setIsPrivate(false);
 			await fetchData(userId);
 		} else {
-			alert(
-				result.message ||
-					"An error occurred while creating the playlist."
-			);
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2:
+					result.message ||
+					"Une erreur est survenue pendant la création de la playlist"
+			});
 		}
 	};
 

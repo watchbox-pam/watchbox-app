@@ -7,6 +7,7 @@ import { useState } from "react";
 import { loginUser } from "@/src/services/LoginService";
 import { router, Link } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
@@ -28,7 +29,11 @@ export default function LoginScreen() {
 			router.replace("/");
 			return;
 		} else {
-			alert(result.message);
+			Toast.show({
+				type: "error",
+				text1: "Erreur de login",
+				text2: result.message
+			});
 		}
 	};
 

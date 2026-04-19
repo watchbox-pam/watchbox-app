@@ -13,6 +13,7 @@ import {
 	resetUserPassword
 } from "@/src/services/PasswordResetService";
 import UserPassword from "@/src/models/UserPassword";
+import Toast from "react-native-toast-message";
 
 export default function ResetPasswordScreen() {
 	const { token }: { token: string } = useLocalSearchParams();
@@ -23,13 +24,21 @@ export default function ResetPasswordScreen() {
 
 	const verifyUserToken = async () => {
 		if (token === "") {
-			alert("Ce lien n'est pas valide");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Ce lien n'est pas valide"
+			});
 			router.replace("/");
 			return;
 		}
 		const result = await checkPasswordResetTokenValidity(token);
 		if (!result || result === "") {
-			alert("Ce lien n'est pas valide");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Ce lien n'est pas valide"
+			});
 			router.replace("/");
 		} else {
 			setUserId(result);
@@ -45,10 +54,18 @@ export default function ResetPasswordScreen() {
 		};
 		const result = await resetUserPassword(passwordToReset);
 		if (result.success) {
-			alert("Votre mot de passe a bien été mis à jour");
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: "Votre mot de passe a bien été mis à jour"
+			});
 			router.replace("/");
 		} else {
-			alert(result.message);
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: result.message
+			});
 		}
 	};
 
@@ -65,9 +82,6 @@ export default function ResetPasswordScreen() {
 
 			<Text style={styles.inputLabel}>Mot de passe</Text>
 			<View style={[styles.inputWrapper, { marginBottom: 16 }]}>
-				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-					🔑
-				</Text>
 				<TextInput
 					style={styles.input}
 					placeholder="Nouveau mot de passe"
@@ -80,9 +94,6 @@ export default function ResetPasswordScreen() {
 
 			<Text style={styles.inputLabel}>Confirmation</Text>
 			<View style={styles.inputWrapper}>
-				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-					🔑
-				</Text>
 				<TextInput
 					style={styles.input}
 					placeholder="Confirmez le mot de passe"

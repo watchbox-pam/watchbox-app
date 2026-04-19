@@ -11,6 +11,7 @@ import RNDateTimePicker, {
 import UserSignup from "@/src/models/UserSignup";
 import useSessionStore from "@/src/zustand/sessionStore";
 import { router, Link } from "expo-router";
+import Toast from "react-native-toast-message";
 
 export default function SignupScreen() {
 	const [username, setUsername] = useState<string>("");
@@ -44,12 +45,20 @@ export default function SignupScreen() {
 		};
 		const result = await registerUser(userToInsert);
 		if (result.success) {
-			alert("Un code de vérification a été envoyé à votre adresse mail");
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: "Un code de vérification a été envoyé à votre adresse mail"
+			});
 			//signIn(result.message.id, username, result.message.token);
 			router.replace("/userVerification");
 			return;
 		} else {
-			alert(result.message);
+			Toast.show({
+				type: "error",
+				text1: "Erreur d'inscription",
+				text2: result.message
+			});
 		}
 	};
 

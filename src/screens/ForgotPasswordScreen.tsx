@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "@/src/services/PasswordResetService";
 import BackButton from "@/src/components/BackButton";
+import Toast from "react-native-toast-message";
 
 export default function ForgotPasswordScreen() {
 	const [email, setEmail] = useState<string>("");
@@ -17,12 +18,18 @@ export default function ForgotPasswordScreen() {
 	const sendPasswordReset = async () => {
 		const result = await sendPasswordResetEmail(email);
 		if (result) {
-			alert(
-				"Un lien de réinitialisation a été envoyé à votre adresse mail"
-			);
+			Toast.show({
+				type: "success",
+				text1: "Succès",
+				text2: "Un lien de réinitialisation a été envoyé à votre adresse mail"
+			});
 			router.replace("/login");
 		} else {
-			alert("Une erreur est survenue");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Une erreur est survenue"
+			});
 		}
 	};
 
@@ -38,9 +45,6 @@ export default function ForgotPasswordScreen() {
 
 			<Text style={styles.inputLabel}>Adresse mail</Text>
 			<View style={styles.inputWrapper}>
-				<Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-					✉
-				</Text>
 				<TextInput
 					style={styles.input}
 					placeholder="exemple@mail.com"

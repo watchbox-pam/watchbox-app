@@ -9,6 +9,7 @@ import {
 	Alert
 } from "react-native";
 import styles from "@/src/styles/CarouselProvidersStyle";
+import Toast from "react-native-toast-message";
 
 // Horizontal carousel displaying provider logos (e.g. Netflix, Hulu)
 export default function CarouselProviders({
@@ -35,10 +36,11 @@ export default function CarouselProviders({
 		if (fallback) {
 			await Linking.openURL(fallback);
 		} else {
-			Alert.alert(
-				"Lien indisponible",
-				"Impossible d'ouvrir cette plateforme"
-			);
+			Toast.show({
+				type: "error",
+				text1: "Lien indisponible",
+				text2: "Impossible d'ouvrir cette plateforme"
+			});
 		}
 	};
 	return (
