@@ -59,10 +59,7 @@ export default function CarouselWatchList({
 							<Link
 								href={{
 									pathname: "/watchList/[id]",
-									params: {
-										id: providers.id,
-										movies: JSON.stringify(filteredMovies)
-									}
+									params: { id: providers.id }
 								}}
 								style={styles.imageContainer}>
 								<Image
