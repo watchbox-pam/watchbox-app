@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { sendUserVerificationCode } from "@/src/services/UserVerificationService";
 import BackButton from "@/src/components/BackButton";
+import Toast from "react-native-toast-message";
 
 export default function UserVerificationScreen() {
 	const [code, setCode] = useState<string>("");
@@ -20,7 +21,11 @@ export default function UserVerificationScreen() {
 		if (result) {
 			router.replace("/");
 		} else {
-			alert("Code invalide, veuillez réessayer.");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Code invalide. Veuillez réssayer"
+			});
 		}
 	};
 

@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import Header from "../components/Header";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import styles from "@/src/styles/CalendarScreenStyle";
+import Toast from "react-native-toast-message";
 
 interface TimePickerModalProps {
 	visible: boolean;
@@ -250,7 +251,11 @@ const CalendarScreen: React.FC = () => {
 	// ouvrir le modal pour créer un événement
 	const openCreateEventModal = () => {
 		if (!selectedDate) {
-			alert("Veuillez sélectionner une date pour ajouter un événement.");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Veuillez sélectionner une date pour ajouter un événement."
+			});
 			return;
 		}
 		setNewEvent({ time: "", title: "", description: "" });
@@ -260,7 +265,11 @@ const CalendarScreen: React.FC = () => {
 	// Créer un nouvel événement
 	const createEvent = () => {
 		if (!selectedDate || !newEvent.title) {
-			alert("Veuillez remplir au moins le titre");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Veuillez remplir au moins le titre"
+			});
 			return;
 		}
 		const event: Event = {

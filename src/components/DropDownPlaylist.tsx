@@ -19,6 +19,7 @@ import {
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
 import MovieScreen from "@/src/screens/MovieScreen";
+import Toast from "react-native-toast-message";
 
 const DropDownPlaylist = ({
 	movieId
@@ -96,7 +97,11 @@ const DropDownPlaylist = ({
 				// Partage annulé
 			}
 		} catch (error: any) {
-			Alert.alert("Erreur", error.message);
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: error.message
+			});
 		}
 	};
 
@@ -117,18 +122,20 @@ const DropDownPlaylist = ({
 	// Add the movie to the selected playlist via API
 	const handleAddToPlaylist = async () => {
 		if (!selectedPlaylistId) {
-			Alert.alert(
-				"Sélection requise",
-				"Veuillez sélectionner une playlist avant d'ajouter le film."
-			);
+			Toast.show({
+				type: "error",
+				text1: "Sélection requise",
+				text2: "Veuillez sélectionner une playlist avant d'ajouter le film."
+			});
 			return;
 		}
 
 		if (!movieId) {
-			Alert.alert(
-				"Erreur",
-				"Identifiant du film invalide. Veuillez réessayer."
-			);
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Identifiant du film invalide. Veuillez réessayer."
+			});
 			return;
 		}
 		setIsAdding(true);
@@ -138,13 +145,20 @@ const DropDownPlaylist = ({
 				movieId
 			);
 			if (response.success) {
-				Alert.alert("Succès", "Film ajouté à la playlist !");
+				Toast.show({
+					type: "success",
+					text1: "Succès",
+					text2: "Film ajouté à la playlist !"
+				});
 				closeModal();
 			} else {
-				Alert.alert(
-					response.message ||
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2:
+						response.message ||
 						"Impossible d'ajouter le film à la playlist."
-				);
+				});
 			}
 		} finally {
 			setIsAdding(false);

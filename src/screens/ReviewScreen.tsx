@@ -8,6 +8,7 @@ import Review from "@/src/models/Review";
 import { router, useLocalSearchParams } from "expo-router";
 import { createReview } from "@/src/services/ReviewService";
 import BackButton from "@/src/components/BackButton";
+import Toast from "react-native-toast-message";
 export default function ReviewScreen() {
 	// Get the media ID from the route params
 	const { id } = useLocalSearchParams();
@@ -33,7 +34,11 @@ export default function ReviewScreen() {
 		if (result.success) {
 			router.back();
 		} else {
-			alert("Echec de la publication de la review");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Echec de la publication de la review"
+			});
 		}
 	};
 
