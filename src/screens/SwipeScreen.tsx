@@ -20,7 +20,7 @@ import {
 	withTiming
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { fetchMovies, postSwipe, checkBackendHealth } from "../services/SwipeService";
+import { fetchMovies, postSwipe } from "../services/SwipeService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
@@ -84,15 +84,6 @@ export default function SwipeScreen() {
 
 	useEffect(() => {
 		const load = async () => {
-			if (__DEV__) {
-				const health = await checkBackendHealth();
-				if (!health.ok) {
-					console.warn("[SwipeScreen] Backend inaccessible →", health.error ?? "pas de /health");
-				} else {
-					console.log("[SwipeScreen] Backend OK");
-				}
-			}
-
 			try {
 				const res = await fetchMovies();
 				res.forEach((m) => seenMovieIdsRef.current.add(m.id));

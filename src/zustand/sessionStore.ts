@@ -2,7 +2,18 @@ import { create } from "zustand/react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-const useSessionStore = create((set) => ({
+type SessionStore = {
+	isLoggedIn: boolean;
+	user: {
+		id: string;
+		identifier: string;
+		token: string;
+	};
+	signIn: (id: string, identifier: string, token: string) => void;
+	signOut: () => Promise<void>;
+};
+
+const useSessionStore = create<SessionStore>((set) => ({
 	isLoggedIn: false,
 	user: {
 		id: "",

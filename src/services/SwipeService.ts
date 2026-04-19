@@ -1,14 +1,5 @@
 import { ApiHelper } from "@/src/utils/axios";
 
-export const checkBackendHealth = async (): Promise<{ ok: boolean; error?: string }> => {
-	try {
-		const res = await ApiHelper.get("/health");
-		return { ok: res.success };
-	} catch (e: any) {
-		return { ok: false, error: e?.message ?? "unreachable" };
-	}
-};
-
 export type Movie = {
 	id: number; // ou string, selon ta base
 	title: string;

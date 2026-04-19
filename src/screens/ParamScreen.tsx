@@ -82,21 +82,21 @@ const ParamScreen: React.FC = () => {
 				title="Profile Public"
 				description="Profile visible à tous"
 				checked={publicProfile}
-				onToggle={() => setPublicProfile(!publicProfile)}
+				onToggle={() => setPublicProfile()}
 			/>
 
 			<SettingCheckboxItem
 				title="Historique"
 				description="Historique visible pour tous"
 				checked={history}
-				onToggle={() => setHistory(!history)}
+				onToggle={() => setHistory()}
 			/>
 
 			<SettingCheckboxItem
 				title="Contenu pour adultes"
 				description="Contenu +18 ans"
 				checked={adultContent}
-				onToggle={() => setAdultContent(!adultContent)}
+				onToggle={() => setAdultContent()}
 			/>
 
 			<SettingItem
