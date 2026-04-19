@@ -1,12 +1,15 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { ComponentProps } from "react";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
+type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
+
 export default function Stars({ rating }: { rating: number }) {
-	const [stars, setStars] = useState<string[]>([]);
+	const [stars, setStars] = useState<MaterialIconName[]>([]);
 
 	useEffect(() => {
-		const starsArray: string[] = [];
+		const starsArray: MaterialIconName[] = [];
 		const fullStars: number = Math.floor(rating / 2);
 		for (let i: number = 0; i < fullStars; i++) {
 			starsArray.push("star");
@@ -23,7 +26,7 @@ export default function Stars({ rating }: { rating: number }) {
 	return (
 		<View style={{ flexDirection: "row" }}>
 			{stars &&
-				stars.map((star: string, index: number) => {
+				stars.map((star, index) => {
 					return (
 						<MaterialIcons
 							size={15}

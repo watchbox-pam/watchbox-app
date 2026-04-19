@@ -1,5 +1,5 @@
 type Review = {
-	id: number;
+	id?: number;
 	userId: string;
 	mediaId: string;
 	rating?: number | null;
