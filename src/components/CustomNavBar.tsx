@@ -1,7 +1,12 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useEffect, useRef } from "react";
-import { Animated, Easing, Dimensions, Pressable, StyleSheet, View } from "react-native";
+import { useEffect } from "react";
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withSpring,
+    interpolate,
+} from "react-native-reanimated";
+import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 
 import HomeIcon from "@/src/assets/icons/HomeIcon";
 import SearchIcon from "@/src/assets/icons/SearchIcon";
@@ -15,19 +20,10 @@ const TAB_WIDTH = 80;
 const OFFSET = (SCREEN_WIDTH - TAB_WIDTH * TAB_COUNT) / 2;
 const INDICATOR_WIDTH = 60;
 
-// Maps route name → icon
-const TAB_ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
-    index: "theaters",
-    search: "search",
-    recommendation: "favorite",
-    swipe: "swipe",
-    calendar: "calendar-today",
-};
+const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "calendar"];
 
 export default function CustomNavBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
-    const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "calendar"];
-    // Only keep the 5 visible routes (those with href !== null)
     const visibleRoutes = state.routes.filter(
         (route) => VISIBLE_TABS.includes(route.name)
     );
@@ -36,42 +32,35 @@ export default function CustomNavBar({ state, descriptors, navigation }: BottomT
         (r) => r.key === state.routes[state.index].key
     );
 
-    const indicatorAnim = useRef(
-        new Animated.Value(activeVisibleIndex >= 0 ? activeVisibleIndex : 0)
-    ).current;
+    const indicatorAnim = useSharedValue(activeVisibleIndex >= 0 ? activeVisibleIndex : 0);
 
     useEffect(() => {
         if (activeVisibleIndex < 0) return;
-        Animated.timing(indicatorAnim, {
-            toValue: activeVisibleIndex,
-            duration: 250,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-        }).start();
+        indicatorAnim.value = withSpring(activeVisibleIndex, {
+            damping: 18,
+            stiffness: 160,
+            mass: 0.8,
+        });
     }, [activeVisibleIndex]);
 
-    const indicatorTranslateX = indicatorAnim.interpolate({
-        inputRange: visibleRoutes.map((_, i) => i),
-        outputRange: visibleRoutes.map(
-            (_, i) => OFFSET + i * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2
-        ),
-    });
+    const indicatorStyle = useAnimatedStyle(() => ({
+        transform: [{
+            translateX: interpolate(
+                indicatorAnim.value,
+                visibleRoutes.map((_, i) => i),
+                visibleRoutes.map((_, i) => OFFSET + i * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2)
+            )
+        }]
+    }));
 
     return (
         <View style={styles.container}>
-            {/* Sliding indicator */}
-            <Animated.View
-                style={[
-                    styles.indicator,
-                    { transform: [{ translateX: indicatorTranslateX }] },
-                ]}
-            />
+            <Animated.View style={[styles.indicator, indicatorStyle]} />
 
-            {/* Tab buttons */}
             {visibleRoutes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const isFocused = activeVisibleIndex === index;
-                const iconName = TAB_ICONS[route.name] ?? "circle";
+                const color = isFocused ? "#a8b8f8" : "#4a5f8a";
 
                 const onPress = () => {
                     const event = navigation.emit({
@@ -98,19 +87,11 @@ export default function CustomNavBar({ state, descriptors, navigation }: BottomT
                         accessibilityLabel={options.tabBarAccessibilityLabel}
                         style={styles.tab}
                     >
-                        {route.name === "index" ? (
-                            <HomeIcon color={isFocused ? "#a8b8f8" : "#4a5f8a"} size={30} />
-                        ) : route.name === "search" ? (
-                            <SearchIcon color={isFocused ? "#a8b8f8" : "#4a5f8a"} size={30} />
-                        ) : route.name === "recommendation" ? (
-                            <RecommendationIcon color={isFocused ? "#a8b8f8" : "#4a5f8a"} size={30} />
-                        ) : route.name === "swipe" ? (
-                            <SwipeIcon color={isFocused ? "#a8b8f8" : "#4a5f8a"} size={30} />
-                        ) : route.name === "calendar" ? (
-                            <CalendarIcon color={isFocused ? "#a8b8f8" : "#4a5f8a"} size={30} />
-                        ) : (
-                            <MaterialIcons name={iconName} size={30} color={isFocused ? "#a8b8f8" : "#4a5f8a"} />
-                        )}
+                        {route.name === "index" ? <HomeIcon color={color} size={30} /> :
+                         route.name === "search" ? <SearchIcon color={color} size={30} /> :
+                         route.name === "recommendation" ? <RecommendationIcon color={color} size={30} /> :
+                         route.name === "swipe" ? <SwipeIcon color={color} size={30} /> :
+                         <CalendarIcon color={color} size={30} />}
                     </Pressable>
                 );
             })}
@@ -128,7 +109,7 @@ const styles = StyleSheet.create({
         position: "relative",
     },
     tab: {
-        width: 80,
+        width: TAB_WIDTH,
         alignItems: "center",
         justifyContent: "center",
         height: "100%",

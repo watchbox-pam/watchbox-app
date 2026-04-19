@@ -1,4 +1,3 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Redirect, Tabs } from "expo-router";
 import { View } from "react-native";
 import useSessionStore from "@/src/zustand/sessionStore";
