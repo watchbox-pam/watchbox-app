@@ -18,7 +18,6 @@ import {
 } from "@/src/services/PlaylistService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
-import MovieScreen from "@/src/screens/MovieScreen";
 import Toast from "react-native-toast-message";
 
 const DropDownPlaylist = ({
@@ -49,12 +48,12 @@ const DropDownPlaylist = ({
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
 
 	const openMenu = () => {
-		const screenWidth = Dimensions.get("window").width;
+		const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 		buttonRef.current?.measure(() => {
 			setMenuPosition({
-				x: screenWidth - MENU_WIDTH + 40, // Ajuster la position horizontale pour que le menu soit aligné à droite
-				y: screenWidth - MENU_HEIGHT - 140 // Ajuster la position verticale pour que le menu soit visible
-			}); // Positionner le menu juste en dessous du bouton
+				x: screenWidth - MENU_WIDTH + 40,
+				y: screenHeight - MENU_HEIGHT - 140
+			});
 			setVisible(true);
 		});
 	};
@@ -149,6 +148,13 @@ const DropDownPlaylist = ({
 					type: "success",
 					text1: "Succès",
 					text2: "Film ajouté à la playlist !"
+				});
+				closeModal();
+			} else if (response.message?.includes("déjà")) {
+				Toast.show({
+					type: "info",
+					text1: "Déjà ajouté",
+					text2: "Ce film est déjà dans cette playlist."
 				});
 				closeModal();
 			} else {
