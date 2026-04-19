@@ -1,13 +1,12 @@
 import React, { FC, memo, useEffect } from "react";
-import { Text, Dimensions, Image } from "react-native";
+import { Text, View, Dimensions, Image } from "react-native";
 import Animated, {
-	Easing,
 	Extrapolation,
 	interpolate,
 	SharedValue,
 	useAnimatedStyle,
 	useSharedValue,
-	withSpring
+	withTiming
 } from "react-native-reanimated";
 import styles from "../styles/SwipeCardStyle";
 
@@ -56,16 +55,10 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 
 	useEffect(() => {
 		const targetScale = isTopCard ? 1 : isSecondCard ? 0.95 : 0.9;
-		cardScale.value = withSpring(targetScale, {
-			duration: 300,
-			easing: Easing.out(Easing.quad)
-		});
+		cardScale.value = withTiming(targetScale, { duration: 300 });
 
 		const targetOpacity = isTopCard ? 1 : isSecondCard ? 0.85 : 0.7;
-		cardOpacity.value = withSpring(targetOpacity, {
-			duration: 300,
-			easing: Easing.out(Easing.quad)
-		});
+		cardOpacity.value = withTiming(targetOpacity, { duration: 300 });
 	}, [index, isTopCard, isSecondCard, cardScale, cardOpacity]);
 
 	const animationStyle = useAnimatedStyle(() => {
@@ -139,11 +132,15 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 				{ height: SCREEN_HEIGHT * 0.62 }
 			]}
 			{...panHandlers}>
-			<Image
-				source={{ uri: posterUri }}
-				style={styles.posterImage}
-				resizeMode="cover"
-			/>
+			{posterUri != null ? (
+				<Image
+					source={{ uri: posterUri }}
+					style={styles.posterImage}
+					resizeMode="cover"
+				/>
+			) : (
+				<View style={[styles.posterImage, { backgroundColor: "#13396A" }]} />
+			)}
 
 			{isTopCard && (
 				<>
