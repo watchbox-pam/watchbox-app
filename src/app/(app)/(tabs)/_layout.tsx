@@ -15,6 +15,7 @@ export default function TabLayout() {
 			<Tabs
 				backBehavior={"fullHistory"}
                 tabBar={(props) => <CustomTabBar {...props} />}
+                safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
                 }}>

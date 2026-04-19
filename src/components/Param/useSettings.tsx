@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import useSessionStore from "@/src/zustand/sessionStore";
+import useFiltersStore from "@/src/zustand/filtersStore";
 import UserProfile from "@/src/models/UserProfile";
-import { deleteAccount, getUserProfile } from "@/src/services/ProfileService";
+import { deleteAccount, getUserProfile, updateSettings } from "@/src/services/ProfileService";
 import { providerService } from "@/src/services/ProviderService";
 import Toast from "react-native-toast-message";
 
@@ -16,6 +17,8 @@ type Provider = {
 export const useSettings = () => {
 	const userId = useSessionStore((state) => state.user.id);
 	const signOut = useSessionStore((state) => state.signOut);
+	const { selectedProviders, isLoaded, loadProviders, toggleProvider } =
+		useFiltersStore();
 
 	// Toggles
 	const [notifications, setNotifications] = useState(false);
@@ -26,7 +29,6 @@ export const useSettings = () => {
 	// Data
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [providers, setProviders] = useState<Provider[]>([]);
-	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 
 	// Loading
 	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -40,6 +42,7 @@ export const useSettings = () => {
 	useEffect(() => {
 		fetchUserProfile();
 		fetchProviders();
+		if (!isLoaded) loadProviders();
 	}, []);
 
 	/* ---------- PROFILE ---------- */
@@ -67,6 +70,63 @@ export const useSettings = () => {
 		}
 	};
 
+	const saveSettings = async (
+		newAdultContent: boolean,
+		newPublicProfile: boolean,
+		newHistory: boolean
+	) => {
+		const result = await updateSettings(
+			userId,
+			newAdultContent,
+			!newPublicProfile,
+			!newHistory
+		);
+		if (!result.success) {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: result.message ?? "Impossible de sauvegarder les paramètres"
+			});
+		}
+	};
+
+	const handleToggleAdultContent = () => {
+		if (!adultContent) {
+			Alert.alert(
+				"Contenu adulte",
+				"Êtes-vous sûr d'avoir plus de 18 ans ?",
+				[
+					{
+						text: "Non",
+						style: "cancel"
+					},
+					{
+						text: "Oui",
+						onPress: () => {
+							setAdultContent(true);
+							saveSettings(true, publicProfile, history);
+						}
+					}
+				]
+			);
+		} else {
+			setAdultContent(false);
+			saveSettings(false, publicProfile, history);
+		}
+	};
+
+	const handleTogglePublicProfile = () => {
+		const next = !publicProfile;
+		setPublicProfile(next);
+		saveSettings(adultContent, next, history);
+	};
+
+	const handleToggleHistory = () => {
+		const next = !history;
+		setHistory(next);
+		saveSettings(adultContent, publicProfile, next);
+	};
+
 	/* ---------- PROVIDERS ---------- */
 
 	const fetchProviders = async () => {
@@ -77,14 +137,6 @@ export const useSettings = () => {
 		} finally {
 			setIsLoadingProviders(false);
 		}
-	};
-
-	const toggleProvider = (providerId: number) => {
-		setSelectedProviders((prev) =>
-			prev.includes(providerId)
-				? prev.filter((id) => id !== providerId)
-				: [...prev, providerId]
-		);
 	};
 
 	/* ---------- CACHE ---------- */
@@ -179,9 +231,9 @@ export const useSettings = () => {
 		isDeletingAccount,
 
 		setNotifications,
-		setPublicProfile,
-		setHistory,
-		setAdultContent,
+		setPublicProfile: handleTogglePublicProfile,
+		setHistory: handleToggleHistory,
+		setAdultContent: handleToggleAdultContent,
 
 		toggleProvider,
 		calculateCacheSize,

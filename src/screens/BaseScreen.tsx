@@ -31,7 +31,7 @@ export default function BaseScreen() {
 
 		const result = await checkLogin();
 		if (result !== null) {
-			signIn(result?.id, result?.identifier, result?.token);
+			signIn(result.id ?? "", result.identifier ?? "", result.token ?? "");
 			router.replace("/"); // Redirect to home if logged in
 			return;
 		}

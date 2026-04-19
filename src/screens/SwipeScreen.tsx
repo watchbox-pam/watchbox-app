@@ -20,11 +20,13 @@ import {
 	withTiming
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { fetchMovies, postSwipe, checkBackendHealth } from "../services/SwipeService";
+import { fetchMovies, postSwipe } from "../services/SwipeService";
+import { postFeedback } from "../services/ReviewService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
 import MovieLoader from "../components/MovieLoader";
+import useSessionStore from "../zustand/sessionStore";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
@@ -44,6 +46,7 @@ export default function SwipeScreen() {
 	const [skippedCount, setSkippedCount] = useState(0);
 
 	const router = useRouter();
+	const currentUser = useSessionStore((state) => state.user);
 
 	const translateX = useSharedValue(0);
 	const translateY = useSharedValue(0);
@@ -84,15 +87,6 @@ export default function SwipeScreen() {
 
 	useEffect(() => {
 		const load = async () => {
-			if (__DEV__) {
-				const health = await checkBackendHealth();
-				if (!health.ok) {
-					console.warn("[SwipeScreen] Backend inaccessible →", health.error ?? "pas de /health");
-				} else {
-					console.log("[SwipeScreen] Backend OK");
-				}
-			}
-
 			try {
 				const res = await fetchMovies();
 				res.forEach((m) => seenMovieIdsRef.current.add(m.id));
@@ -121,6 +115,11 @@ export default function SwipeScreen() {
 			const apiDirection =
 				direction === "right" ? "like" : direction === "left" ? "dislike" : "skip";
 			postSwipe(movie.id, apiDirection);
+
+			if (apiDirection === "like" || apiDirection === "dislike") {
+				const rating = apiDirection === "like" ? 8 : 2;
+				postFeedback(movie.id, currentUser.id, rating);
+			}
 
 			if (direction === "right") setLikedCount((n) => n + 1);
 			else if (direction === "left") setDislikedCount((n) => n + 1);

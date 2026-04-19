@@ -13,7 +13,7 @@ const DropDownButton = () => {
 	const closeMenu = () => setVisible(false);
 
 	const handleNavigate = (screen: string) => {
-		router.push(`/${screen.toLowerCase()}`);
+		router.push(`/${screen.toLowerCase()}` as any);
 		closeMenu();
 	};
 

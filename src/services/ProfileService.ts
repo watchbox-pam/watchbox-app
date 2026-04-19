@@ -45,6 +45,37 @@ export async function getUserProfile(userId: string) {
 }
 
 /**
+ * Update user settings (adult_content, is_private, history_private)
+ */
+export async function updateSettings(
+	userId: string,
+	adultContent: boolean,
+	isPrivate: boolean,
+	historyPrivate: boolean
+): Promise<{ success: boolean; message?: string }> {
+	try {
+		const result = await ApiHelper.patch(`/users/${userId}/settings`, {
+			adult_content: adultContent,
+			is_private: isPrivate,
+			history_private: historyPrivate
+		});
+		if (result.success) {
+			return { success: true };
+		}
+		return {
+			success: false,
+			message: result.data ?? "Erreur lors de la mise à jour"
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message:
+				error instanceof Error ? error.message : "Erreur inconnue"
+		};
+	}
+}
+
+/**
  * Delete the user account
  * @returns Success status and message
  */

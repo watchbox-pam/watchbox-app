@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
 	ScrollView,
 	View,
@@ -112,42 +113,24 @@ export default function Index() {
 		}
 	}, [currentUser, refreshing]);
 
-	useEffect(() => {
+	const fetchStats = useCallback(() => {
 		const userId = currentUser && currentUser.id;
-		if (
-			userId &&
-			typeof userId === "string" &&
-			Array.isArray(userPlaylists) &&
-			userPlaylists.length > 0
-		) {
-			try {
-				const historique = userPlaylists.find(
-					(p) => p.title === "Historique"
-				);
-				if (historique) {
-					console.log("historique id", historique.id);
-					getMovieRuntime(historique.id)
-						.then((result) => {
-							if (result.success && result.data) {
-								setTotalMovies(result.data.movie_count);
-								setTotalRuntime(result.data.total_runtime);
-							}
-						})
-						.catch((error) => {
-							console.error(
-								"Erreur lors de la récupération du runtime:",
-								error
-							);
-						});
+		if (!userId || typeof userId !== "string") return;
+
+		getUserPlaylists(userId).then((response) => {
+			if (!response.success || !Array.isArray(response.data)) return;
+			const historique = response.data.find((p: Playlist) => p.title === "Historique");
+			if (!historique) return;
+			getMovieRuntime(historique.id).then((result) => {
+				if (result.success && result.data) {
+					setTotalMovies(result.data.movie_count);
+					setTotalRuntime(result.data.total_runtime);
 				}
-			} catch (error) {
-				console.error(
-					"Erreur lors du traitement des playlists:",
-					error
-				);
-			}
-		}
-	}, [userPlaylists, currentUser]);
+			});
+		});
+	}, [currentUser]);
+
+	useFocusEffect(fetchStats);
 
 	const fetchData = async (userId: string) => {
 		try {

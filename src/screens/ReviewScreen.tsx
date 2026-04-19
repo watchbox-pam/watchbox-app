@@ -25,7 +25,7 @@ export default function ReviewScreen() {
 	const addReview = async () => {
 		const review: Review = {
 			userId: currentUser.id,
-			mediaId: id,
+			mediaId: Array.isArray(id) ? id[0] : id,
 			rating: rating,
 			comment: comment,
 			isSpoiler: isSpoiler
