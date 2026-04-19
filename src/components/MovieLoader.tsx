@@ -7,7 +7,6 @@ import Animated, {
 	withRepeat,
 	withSequence,
 	withDelay,
-	Easing,
 	interpolate,
 	cancelAnimation
 } from "react-native-reanimated";
@@ -49,10 +48,7 @@ function SkeletonCard({
 		shimmer.value = withDelay(
 			delay,
 			withRepeat(
-				withTiming(1, {
-					duration: 1600,
-					easing: Easing.inOut(Easing.sine)
-				}),
+				withTiming(1, { duration: 1600 }),
 				-1,
 				true
 			)
@@ -61,14 +57,8 @@ function SkeletonCard({
 			delay,
 			withRepeat(
 				withSequence(
-					withTiming(1, {
-						duration: 900,
-						easing: Easing.inOut(Easing.ease)
-					}),
-					withTiming(0, {
-						duration: 900,
-						easing: Easing.inOut(Easing.ease)
-					})
+					withTiming(1, { duration: 900 }),
+					withTiming(0, { duration: 900 })
 				),
 				-1,
 				false
@@ -140,14 +130,8 @@ function LoadingDot({ index }: { index: number }) {
 			index * 180,
 			withRepeat(
 				withSequence(
-					withTiming(1, {
-						duration: 400,
-						easing: Easing.out(Easing.ease)
-					}),
-					withTiming(0, {
-						duration: 400,
-						easing: Easing.in(Easing.ease)
-					}),
+					withTiming(1, { duration: 400 }),
+					withTiming(0, { duration: 400 }),
 					withDelay(300, withTiming(0, { duration: 0 }))
 				),
 				-1,
@@ -183,7 +167,7 @@ export default function MovieLoader() {
 	useEffect(() => {
 		titleOpacity.value = withDelay(
 			200,
-			withTiming(1, { duration: 600, easing: Easing.out(Easing.ease) })
+			withTiming(1, { duration: 600 })
 		);
 		return () => cancelAnimation(titleOpacity);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

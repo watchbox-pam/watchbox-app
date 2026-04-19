@@ -20,7 +20,7 @@ import {
 	withTiming
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { fetchMovies } from "../services/SwipeService";
+import { fetchMovies, postSwipe, checkBackendHealth } from "../services/SwipeService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,6 +29,7 @@ import MovieLoader from "../components/MovieLoader";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 const SWIPE_OUT_DURATION = 250;
+const PREFETCH_THRESHOLD = 10;
 
 type SwipeDirection = "left" | "right" | "up";
 
@@ -53,6 +54,8 @@ export default function SwipeScreen() {
 	const moviesRef = useRef<Movie[]>([]);
 	const tapStartTime = useRef(0);
 	const isAnimatingRef = useRef(false);
+	const isFetchingMoreRef = useRef(false);
+	const seenMovieIdsRef = useRef<Set<number>>(new Set());
 
 	useEffect(() => {
 		currentIndexRef.current = currentIndex;
@@ -63,9 +66,36 @@ export default function SwipeScreen() {
 	}, [movies]);
 
 	useEffect(() => {
+		const remaining = movies.length - currentIndex;
+		if (remaining > PREFETCH_THRESHOLD || movies.length === 0 || isFetchingMoreRef.current) return;
+
+		isFetchingMoreRef.current = true;
+		fetchMovies().then((newMovies) => {
+			const fresh = newMovies.filter((m) => !seenMovieIdsRef.current.has(m.id));
+			fresh.forEach((m) => seenMovieIdsRef.current.add(m.id));
+			if (fresh.length > 0) {
+				setMovies((prev) => [...prev, ...fresh]);
+			}
+			isFetchingMoreRef.current = false;
+		}).catch(() => {
+			isFetchingMoreRef.current = false;
+		});
+	}, [currentIndex, movies.length]);
+
+	useEffect(() => {
 		const load = async () => {
+			if (__DEV__) {
+				const health = await checkBackendHealth();
+				if (!health.ok) {
+					console.warn("[SwipeScreen] Backend inaccessible →", health.error ?? "pas de /health");
+				} else {
+					console.log("[SwipeScreen] Backend OK");
+				}
+			}
+
 			try {
 				const res = await fetchMovies();
+				res.forEach((m) => seenMovieIdsRef.current.add(m.id));
 				setMovies(res);
 			} catch (err) {
 				console.error("Erreur lors du chargement des films :", err);
@@ -88,12 +118,16 @@ export default function SwipeScreen() {
 			const movie = moviesRef.current[currentIndexRef.current];
 			if (!movie) return;
 
+			const apiDirection =
+				direction === "right" ? "like" : direction === "left" ? "dislike" : "skip";
+			postSwipe(movie.id, apiDirection);
+
 			if (direction === "right") setLikedCount((n) => n + 1);
 			else if (direction === "left") setDislikedCount((n) => n + 1);
 			else setSkippedCount((n) => n + 1);
 
 			setCurrentIndex((prev) => prev + 1);
-			nextCardScale.value = withSpring(0.95, { duration: 400 });
+			nextCardScale.value = withTiming(0.95, { duration: 400 });
 			isAnimatingRef.current = false;
 			setIsAnimating(false);
 		},
@@ -132,7 +166,7 @@ export default function SwipeScreen() {
 	const resetPosition = useCallback(() => {
 		translateX.value = withSpring(0, { damping: 15 });
 		translateY.value = withSpring(0, { damping: 15 });
-		nextCardScale.value = withSpring(0.95, { duration: 300 });
+		nextCardScale.value = withTiming(0.95, { duration: 300 });
 	}, [nextCardScale, translateX, translateY]);
 
 	const panResponder = useRef(
