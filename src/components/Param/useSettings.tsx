@@ -4,7 +4,11 @@ import * as FileSystem from "expo-file-system/legacy";
 import useSessionStore from "@/src/zustand/sessionStore";
 import useFiltersStore from "@/src/zustand/filtersStore";
 import UserProfile from "@/src/models/UserProfile";
-import { deleteAccount, getUserProfile, updateSettings } from "@/src/services/ProfileService";
+import {
+	deleteAccount,
+	getUserProfile,
+	updateSettings
+} from "@/src/services/ProfileService";
 import { providerService } from "@/src/services/ProviderService";
 import Toast from "react-native-toast-message";
 
@@ -85,7 +89,8 @@ export const useSettings = () => {
 			Toast.show({
 				type: "error",
 				text1: "Erreur",
-				text2: result.message ?? "Impossible de sauvegarder les paramètres"
+				text2:
+					result.message ?? "Impossible de sauvegarder les paramètres"
 			});
 		}
 	};

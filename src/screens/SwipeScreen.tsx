@@ -70,19 +70,28 @@ export default function SwipeScreen() {
 
 	useEffect(() => {
 		const remaining = movies.length - currentIndex;
-		if (remaining > PREFETCH_THRESHOLD || movies.length === 0 || isFetchingMoreRef.current) return;
+		if (
+			remaining > PREFETCH_THRESHOLD ||
+			movies.length === 0 ||
+			isFetchingMoreRef.current
+		)
+			return;
 
 		isFetchingMoreRef.current = true;
-		fetchMovies().then((newMovies) => {
-			const fresh = newMovies.filter((m) => !seenMovieIdsRef.current.has(m.id));
-			fresh.forEach((m) => seenMovieIdsRef.current.add(m.id));
-			if (fresh.length > 0) {
-				setMovies((prev) => [...prev, ...fresh]);
-			}
-			isFetchingMoreRef.current = false;
-		}).catch(() => {
-			isFetchingMoreRef.current = false;
-		});
+		fetchMovies()
+			.then((newMovies) => {
+				const fresh = newMovies.filter(
+					(m) => !seenMovieIdsRef.current.has(m.id)
+				);
+				fresh.forEach((m) => seenMovieIdsRef.current.add(m.id));
+				if (fresh.length > 0) {
+					setMovies((prev) => [...prev, ...fresh]);
+				}
+				isFetchingMoreRef.current = false;
+			})
+			.catch(() => {
+				isFetchingMoreRef.current = false;
+			});
 	}, [currentIndex, movies.length]);
 
 	useEffect(() => {
@@ -113,7 +122,11 @@ export default function SwipeScreen() {
 			if (!movie) return;
 
 			const apiDirection =
-				direction === "right" ? "like" : direction === "left" ? "dislike" : "skip";
+				direction === "right"
+					? "like"
+					: direction === "left"
+						? "dislike"
+						: "skip";
 			postSwipe(movie.id, apiDirection);
 
 			if (apiDirection === "like" || apiDirection === "dislike") {

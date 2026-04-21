@@ -48,7 +48,8 @@ const DropDownPlaylist = ({
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
 
 	const openMenu = () => {
-		const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+		const { width: screenWidth, height: screenHeight } =
+			Dimensions.get("window");
 		buttonRef.current?.measure(() => {
 			setMenuPosition({
 				x: screenWidth - MENU_WIDTH + 40,

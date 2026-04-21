@@ -139,7 +139,9 @@ const SwipeCard: FC<SwipeCardViewProps> = ({
 					resizeMode="cover"
 				/>
 			) : (
-				<View style={[styles.posterImage, { backgroundColor: "#13396A" }]} />
+				<View
+					style={[styles.posterImage, { backgroundColor: "#13396A" }]}
+				/>
 			)}
 
 			{isTopCard && (

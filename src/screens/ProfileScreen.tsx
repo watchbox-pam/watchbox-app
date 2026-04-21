@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {
 	ScrollView,
@@ -7,124 +7,108 @@ import {
 	Image,
 	Modal,
 	TextInput,
-	Button,
 	RefreshControl,
-	TouchableOpacity
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	Pressable,
+	Animated
 } from "react-native";
-import styles from "../styles/ProfileScreenStyle";
 import { LinearGradient } from "expo-linear-gradient";
-import DropDownButton from "../components/DropDownButton";
-import TraitGradiant from "../components/TraitGradiant";
-import Stats from "../components/Stats";
+import { ActivityIndicator } from "react-native-paper";
+import Toast from "react-native-toast-message";
+
+import styles from "../styles/ProfileScreenStyle";
 import CarouselWatchList from "../components/CarouselWatchList";
+import DropDownButton from "../components/DropDownButton";
+import { ErrorMessage } from "../components/ErrorMessage";
 import { getUserProfile } from "../services/ProfileService";
-import useSessionStore from "../zustand/sessionStore";
-import Playlist from "../models/Playlist";
 import {
 	createPlaylist,
 	getMovieRuntime,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
-import { ActivityIndicator } from "react-native-paper";
-import { ErrorMessage } from "../components/ErrorMessage";
-import Toast from "react-native-toast-message";
+import useSessionStore from "../zustand/sessionStore";
+import Playlist from "../models/Playlist";
+import { FontAwesome5 } from "@expo/vector-icons";
+
+// Adapté depuis l'ancien composant Stats
+function formatRuntime(totalMinutes: number): string {
+	if (!totalMinutes) return "0min";
+	const h = Math.floor(totalMinutes / 60);
+	const months = Math.floor(h / 720);
+	const days = Math.floor((h % 720) / 24);
+	const hours = h % 24;
+	const mins = totalMinutes % 60;
+	const parts: string[] = [];
+	if (months > 0) parts.push(`${months}m`);
+	if (days > 0) parts.push(`${days}j`);
+	if (hours > 0) parts.push(`${hours}h`);
+	if (mins > 0) parts.push(`${mins}min`);
+	return parts.join(" ") || "0min";
+}
 
 interface UserProfile {
 	username: string;
 	[key: string]: any;
 }
 
-export default function Index() {
+function useSlideIn(visible: boolean) {
+	const translateY = useRef(new Animated.Value(500)).current;
+	useEffect(() => {
+		Animated.spring(translateY, {
+			toValue: visible ? 0 : 500,
+			useNativeDriver: true,
+			bounciness: 0,
+			speed: 20
+		}).start();
+	}, [visible]);
+	return translateY;
+}
+
+export default function ProfileScreen() {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 	const [totalMovies, setTotalMovies] = useState(0);
+	const [totalShows, setTotalShows] = useState(0);
 	const [totalRuntime, setTotalRuntime] = useState(0);
-
 	const [profileData, setProfileData] = useState<UserProfile | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
-	const currentUser = useSessionStore((state: any) => state.user);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
-
 	const [refreshing, setRefreshing] = useState(false);
-	const onRefresh = useCallback(() => {
-		setRefreshing(true);
-	}, []);
+	const [editModalVisible, setEditModalVisible] = useState(false);
+	const [newUsername, setNewUsername] = useState("");
+	const playlistSlide = useSlideIn(modalVisible);
+	const editSlide = useSlideIn(editModalVisible);
 
-	const handleCreateWatchlist = () => {
-		setModalVisible(true);
-	};
-
-	const handleSavePlaylist = async () => {
-		const userId = currentUser && currentUser.id;
-		if (!userId) {
-			Toast.show({
-				type: "error",
-				text1: "Erreur",
-				text2: "Utilisateur non connecté"
-			});
-			return;
-		}
-
-		const playlistToInsert: Playlist = {
-			id: "",
-			user_id: userId,
-			title: playlistTitle,
-			is_private: isPrivate,
-			created_at: new Date()
-		};
-
-		const result = await createPlaylist(playlistToInsert);
-
-		if (result.success) {
-			Toast.show({
-				type: "success",
-				text1: "Succès",
-				text2: result.message || "Playlist créée avec succès !"
-			});
-			setModalVisible(false);
-			setPlaylistTitle("");
-			setIsPrivate(false);
-			await fetchData(userId);
-		} else {
-			Toast.show({
-				type: "error",
-				text1: "Erreur",
-				text2:
-					result.message ||
-					"Une erreur est survenue pendant la création de la playlist"
-			});
-		}
-	};
+	const currentUser = useSessionStore((state: any) => state.user);
 
 	useEffect(() => {
 		setLoading(true);
-
-		const userId = currentUser && currentUser.id;
-		if (userId && typeof userId === "string") {
-			fetchData(userId);
-		} else {
+		const userId = currentUser?.id;
+		if (userId && typeof userId === "string") fetchData(userId);
+		else {
 			setError(true);
 			setLoading(false);
 		}
-		if (refreshing) {
-			setRefreshing(false);
-		}
+		if (refreshing) setRefreshing(false);
 	}, [currentUser, refreshing]);
 
 	const fetchStats = useCallback(() => {
-		const userId = currentUser && currentUser.id;
-		if (!userId || typeof userId !== "string") return;
-
-		getUserPlaylists(userId).then((response) => {
-			if (!response.success || !Array.isArray(response.data)) return;
-			const historique = response.data.find((p: Playlist) => p.title === "Historique");
-			if (!historique) return;
-			getMovieRuntime(historique.id).then((result) => {
-				if (result.success && result.data) {
-					setTotalMovies(result.data.movie_count);
-					setTotalRuntime(result.data.total_runtime);
+		const userId = currentUser?.id;
+		if (!userId) return;
+		getUserPlaylists(userId).then((res) => {
+			if (!res.success || !Array.isArray(res.data)) return;
+			const hist = res.data.find(
+				(p: Playlist) => p.title === "Historique"
+			);
+			if (!hist) return;
+			getMovieRuntime(hist.id).then((r) => {
+				if (r.success && r.data) {
+					setTotalMovies(r.data.movie_count);
+					setTotalShows(r.data.Show_count);
+					setTotalRuntime(r.data.total_runtime);
 				}
 			});
 		});
@@ -134,165 +118,365 @@ export default function Index() {
 
 	const fetchData = async (userId: string) => {
 		try {
-			// Récupération du profil utilisateur
-			try {
-				const response = await getUserProfile(userId);
-				if (response.success) {
-					setProfileData(response.data);
-				} else {
-					console.error(
-						"Erreur lors de la récupération du profil:",
-						response.message
-					);
-				}
-			} catch (profileError) {
-				console.error(
-					"Erreur lors de la récupération du profil:",
-					profileError
-				);
-				// Ne pas définir error=true ici pour permettre l'affichage partiel
-			}
-
-			// Récupération des playlists utilisateur
-			try {
-				const response2 = await getUserPlaylists(userId);
-				if (response2.success && response2.data) {
-					setUserPlaylists(response2.data);
-				} else {
-					console.error(
-						"Erreur lors de la récupération des playlists:",
-						response2?.message
-					);
-					// S'assurer que userPlaylists est toujours un tableau vide en cas d'échec
-					setUserPlaylists([]);
-				}
-			} catch (playlistError) {
-				console.error(
-					"Erreur lors de la récupération des playlists:",
-					playlistError
-				);
-				// S'assurer que userPlaylists est toujours un tableau vide en cas d'erreur réseau
-				setUserPlaylists([]);
-			}
-		} catch (error) {
-			console.error("Erreur générale:", error);
+			const [profileRes, playlistRes] = await Promise.allSettled([
+				getUserProfile(userId),
+				getUserPlaylists(userId)
+			]);
+			if (profileRes.status === "fulfilled" && profileRes.value.success)
+				setProfileData(profileRes.value.data);
+			if (playlistRes.status === "fulfilled" && playlistRes.value.success)
+				setUserPlaylists(playlistRes.value.data ?? []);
+			else setUserPlaylists([]);
+		} catch {
 			setError(true);
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	if (error) {
-		return <ErrorMessage />;
-	}
+	const handleSavePlaylist = async () => {
+		const userId = currentUser?.id;
+		if (!userId) return;
+		const result = await createPlaylist({
+			id: "",
+			user_id: userId,
+			title: playlistTitle,
+			is_private: isPrivate,
+			created_at: new Date()
+		});
+		if (result.success) {
+			Toast.show({ type: "success", text1: "Playlist créée !" });
+			setModalVisible(false);
+			setPlaylistTitle("");
+			setIsPrivate(false);
+			fetchData(userId);
+		} else {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: result.message
+			});
+		}
+	};
 
-	if (loading) {
+	const historyPlaylist = userPlaylists.find((p) => p.title === "Historique");
+	const otherPlaylists = userPlaylists.filter(
+		(p) => p.title !== "Historique"
+	);
+
+	if (error) return <ErrorMessage />;
+	if (loading)
 		return (
-			<View style={styles.loading} testID="loading">
-				<ActivityIndicator size="large" color="#fff" />
+			<View style={styles.loading}>
+				<ActivityIndicator size="large" color="#1E90FF" />
 			</View>
 		);
-	}
 
 	return (
-		<ScrollView
-			style={styles.container}
-			contentContainerStyle={styles.contentContainer}
-			showsVerticalScrollIndicator={false}
-			refreshControl={
-				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-			}>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => setModalVisible(false)}>
-				<View style={styles.modalContainer}>
-					<View style={styles.modalContent}>
-						<Text style={styles.modalTitle}>Créer un playlist</Text>
-						<TextInput
-							style={styles.input}
-							placeholder="Titre de la playlist"
-							placeholderTextColor="#ccc"
-							value={playlistTitle}
-							onChangeText={setPlaylistTitle}
+		<>
+			<ScrollView
+				style={styles.container}
+				contentContainerStyle={styles.contentContainer}
+				showsVerticalScrollIndicator={false}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={() => setRefreshing(true)}
+						tintColor="#1E90FF"
+					/>
+				}>
+				{/* Banner */}
+				<View style={styles.bannerContainer}>
+					<Image
+						source={require("../assets/images/banniere default.png")}
+						style={styles.bannerImage}
+					/>
+					<LinearGradient
+						colors={["rgba(7,25,46,0.55)", "transparent"]}
+						style={styles.bannerGradientTop}
+					/>
+					<LinearGradient
+						colors={["transparent", "#07192e"]}
+						style={styles.bannerGradient}
+					/>
+				</View>
+
+				{/* Profile header */}
+				<View style={styles.profileSection}>
+					<View style={styles.avatarRow}>
+						<Image
+							source={require("../assets/images/default-user.png")}
+							style={styles.avatar}
 						/>
-						<View style={styles.checkboxContainer}>
+						<View style={styles.avatarActions}>
 							<TouchableOpacity
-								style={[
-									styles.checkbox,
-									isPrivate && styles.checkboxChecked
-								]}
-								onPress={() => setIsPrivate(!isPrivate)}
-							/>
-							<Text style={styles.checkboxLabel}>Privée</Text>
+								style={styles.btnEdit}
+								onPress={() => {
+									setNewUsername(profileData?.username ?? "");
+									setEditModalVisible(true);
+								}}>
+								<FontAwesome5
+									name="pen"
+									size={16}
+									color="white"
+								/>
+							</TouchableOpacity>
+							<DropDownButton />
 						</View>
-						<View style={styles.modalButtons}>
-							<Button
-								title="Annuler"
-								onPress={() => setModalVisible(false)}
-							/>
-							<Button
-								title="Ajouter"
-								onPress={handleSavePlaylist}
-							/>
+					</View>
+
+					<Text style={styles.username}>
+						{profileData?.username ?? "—"}
+					</Text>
+					<Text style={styles.handle}>
+						@{profileData?.username?.toLowerCase() ?? "—"} ·{" "}
+						{profileData?.created_at
+							? new Date(profileData.created_at).getFullYear()
+							: "—"}
+					</Text>
+
+					{/* Stats */}
+					<View style={styles.statsRow}>
+						{/* <TouchableOpacity style={styles.statItem}>
+							<Text style={styles.statNum}>
+								{totalFollower}142
+							</Text>
+							<Text style={styles.statLabel}>Abonnés</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.statItem}>
+							<Text style={styles.statNum}>
+								{totalFollow}
+							</Text>
+							<Text style={styles.statLabel}>Abonnements</Text>
+						</TouchableOpacity> */}
+						<View style={styles.statItem}>
+							<Text style={styles.statNum}>{totalMovies}</Text>
+							<Text style={styles.statLabel}>Films</Text>
+						</View>
+						{/* <View style={styles.statItem}>
+							<Text style={styles.statNum}>{totalShows}9</Text>
+							<Text style={styles.statLabel}>Séries</Text>
+						</View> */}
+						<View
+							style={[styles.statItem, { borderRightWidth: 0 }]}>
+							<Text
+								style={styles.statNum}
+								numberOfLines={1}
+								adjustsFontSizeToFit>
+								{formatRuntime(totalRuntime)}
+							</Text>
+							<Text style={styles.statLabel}>Visionnés</Text>
 						</View>
 					</View>
 				</View>
-			</Modal>
 
-			<View style={styles.imageBannerContainer}>
-				<LinearGradient
-					colors={["#0A1E38", "transparent"]}
-					style={styles.shadowBottom}
-				/>
-				<Image
-					source={require("../assets/images/banniere default.png")}
-					style={styles.imageBanner}
-				/>
-			</View>
-
-			<View style={styles.infoContainer}>
-				<View style={styles.imagePosterContainer}>
-					<Image
-						source={require("../assets/images/default-user.png")}
-						style={styles.ProfilPicture}
-					/>
-					<Text style={styles.title}>{profileData?.username}</Text>
-				</View>
-				<DropDownButton />
-			</View>
-
-			<TraitGradiant />
-
-			<View style={styles.WatchList}>
-				<View style={styles.watchListHeader}>
-					<Text style={styles.TitleWatchList}>Mes Playlists</Text>
-					<TouchableOpacity
-						style={styles.createWatchlistButton}
-						onPress={handleCreateWatchlist}>
-						<Text style={styles.createWatchlistButtonText}>+</Text>
-					</TouchableOpacity>
-				</View>
-				{Array.isArray(userPlaylists) && userPlaylists.length > 0 ? (
-					userPlaylists.map((playlist) => (
-						<View key={playlist.id} style={styles.WatchList}>
-							<View style={styles.watchListHeader}>
-								<Text style={styles.TitleWatchList}>
-									{playlist.title}
-								</Text>
+				{/* Playlists */}
+				<View style={styles.section}>
+					{/* Historique */}
+					{historyPlaylist && (
+						<View>
+							<View style={styles.playlistCard}>
+								<View style={styles.playlistInfo}>
+									<Text style={styles.playlistName}>
+										Historique
+									</Text>
+									<Text style={styles.playlistMeta}>
+										{totalMovies} film
+										{totalMovies !== 1 ? "s" : ""} ·{" "}
+										{formatRuntime(totalRuntime)}
+									</Text>
+								</View>
+								{/* <View style={styles.badge}>
+									<Text style={styles.badgeText}>Auto</Text>
+								</View> */}
 							</View>
-							<CarouselWatchList providers={playlist} />
+							<CarouselWatchList
+								providers={historyPlaylist}
+								showDivider={false}
+							/>
 						</View>
-					))
-				) : (
-					<Text style={styles.noPlaylistsText}>
-						Aucune playlist disponible
-					</Text>
-				)}
-			</View>
+					)}
 
-			<Stats totalMovies={totalMovies} total_runtime={totalRuntime} />
-		</ScrollView>
+					<View style={styles.sectionHeader}>
+						<Text style={styles.sectionTitle}>Mes Playlists</Text>
+						<TouchableOpacity
+							style={styles.btnAdd}
+							onPress={() => setModalVisible(true)}>
+							<Text style={styles.btnAddText}>+</Text>
+						</TouchableOpacity>
+					</View>
+
+					{/* Autres playlists */}
+					{otherPlaylists.length > 0 ? (
+						otherPlaylists.map((p, i) => (
+							<View key={p.id}>
+								<View style={styles.playlistCard}>
+									<View style={styles.playlistInfo}>
+										<Text style={styles.playlistName}>
+											{p.title}
+										</Text>
+									</View>
+									{p.is_private ? (
+										<View style={styles.badgePrivate}>
+											<Text
+												style={styles.badgePrivateText}>
+												Privée
+											</Text>
+										</View>
+									) : (
+										<View style={styles.badge}>
+											<Text style={styles.badgeText}>
+												Publique
+											</Text>
+										</View>
+									)}
+								</View>
+								<CarouselWatchList
+									providers={p}
+									showDivider={false}
+								/>
+							</View>
+						))
+					) : (
+						<Text style={styles.emptyPlaylists}>
+							Aucune playlist créée
+						</Text>
+					)}
+				</View>
+			</ScrollView>
+
+			{/* Modal bottom sheet */}
+			<Modal
+				animationType="fade"
+				transparent
+				visible={modalVisible}
+				onRequestClose={() => setModalVisible(false)}>
+				<Pressable
+					style={styles.modalOverlay}
+					onPress={() => setModalVisible(false)}>
+					<Animated.View
+						style={{ transform: [{ translateY: playlistSlide }] }}>
+						<Pressable
+							style={styles.modalSheet}
+							onPress={(e) => e.stopPropagation()}>
+							<View style={styles.modalHandle} />
+							<Text style={styles.modalTitle}>
+								Nouvelle playlist
+							</Text>
+							<TextInput
+								style={styles.input}
+								placeholder="Titre de la playlist"
+								placeholderTextColor="rgba(255,255,255,0.25)"
+								value={playlistTitle}
+								onChangeText={setPlaylistTitle}
+								autoFocus
+							/>
+							<Pressable
+								style={styles.checkboxRow}
+								onPress={() => setIsPrivate(!isPrivate)}>
+								<View
+									style={[
+										styles.checkbox,
+										isPrivate && styles.checkboxChecked
+									]}
+								/>
+								<Text style={styles.checkboxLabel}>
+									Rendre cette playlist privée
+								</Text>
+							</Pressable>
+						</Pressable>
+
+						<View style={styles.modalButtons}>
+							<Pressable
+								style={styles.btnCancel}
+								onPress={() => setModalVisible(false)}>
+								<Text style={styles.btnCancelText}>
+									Annuler
+								</Text>
+							</Pressable>
+							<Pressable
+								style={styles.btnConfirm}
+								onPress={handleSavePlaylist}>
+								<Text style={styles.btnConfirmText}>Créer</Text>
+							</Pressable>
+						</View>
+					</Animated.View>
+				</Pressable>
+			</Modal>
+			{/* Modal édition profil */}
+			<Modal
+				animationType="fade"
+				transparent
+				visible={editModalVisible}
+				onRequestClose={() => setEditModalVisible(false)}>
+				<Pressable
+					style={styles.modalOverlay}
+					onPress={() => setEditModalVisible(false)}>
+					<Animated.View
+						style={{ transform: [{ translateY: editSlide }] }}>
+						<Pressable
+							style={styles.modalSheet}
+							onPress={(e) => e.stopPropagation()}>
+							<View style={styles.modalHandle} />
+							<Text style={styles.modalTitle}>
+								Modifier le profil
+							</Text>
+
+							{/* Bannière */}
+							<Text style={styles.editSectionLabel}>
+								Bannière
+							</Text>
+							<Pressable style={styles.editMediaButton}>
+								<Text style={styles.editMediaText}>
+									Changer la bannière
+								</Text>
+								<Text style={styles.editMediaArrow}>›</Text>
+							</Pressable>
+
+							{/* Photo de profil */}
+							<Text style={styles.editSectionLabel}>
+								Photo de profil
+							</Text>
+							<Pressable style={styles.editMediaButton}>
+								<Text style={styles.editMediaText}>
+									Changer la photo
+								</Text>
+								<Text style={styles.editMediaArrow}>›</Text>
+							</Pressable>
+
+							{/* Pseudo */}
+							<Text style={styles.editSectionLabel}>Pseudo</Text>
+							<TextInput
+								style={styles.input}
+								placeholder="Nouveau pseudo"
+								placeholderTextColor="rgba(255,255,255,0.25)"
+								value={newUsername}
+								onChangeText={setNewUsername}
+							/>
+
+							<View style={styles.modalButtons}>
+								<Pressable
+									style={styles.btnCancel}
+									onPress={() => setEditModalVisible(false)}>
+									<Text style={styles.btnCancelText}>
+										Annuler
+									</Text>
+								</Pressable>
+								<Pressable
+									style={styles.btnConfirm}
+									onPress={() => {
+										// TODO: appel service update profil
+										setEditModalVisible(false);
+									}}>
+									<Text style={styles.btnConfirmText}>
+										Enregistrer
+									</Text>
+								</Pressable>
+							</View>
+						</Pressable>
+					</Animated.View>
+				</Pressable>
+			</Modal>
+		</>
 	);
 }
