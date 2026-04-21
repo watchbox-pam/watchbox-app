@@ -16,8 +16,6 @@ const styles = StyleSheet.create({
 	menuContent: {
 		backgroundColor: "#0A1E38",
 		borderWidth: 1,
-		top: 30,
-		left: 130,
 		zIndex: 5,
 		borderRadius: 30,
 		paddingVertical: 0,

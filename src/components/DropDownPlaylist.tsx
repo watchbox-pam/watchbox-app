@@ -8,8 +8,7 @@ import {
 	FlatList,
 	Alert,
 	Share,
-	ActivityIndicator,
-	Dimensions
+	ActivityIndicator
 } from "react-native";
 import { Menu, IconButton } from "react-native-paper";
 import {
@@ -48,11 +47,10 @@ const DropDownPlaylist = ({
 	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
 
 	const openMenu = () => {
-		const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-		buttonRef.current?.measure(() => {
+		buttonRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
 			setMenuPosition({
-				x: screenWidth - MENU_WIDTH + 40,
-				y: screenHeight - MENU_HEIGHT - 140
+				x: pageX + width,
+				y: pageY + height
 			});
 			setVisible(true);
 		});
