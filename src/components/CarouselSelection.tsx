@@ -73,7 +73,12 @@ const RadialMenu = () => {
 							transform: [{ translateX }, { translateY }]
 						}}>
 						<TouchableOpacity style={styles.button}>
-							<Text style={{ color: "#fff", fontSize: 10, textAlign: "center" }}>
+							<Text
+								style={{
+									color: "#fff",
+									fontSize: 10,
+									textAlign: "center"
+								}}>
 								{icons[index]}
 							</Text>
 						</TouchableOpacity>

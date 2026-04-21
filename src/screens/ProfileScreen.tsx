@@ -119,7 +119,9 @@ export default function Index() {
 
 		getUserPlaylists(userId).then((response) => {
 			if (!response.success || !Array.isArray(response.data)) return;
-			const historique = response.data.find((p: Playlist) => p.title === "Historique");
+			const historique = response.data.find(
+				(p: Playlist) => p.title === "Historique"
+			);
 			if (!historique) return;
 			getMovieRuntime(historique.id).then((result) => {
 				if (result.success && result.data) {

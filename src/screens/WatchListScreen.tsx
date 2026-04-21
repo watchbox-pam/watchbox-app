@@ -21,7 +21,12 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
 import { ErrorMessage } from "../components/ErrorMessage";
 
-type MovieItem = { id: number; image: string | null; title: string | null; release_date: string | null };
+type MovieItem = {
+	id: number;
+	image: string | null;
+	title: string | null;
+	release_date: string | null;
+};
 
 export default function Index() {
 	const { id }: { id: string } = useLocalSearchParams();
@@ -50,7 +55,7 @@ export default function Index() {
 			try {
 				const [playlistResult, mediaResult] = await Promise.all([
 					getPlaylistById(stringifiedId),
-					getMediaInPlaylist(stringifiedId),
+					getMediaInPlaylist(stringifiedId)
 				]);
 
 				if (playlistResult.success) {
@@ -78,7 +83,10 @@ export default function Index() {
 
 	const handleDeleteMedia = async (movieId: number) => {
 		try {
-			const result = await deleteMediaFromPlaylist(stringifiedId, movieId);
+			const result = await deleteMediaFromPlaylist(
+				stringifiedId,
+				movieId
+			);
 			if (result.success) {
 				setMovieList((prev) => prev.filter((m) => m.id !== movieId));
 			}
@@ -118,19 +126,28 @@ export default function Index() {
 				data={movieList}
 				keyExtractor={(item) => String(item.id)}
 				refreshControl={
-					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>
 				}
 				ListEmptyComponent={
-					<StyledText style={styles.NoResult}>Aucun résultat</StyledText>
+					<StyledText style={styles.NoResult}>
+						Aucun résultat
+					</StyledText>
 				}
 				renderItem={({ item: movie }) => (
 					<View style={styles.viewResult}>
 						<TouchableOpacity
-							onPress={() => router.push(`/(app)/(tabs)/movie/${movie.id}`)}
+							onPress={() =>
+								router.push(`/(app)/(tabs)/movie/${movie.id}`)
+							}
 							style={styles.resultatInfo}>
 							{movie.image != null ? (
 								<Image
-									source={{ uri: `https://image.tmdb.org/t/p/w500${movie.image}` }}
+									source={{
+										uri: `https://image.tmdb.org/t/p/w500${movie.image}`
+									}}
 									style={styles.image}
 									resizeMode="cover"
 								/>
@@ -138,11 +155,17 @@ export default function Index() {
 								<View style={styles.image} />
 							)}
 							<View style={styles.resultInfo}>
-								<Text style={styles.resultTitle} numberOfLines={3}>
+								<Text
+									style={styles.resultTitle}
+									numberOfLines={3}>
 									{movie.title}
 								</Text>
 								<Text style={styles.resultYear}>
-									{movie.release_date ? movie.release_date.toString().split("-")[0] : ""}
+									{movie.release_date
+										? movie.release_date
+												.toString()
+												.split("-")[0]
+										: ""}
 								</Text>
 							</View>
 							<TouchableOpacity

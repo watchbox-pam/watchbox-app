@@ -11,54 +11,54 @@ export default function TabLayout() {
 	}
 
 	return (
-		<View style={{ flex: 1}}>
+		<View style={{ flex: 1 }}>
 			<Tabs
 				backBehavior={"fullHistory"}
-                tabBar={(props) => <CustomTabBar {...props} />}
-                safeAreaInsets={{ bottom: 0 }}
-                screenOptions={{
-                    headerShown: false,
-                }}>
+				tabBar={(props) => <CustomTabBar {...props} />}
+				safeAreaInsets={{ bottom: 0 }}
+				screenOptions={{
+					headerShown: false
+				}}>
 				<Tabs.Screen
-                    name="index"
-                    options={{
-                        headerShown: false,
-                        title: "",
-                    }}
-                />
+					name="index"
+					options={{
+						headerShown: false,
+						title: ""
+					}}
+				/>
 				<Tabs.Screen
-                    name="search"
-                    options={{
-                        title: "",
-                    }}
-                />
+					name="search"
+					options={{
+						title: ""
+					}}
+				/>
 				<Tabs.Screen
-                    name="recommendation"
-                    options={{
-                        title: "",
-                    }}
-                />
-                <Tabs.Screen
-                    name="swipe"
-                    options={{
-                        title: "",
-                    }}
-                />
-                <Tabs.Screen
-                    name="calendar"
-                    options={{
-                        title: "",
-                    }}
-                />
+					name="recommendation"
+					options={{
+						title: ""
+					}}
+				/>
+				<Tabs.Screen
+					name="swipe"
+					options={{
+						title: ""
+					}}
+				/>
+				<Tabs.Screen
+					name="calendar"
+					options={{
+						title: ""
+					}}
+				/>
 				{/* Routes cachées (href: null) */}
-                <Tabs.Screen name="profile" options={{ href: null }} />
-                <Tabs.Screen name="commentary" options={{ href: null }} />
-                <Tabs.Screen name="friends" options={{ href: null }} />
-                <Tabs.Screen name="notifs" options={{ href: null }} />
-                <Tabs.Screen name="param" options={{ href: null }} />
-                <Tabs.Screen name="movie/[id]" options={{ href: null }} />
-                <Tabs.Screen name="person/[id]" options={{ href: null }} />
-                <Tabs.Screen name="review/[id]" options={{ href: null }} />
+				<Tabs.Screen name="profile" options={{ href: null }} />
+				<Tabs.Screen name="commentary" options={{ href: null }} />
+				<Tabs.Screen name="friends" options={{ href: null }} />
+				<Tabs.Screen name="notifs" options={{ href: null }} />
+				<Tabs.Screen name="param" options={{ href: null }} />
+				<Tabs.Screen name="movie/[id]" options={{ href: null }} />
+				<Tabs.Screen name="person/[id]" options={{ href: null }} />
+				<Tabs.Screen name="review/[id]" options={{ href: null }} />
 			</Tabs>
 		</View>
 	);
