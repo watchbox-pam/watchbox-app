@@ -229,7 +229,10 @@ export default function ProfileScreen() {
 						{profileData?.username ?? "—"}
 					</Text>
 					<Text style={styles.handle}>
-						@{profileData?.username?.toLowerCase() ?? "—"} ·{" "}
+						@{profileData?.username?.toLowerCase() ?? "—"}
+					</Text>
+					<Text style={styles.handle}>
+						{"Membre depuis "}
 						{profileData?.created_at
 							? new Date(profileData.created_at).getFullYear()
 							: "—"}
@@ -286,9 +289,11 @@ export default function ProfileScreen() {
 										{formatRuntime(totalRuntime)}
 									</Text>
 								</View>
-								{/* <View style={styles.badge}>
-									<Text style={styles.badgeText}>Auto</Text>
-								</View> */}
+								<View style={styles.badge}>
+									<Text style={styles.badgeText}>
+										Publique
+									</Text>
+								</View>
 							</View>
 							<CarouselWatchList
 								providers={historyPlaylist}
