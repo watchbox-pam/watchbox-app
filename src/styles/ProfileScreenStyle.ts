@@ -46,10 +46,7 @@ const styles = StyleSheet.create({
 	avatar: {
 		width: 88,
 		height: 88,
-		borderRadius: 44,
-		borderWidth: 3,
-		borderColor: "#1E90FF",
-		backgroundColor: "#0d2d54"
+		borderRadius: 44
 	},
 	avatarActions: {
 		position: "absolute",

@@ -227,43 +227,54 @@ export default function ProfileScreen() {
 					</Text>
 					<Text style={styles.handle}>
 						{"Membre depuis " +
-							new Date(profileData?.created_at).getFullYear()}
+							new Date(
+								profileData?.created_at ?? ""
+							).getFullYear()}{" "}
 					</Text>
+				</View>
 
-					{/* Stats */}
-					<View style={styles.statsRow}>
-						{/* <TouchableOpacity style={styles.statItem}>
-				<Text style={styles.statNum}>{follower}142</Text>
-				<Text style={styles.statLabel}>Abonnés</Text>
-			</TouchableOpacity>
-			<TouchableOpacity style={styles.statItem}>
-				<Text style={styles.statNum}>{follow}89</Text>
-				<Text style={styles.statLabel}>Abonnements</Text>
-			</TouchableOpacity> */}
-						<View style={styles.statItem}>
-							<Text style={styles.statNum}>{totalMovies}</Text>
-							<Text style={styles.statLabel}>Films</Text>
-						</View>
-						{/* <View style={styles.statItem}>
-				<Text style={styles.statNum}>{totalShows}</Text>
-				<Text style={styles.statLabel}>Séries</Text>
-			</View> */}
-						<View
-							style={[styles.statItem, { borderRightWidth: 0 }]}>
-							<Text
-								style={styles.statNum}
-								numberOfLines={1}
-								adjustsFontSizeToFit>
-								{formatRuntime(totalRuntime)}
-							</Text>
-							<Text style={styles.statLabel}>Visionnés</Text>
-						</View>
+				{/* Stats */}
+				<View style={styles.statsRow}>
+					{/* <TouchableOpacity style={styles.statItem}>
+						<Text style={styles.statNum}>{follower}142</Text>
+						<Text style={styles.statLabel}>Abonnés</Text>
+					</TouchableOpacity>
+					<TouchableOpacity style={styles.statItem}>
+						<Text style={styles.statNum}>{follow}89</Text>
+						<Text style={styles.statLabel}>Abonnements</Text>
+					</TouchableOpacity> */}
+					<View style={styles.statItem}>
+						<Text style={styles.statNum}>{totalMovies}</Text>
+						<Text style={styles.statLabel}>Films</Text>
+					</View>
+					{/* <View style={styles.statItem}>
+						<Text style={styles.statNum}>{totalShows}</Text>
+						<Text style={styles.statLabel}>Séries</Text>
+					</View> */}
+					<View style={[styles.statItem, { borderRightWidth: 0 }]}>
+						<Text
+							style={styles.statNum}
+							numberOfLines={1}
+							adjustsFontSizeToFit>
+							{formatRuntime(totalRuntime)}
+						</Text>
+						<Text style={styles.statLabel}>Visionnés</Text>
 					</View>
 				</View>
 
 				{/* Playlists */}
 				<View style={styles.section}>
 					{/* Historique */}
+
+					<View style={styles.sectionHeader}>
+						<Text style={styles.sectionTitle}>Mes Playlists</Text>
+						<TouchableOpacity
+							style={styles.btnAdd}
+							onPress={() => setModalVisible(true)}>
+							<Text style={styles.btnAddText}>+</Text>
+						</TouchableOpacity>
+					</View>
+
 					{historyPlaylist && (
 						<View>
 							<View style={styles.playlistCard}>
@@ -278,7 +289,9 @@ export default function ProfileScreen() {
 									</Text>
 								</View>
 								<View style={styles.badge}>
-									<Text style={styles.badgeText}>Auto</Text>
+									<Text style={styles.badgeText}>
+										Publique
+									</Text>
 								</View>
 							</View>
 							<CarouselWatchList
@@ -287,15 +300,6 @@ export default function ProfileScreen() {
 							/>
 						</View>
 					)}
-
-					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>Mes Playlists</Text>
-						<TouchableOpacity
-							style={styles.btnAdd}
-							onPress={() => setModalVisible(true)}>
-							<Text style={styles.btnAddText}>+</Text>
-						</TouchableOpacity>
-					</View>
 
 					{/* Autres playlists */}
 					{otherPlaylists.length > 0 ? (
