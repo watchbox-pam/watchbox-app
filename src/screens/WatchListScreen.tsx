@@ -7,7 +7,8 @@ import {
 	Text,
 	FlatList,
 	TouchableOpacity,
-	RefreshControl
+	RefreshControl,
+	ScrollView
 } from "react-native";
 import StyledText from "../components/StyledText";
 import {
@@ -21,7 +22,12 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
 import { ErrorMessage } from "../components/ErrorMessage";
 
-type MovieItem = { id: number; image: string | null; title: string | null; release_date: string | null };
+type MovieItem = {
+	id: number;
+	image: string | null;
+	title: string | null;
+	release_date: string | null;
+};
 
 export default function Index() {
 	const { id }: { id: string } = useLocalSearchParams();
@@ -50,7 +56,7 @@ export default function Index() {
 			try {
 				const [playlistResult, mediaResult] = await Promise.all([
 					getPlaylistById(stringifiedId),
-					getMediaInPlaylist(stringifiedId),
+					getMediaInPlaylist(stringifiedId)
 				]);
 
 				if (playlistResult.success) {
@@ -78,7 +84,10 @@ export default function Index() {
 
 	const handleDeleteMedia = async (movieId: number) => {
 		try {
-			const result = await deleteMediaFromPlaylist(stringifiedId, movieId);
+			const result = await deleteMediaFromPlaylist(
+				stringifiedId,
+				movieId
+			);
 			if (result.success) {
 				setMovieList((prev) => prev.filter((m) => m.id !== movieId));
 			}
@@ -110,60 +119,24 @@ export default function Index() {
 	}
 
 	return (
-		<View style={{ flex: 1 }}>
-			<FlatList
-				style={styles.container}
-				contentContainerStyle={styles.contentContainer}
-				overScrollMode="never"
-				data={movieList}
-				keyExtractor={(item) => String(item.id)}
-				refreshControl={
-					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-				}
-				ListEmptyComponent={
-					<StyledText style={styles.NoResult}>Aucun résultat</StyledText>
-				}
-				renderItem={({ item: movie }) => (
-					<View style={styles.viewResult}>
-						<TouchableOpacity
-							onPress={() => router.push(`/(app)/(tabs)/movie/${movie.id}`)}
-							style={styles.resultatInfo}>
-							{movie.image != null ? (
-								<Image
-									source={{ uri: `https://image.tmdb.org/t/p/w500${movie.image}` }}
-									style={styles.image}
-									resizeMode="cover"
-								/>
-							) : (
-								<View style={styles.image} />
-							)}
-							<View style={styles.resultInfo}>
-								<Text style={styles.resultTitle} numberOfLines={3}>
-									{movie.title}
-								</Text>
-								<Text style={styles.resultYear}>
-									{movie.release_date ? movie.release_date.toString().split("-")[0] : ""}
-								</Text>
-							</View>
-							<TouchableOpacity
-								onPress={() => handleDeleteMedia(movie.id)}
-								style={styles.deleteIconContainer}>
-								<MaterialIcons
-									name="delete"
-									size={24}
-									color="red"
-									style={styles.deleteIcon}
-								/>
-							</TouchableOpacity>
-						</TouchableOpacity>
-						<View style={styles.separator} />
-					</View>
-				)}
-			/>
+		<ScrollView
+			style={styles.container}
+			contentContainerStyle={styles.contentContainer}
+			overScrollMode="never"
+			refreshControl={
+				<RefreshControl
+					refreshing={refreshing}
+					onRefresh={onRefresh}
+					tintColor="#1E90FF"
+				/>
+			}>
+			{/* Header */}
 			<View style={styles.headers}>
 				<BackButton />
-				<Text style={styles.playlistName}>{playlistTitle}</Text>
-				{shouldShowEditButton && (
+				<Text style={styles.playlistName} numberOfLines={1}>
+					{playlistTitle}
+				</Text>
+				{shouldShowEditButton ? (
 					<DropDownModifyPlaylist
 						playlistId={stringifiedId}
 						initialTitle={playlistTitle}
@@ -173,8 +146,58 @@ export default function Index() {
 							setIsPrivate(is_private);
 						}}
 					/>
+				) : (
+					<View style={{ width: 44 }} /> // spacer pour centrer le titre
 				)}
 			</View>
-		</View>
+
+			{movieList?.length > 0 ? (
+				movieList.map((movie) => (
+					<View key={movie.id} style={styles.viewResult}>
+						<TouchableOpacity
+							onPress={() =>
+								router.push(`/(app)/(tabs)/movie/${movie.id}`)
+							}
+							style={styles.resultatInfo}
+							activeOpacity={0.7}>
+							<Image
+								source={{
+									uri: movie.image
+										? `https://image.tmdb.org/t/p/w500${movie.image}`
+										: ""
+								}}
+								style={styles.image}
+								resizeMode="cover"
+							/>
+							<View style={styles.resultInfo}>
+								<Text
+									style={styles.resultTitle}
+									numberOfLines={3}>
+									{movie.title}
+								</Text>
+								<Text style={styles.resultYear}>
+									{movie.release_date
+										?.toString()
+										.split("-")[0] ?? "Date inconnue"}
+								</Text>
+							</View>
+							<TouchableOpacity
+								onPress={() => handleDeleteMedia(movie.id)}
+								style={styles.deleteIconContainer}>
+								<MaterialIcons
+									name="delete"
+									size={20}
+									color="#e05a5a"
+								/>
+							</TouchableOpacity>
+						</TouchableOpacity>
+					</View>
+				))
+			) : (
+				<Text style={styles.NoResult}>
+					Aucun film dans cette playlist
+				</Text>
+			)}
+		</ScrollView>
 	);
 }

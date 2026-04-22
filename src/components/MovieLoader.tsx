@@ -47,11 +47,7 @@ function SkeletonCard({
 	useEffect(() => {
 		shimmer.value = withDelay(
 			delay,
-			withRepeat(
-				withTiming(1, { duration: 1600 }),
-				-1,
-				true
-			)
+			withRepeat(withTiming(1, { duration: 1600 }), -1, true)
 		);
 		pulse.value = withDelay(
 			delay,
@@ -165,10 +161,7 @@ export default function MovieLoader() {
 	const titleOpacity = useSharedValue(0);
 
 	useEffect(() => {
-		titleOpacity.value = withDelay(
-			200,
-			withTiming(1, { duration: 600 })
-		);
+		titleOpacity.value = withDelay(200, withTiming(1, { duration: 600 }));
 		return () => cancelAnimation(titleOpacity);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
