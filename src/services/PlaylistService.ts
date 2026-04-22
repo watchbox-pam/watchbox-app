@@ -236,8 +236,7 @@ export async function addMediaToPlaylist(playlistId: string, mediaId: number) {
 			return {
 				success: false,
 				message:
-					result?.data ||
-					"Impossible d'ajouter le film à la playlist"
+					result?.data || "Impossible d'ajouter le film à la playlist"
 			};
 		}
 	} catch (error: any) {
