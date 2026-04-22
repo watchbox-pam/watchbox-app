@@ -43,8 +43,13 @@ export default function SearchScreen() {
 	const [allProviders, setAllProviders] = useState<Provider[]>([]);
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
-	const { selectedProviders, isLoaded, loadProviders, toggleProvider, clearProviders } =
-		useFiltersStore();
+	const {
+		selectedProviders,
+		isLoaded,
+		loadProviders,
+		toggleProvider,
+		clearProviders
+	} = useFiltersStore();
 
 	const hasInteracted = useRef(false);
 

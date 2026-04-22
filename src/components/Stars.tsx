@@ -1,6 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { ComponentProps } from "react";
-import { useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { View } from "react-native";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];

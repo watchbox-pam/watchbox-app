@@ -69,8 +69,7 @@ export async function updateSettings(
 	} catch (error) {
 		return {
 			success: false,
-			message:
-				error instanceof Error ? error.message : "Erreur inconnue"
+			message: error instanceof Error ? error.message : "Erreur inconnue"
 		};
 	}
 }
