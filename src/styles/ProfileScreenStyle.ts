@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
 	},
 	statNum: {
 		color: "#ffffff",
-		fontSize: 18,
+		fontSize: 20,
 		fontWeight: "700",
 		letterSpacing: -0.3
 	},
 	statLabel: {
 		color: "#4a6a8a",
-		fontSize: 13,
+		fontSize: 15,
 		fontWeight: "400",
 		marginTop: 1
 	},

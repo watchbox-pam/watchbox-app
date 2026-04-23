@@ -44,10 +44,6 @@ export default function StarsRatings({ value, onChange }: StarsRatingsProps) {
 	const containerX = useRef<number>(0);
 	const scroreScale = useSharedValue(1);
 
-	const animatedScore = useAnimatedStyle(() => ({
-		transform: [{ scale: scroreScale.value }]
-	}));
-
 	const handleChange = (newValue: number) => {
 		if (newValue !== value) {
 			scroreScale.value = withSequence(
@@ -75,19 +71,6 @@ export default function StarsRatings({ value, onChange }: StarsRatingsProps) {
 		})
 	).current;
 
-	const label =
-		value === null
-			? "Glisser pour noter"
-			: value === 5
-				? "Chef-d'œuvre"
-				: value >= 4
-					? "Excellent"
-					: value >= 3
-						? "Bon"
-						: value >= 2
-							? "Moyen"
-							: "Mauvais";
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.row}>
@@ -111,19 +94,13 @@ export default function StarsRatings({ value, onChange }: StarsRatingsProps) {
 					))}
 				</View>
 				<View style={styles.separator} />
-				<Animated.View style={[styles.scoreBlock, animatedScore]}>
+				<View style={styles.scoreBlock}>
 					<StyledText style={styles.scoreNumber}>
-						{value ?? "-"}
+						{value ?? ""}
 					</StyledText>
 					<StyledText style={styles.scoreMax}>/5</StyledText>
-				</Animated.View>
-			</View>
-
-			{value !== null && (
-				<View style={styles.labelPill}>
-					<StyledText style={styles.labelText}>{label}</StyledText>
 				</View>
-			)}
+			</View>
 		</View>
 	);
 }
@@ -140,7 +117,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#0F1E3C",
 		borderRadius: 10,
 		borderWidth: 1,
-		borderColor: "#1E3060",
+		borderColor: "#4a6a8a",
 		paddingHorizontal: 12,
 		paddingVertical: 8
 	},
@@ -152,13 +129,12 @@ const styles = StyleSheet.create({
 	separator: {
 		width: 1,
 		height: 18,
-		backgroundColor: "#1E3060"
+		backgroundColor: "#4a6a8a"
 	},
 	scoreBlock: {
 		flexDirection: "row",
 		alignItems: "flex-end",
 		gap: 2
-		//minWidth: 42
 	},
 	scoreNumber: {
 		fontSize: 18,
@@ -171,7 +147,7 @@ const styles = StyleSheet.create({
 	},
 	scoreMax: {
 		fontSize: 11,
-		color: "#3A5080",
+		color: "#4a6a8a",
 		fontWeight: "600",
 		paddingBottom: 1
 	},

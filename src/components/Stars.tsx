@@ -6,8 +6,7 @@ import StyledText from "@/src/components/StyledText";
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
 const MAX_RATING = 5;
-//const STAR_COLOR = "#FFD700";
-const STAR_COLOR = "#F5C518";
+const STAR_COLOR = "#fff";
 
 function getStars(rating: number): MaterialIconName[] {
 	const full = Math.floor(rating / 2);
