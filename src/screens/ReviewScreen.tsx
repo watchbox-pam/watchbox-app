@@ -58,9 +58,9 @@ export default function ReviewScreen() {
 				textAlignVertical={"top"}
 			/>
 			<StyledText>Ajouter une note au film</StyledText>
-			<View style={{ marginVertical: 10 }}>
-				<StarsRatings value={rating} onChange={setRating} />
-			</View>
+
+			<StarsRatings value={rating} onChange={setRating} />
+
 			<View style={styles.spoilerView}>
 				<StyledText>Ajouter un spoiler warning</StyledText>
 				<Switch
