@@ -7,7 +7,6 @@ import React, { useState } from "react";
 
 export default function MovieReview({ review }: { review: Review }) {
 	const [isSpoiler, setIsSpoiler] = useState<boolean>(review.isSpoiler);
-
 	return (
 		<View style={styles.comment} key={review.id}>
 			<View style={styles.commentTop}>
@@ -20,9 +19,7 @@ export default function MovieReview({ review }: { review: Review }) {
 						{review.user?.username}
 					</StyledText>
 				</View>
-				{review.rating !== null && review.rating !== undefined && (
-					<Stars rating={review.rating} />
-				)}
+				{review.rating != null && <Stars rating={review.rating} />}
 			</View>
 			<View>
 				{isSpoiler ? (
