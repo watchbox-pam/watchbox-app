@@ -82,3 +82,25 @@ export async function deleteAccount(): Promise<{
 		};
 	}
 }
+
+export default async function getPasswordResetToken(userId: string) {
+	try {
+		const result = await ApiHelper.get(
+			`/users/${userId}/password_reset_token`
+		);
+		if (result.success) {
+			return { success: true, data: result.data };
+		} else {
+			return {
+				success: false,
+				message: result.data || "Erreur lors de la récupération"
+			};
+		}
+	} catch (error) {
+		console.error("Error fetching password reset token", error);
+		return {
+			success: false,
+			message: error instanceof Error ? error.message : "Erreur inconnue"
+		};
+	}
+}
