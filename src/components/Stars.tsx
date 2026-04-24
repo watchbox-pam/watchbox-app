@@ -1,40 +1,68 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { ComponentProps, useEffect, useState } from "react";
-import { View } from "react-native";
+import { ComponentProps } from "react";
+import { View, StyleSheet } from "react-native";
+import StyledText from "@/src/components/StyledText";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
-export default function Stars({ rating }: { rating: number }) {
-	const [stars, setStars] = useState<MaterialIconName[]>([]);
+const MAX_RATING = 5;
+const STAR_COLOR = "#fff";
 
-	useEffect(() => {
-		const starsArray: MaterialIconName[] = [];
-		const fullStars: number = Math.floor(rating / 2);
-		for (let i: number = 0; i < fullStars; i++) {
-			starsArray.push("star");
-		}
-		if (rating % 2 !== 0) {
-			starsArray.push("star-half");
-		}
-		while (starsArray.length < 5) {
-			starsArray.push("star-border");
-		}
-		setStars(starsArray);
-	}, [rating]);
+function getStars(rating: number): MaterialIconName[] {
+	const full = Math.floor(rating / 2);
+	const half = rating % 2 !== 0 ? 1 : 0;
+	const empty = MAX_RATING - full - half;
+	return [
+		...Array(full).fill("star"),
+		...Array(half).fill("star-half"),
+		...Array(empty).fill("star-border")
+	];
+}
+
+type StarsProps = {
+	rating: number;
+	size?: "sm" | "md";
+};
+
+export default function Stars({ rating, size = "sm" }: StarsProps) {
+	const starSize = size === "sm" ? 13 : 18;
+	const stars = getStars(rating);
 
 	return (
-		<View style={{ flexDirection: "row" }}>
-			{stars &&
-				stars.map((star, index) => {
-					return (
-						<MaterialIcons
-							size={15}
-							key={index}
-							name={star}
-							color={"#fff"}
-						/>
-					);
-				})}
+		<View style={styles.wrapper}>
+			<StyledText style={[styles.score, size === "md" && styles.scoreLg]}>
+				{rating.toFixed(1)}
+			</StyledText>
+			<View style={styles.stars}>
+				{stars.map((name, i) => (
+					<MaterialIcons
+						key={i}
+						name={name}
+						size={starSize}
+						color={STAR_COLOR}
+					/>
+				))}
+			</View>
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	wrapper: {
+		alignItems: "flex-end",
+		gap: 2
+	},
+	score: {
+		color: STAR_COLOR,
+		fontSize: 13,
+		fontWeight: "700",
+		letterSpacing: 0.3
+	},
+	scoreLg: {
+		fontSize: 18
+	},
+	stars: {
+		flexDirection: "row",
+		gap: 1
+	}
+});
