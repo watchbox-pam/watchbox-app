@@ -1,14 +1,5 @@
 import { ApiHelper } from "@/src/utils/axios";
 
-export const checkBackendHealth = async (): Promise<{ ok: boolean; error?: string }> => {
-	try {
-		const res = await ApiHelper.get("/health");
-		return { ok: res.success };
-	} catch (e: any) {
-		return { ok: false, error: e?.message ?? "unreachable" };
-	}
-};
-
 export type Movie = {
 	id: number; // ou string, selon ta base
 	title: string;
@@ -34,12 +25,17 @@ export const fetchMovies = async (count: number = 50): Promise<Movie[]> => {
 		const response = await ApiHelper.get(`/movies/random?count=${count}`);
 
 		if (!response.success) {
-			if (__DEV__) console.warn("fetchMovies: réponse backend KO →", response.data);
+			if (__DEV__)
+				console.warn(
+					"fetchMovies: réponse backend KO →",
+					response.data
+				);
 			return [];
 		}
 
 		if (!Array.isArray(response.data)) {
-			if (__DEV__) console.warn("fetchMovies: format inattendu →", response.data);
+			if (__DEV__)
+				console.warn("fetchMovies: format inattendu →", response.data);
 			return [];
 		}
 
@@ -48,7 +44,9 @@ export const fetchMovies = async (count: number = 50): Promise<Movie[]> => {
 		);
 
 		if (__DEV__ && valid.length !== response.data.length) {
-			console.warn(`fetchMovies: ${response.data.length - valid.length} film(s) ignorés (données manquantes)`);
+			console.warn(
+				`fetchMovies: ${response.data.length - valid.length} film(s) ignorés (données manquantes)`
+			);
 		}
 
 		return valid as Movie[];

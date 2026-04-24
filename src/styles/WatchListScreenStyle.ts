@@ -1,146 +1,171 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-	headers: {
-		position: "absolute",
-		width: "100%",
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 25,
-		marginTop: 10,
-		zIndex: 100,
-		alignItems: "center",
-		paddingVertical: 10
-	},
-	editButton: {
-		top: -10
-	},
-	container: {
-		width: "100%",
-		backgroundColor: "#0A1E38",
-		margin: 0
-	},
+	container: { flex: 1, backgroundColor: "#07192e" },
+	contentContainer: { paddingTop: 80, paddingBottom: 40 },
 	loading: {
 		flex: 1,
+		backgroundColor: "#07192e",
 		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#0A1E38"
-	},
-	contentContainer: {
-		alignItems: "center",
-		paddingVertical: 90
-	},
-	header: {
-		width: "100%",
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 25
-	},
-	viewResult: {
-		height: 175
-	},
-	resultatInfo: {
-		flexDirection: "row",
-		paddingHorizontal: 10,
-		width: "100%"
-	},
-	image: {
-		width: 90,
-		height: 130,
-		borderRadius: 10,
-		backgroundColor: "#313131"
-	},
-	resultInfo: {
-		width: "60%",
-		marginLeft: 10
-	},
-	resultTitle: {
-		color: "#EBDDFF",
-		fontWeight: "bold",
-		fontSize: 20,
-		marginTop: 10
-	},
-	resultYear: {
-		color: "#fff",
-		fontSize: 14
-	},
-	separator: {
-		width: "95%",
-		height: 1,
-		backgroundColor: "#EBDDFF",
-		position: "absolute",
-		bottom: 20
-	},
-	NoResult: {
-		margin: "auto",
-		height: "100%",
-		fontSize: 30
-	},
-	playlistName: {
-		color: "#FFFFFF",
-		fontSize: 25,
-		fontWeight: "bold",
-		marginBottom: 30,
-		marginLeft: 10
-	},
-	deleteIconContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 10
-	},
-	deleteIcon: {
-		marginLeft: 10,
-		alignSelf: "center"
-	},
-	modalOverlay: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "rgba(0,0,0,0.5)"
-	},
-
-	modalContent: {
-		backgroundColor: "#0A1E38",
-		borderRadius: 10,
-		padding: 20,
-		width: "80%",
 		alignItems: "center"
 	},
 
-	modalTitle: {
-		fontSize: 18,
-		color: "#FFFFFF",
-		fontWeight: "bold",
-		marginBottom: 15
-	},
-
-	input: {
-		backgroundColor: "#1E2D4F",
-		color: "#FFFFFF",
-		width: "100%",
-		padding: 10,
-		marginBottom: 15,
-		borderRadius: 5
-	},
-
-	switchContainer: {
+	// Header
+	headers: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		width: "100%",
+		paddingHorizontal: 20,
+		paddingVertical: 14,
+		zIndex: 100,
+		backgroundColor: "rgba(7,25,46,0.95)",
+		borderBottomWidth: 1,
+		borderBottomColor: "rgba(30,144,255,0.12)"
+	},
+	playlistName: {
+		flex: 1,
+		color: "#ffffff",
+		fontSize: 18,
+		fontWeight: "700",
+		letterSpacing: -0.3,
+		textAlign: "center",
+		marginHorizontal: 8
+	},
+
+	// Movie row
+	viewResult: {
+		paddingHorizontal: 20,
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: "rgba(255,255,255,0.06)"
+	},
+	resultatInfo: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 14
+	},
+	image: {
+		width: 72,
+		height: 108,
+		borderRadius: 10,
+		backgroundColor: "#0d2240"
+	},
+	resultInfo: { flex: 1 },
+	resultTitle: {
+		color: "#e8f0fe",
+		fontSize: 16,
+		fontWeight: "600",
+		letterSpacing: -0.2,
+		marginBottom: 6
+	},
+	resultYear: {
+		color: "#4a6a8a",
+		fontSize: 13
+	},
+	deleteIconContainer: {
+		padding: 8,
+		backgroundColor: "rgba(224,90,90,0.1)",
+		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: "rgba(224,90,90,0.2)"
+	},
+
+	NoResult: {
+		color: "#4a6a8a",
+		fontSize: 16,
+		textAlign: "center",
+		marginTop: 60
+	},
+
+	// Modal
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: "rgba(0,0,0,0.65)",
+		justifyContent: "flex-end"
+	},
+	modalSheet: {
+		backgroundColor: "#0d2240",
+		borderTopLeftRadius: 24,
+		borderTopRightRadius: 24,
+		padding: 24,
+		borderWidth: 1,
+		borderColor: "rgba(30,144,255,0.15)",
+		borderBottomWidth: 0
+	},
+	modalHandle: {
+		width: 36,
+		height: 4,
+		backgroundColor: "rgba(255,255,255,0.15)",
+		borderRadius: 2,
+		alignSelf: "center",
 		marginBottom: 20
 	},
-
-	switchLabel: {
-		color: "#FFFFFF",
-		fontSize: 16
+	modalTitle: {
+		color: "#ffffff",
+		fontSize: 18,
+		fontWeight: "700",
+		marginBottom: 20,
+		letterSpacing: -0.3
 	},
-
-	modalButtons: {
+	input: {
+		width: "100%",
+		backgroundColor: "rgba(255,255,255,0.05)",
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.1)",
+		borderRadius: 12,
+		padding: 14,
+		color: "#ffffff",
+		fontSize: 15,
+		marginBottom: 16
+	},
+	checkboxRow: {
 		flexDirection: "row",
-		justifyContent: "space-between",
-		width: "100%"
-	}
+		alignItems: "center",
+		marginBottom: 24,
+		gap: 10
+	},
+	checkbox: {
+		width: 22,
+		height: 22,
+		borderRadius: 6,
+		borderWidth: 1.5,
+		borderColor: "rgba(30,144,255,0.5)"
+	},
+	checkboxChecked: { backgroundColor: "#1E90FF", borderColor: "#1E90FF" },
+	checkboxLabel: { color: "#c0d4f0", fontSize: 14 },
+	modalButtons: { flexDirection: "row", gap: 10 },
+	btnCancel: {
+		flex: 1,
+		padding: 14,
+		borderRadius: 12,
+		backgroundColor: "rgba(255,255,255,0.07)",
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.1)",
+		alignItems: "center"
+	},
+	btnCancelText: { color: "#8ba4c0", fontSize: 15, fontWeight: "600" },
+	btnConfirm: {
+		flex: 1,
+		padding: 14,
+		borderRadius: 12,
+		backgroundColor: "#1E90FF",
+		alignItems: "center"
+	},
+	btnConfirmText: { color: "#ffffff", fontSize: 15, fontWeight: "700" },
+	btnDelete: {
+		flex: 1,
+		padding: 14,
+		borderRadius: 12,
+		backgroundColor: "rgba(224,90,90,0.15)",
+		borderWidth: 1,
+		borderColor: "rgba(224,90,90,0.3)",
+		alignItems: "center"
+	},
+	btnDeleteText: { color: "#e05a5a", fontSize: 15, fontWeight: "600" }
 });
 
 export default styles;

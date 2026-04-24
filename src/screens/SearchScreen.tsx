@@ -21,7 +21,7 @@ import CadrePublicitaire from "../components/CadrePublicitaire";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
-import * as SecureStore from "expo-secure-store";
+import useFiltersStore from "@/src/zustand/filtersStore";
 import { ErrorMessage } from "../components/ErrorMessage";
 import FallbackImage from "../components/FallbackImage";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -41,9 +41,15 @@ export default function SearchScreen() {
 
 	// State variables for providers
 	const [allProviders, setAllProviders] = useState<Provider[]>([]);
-	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
+	const {
+		selectedProviders,
+		isLoaded,
+		loadProviders,
+		toggleProvider,
+		clearProviders
+	} = useFiltersStore();
 
 	const hasInteracted = useRef(false);
 
@@ -78,7 +84,7 @@ export default function SearchScreen() {
 	// Load providers and selected providers when component mounts
 	useEffect(() => {
 		fetchProviders();
-		loadSelectedProviders();
+		if (!isLoaded) loadProviders();
 		if (refreshing) {
 			setRefreshing(false);
 		}
@@ -94,20 +100,6 @@ export default function SearchScreen() {
 		} catch (error) {
 			setError(true);
 			console.error("Error fetching providers:", error);
-		}
-	};
-
-	// Load selected providers from AsyncStorage
-	const loadSelectedProviders = async () => {
-		try {
-			const savedProviders =
-				await SecureStore.getItemAsync("selectedProviders");
-			if (savedProviders) {
-				const parsedProviders = JSON.parse(savedProviders);
-				setSelectedProviders(parsedProviders);
-			}
-		} catch (error) {
-			console.error("Error loading selected providers:", error);
 		}
 	};
 
@@ -211,35 +203,11 @@ export default function SearchScreen() {
 		}
 	};
 
-	// Toggle provider selection
-	const toggleProvider = (providerId: number) => {
-		setSelectedProviders((prev) =>
-			prev.includes(providerId)
-				? prev.filter((id) => id !== providerId)
-				: [...prev, providerId]
-		);
-	};
-
-	// Save selected providers to AsyncStorage
-	const saveSelectedProviders = async () => {
-		try {
-			await SecureStore.setItemAsync(
-				"selectedProviders",
-				JSON.stringify(selectedProviders)
-			);
-			setShowProviderFilter(false);
-			// Trigger search again with new providers
-			if (searchTerm.trim()) {
-				search();
-			}
-		} catch (error) {
-			console.error("Error saving selected providers:", error);
+	const applyProviders = () => {
+		setShowProviderFilter(false);
+		if (searchTerm.trim()) {
+			search();
 		}
-	};
-
-	// Clear all selected providers
-	const clearSelectedProviders = () => {
-		setSelectedProviders([]);
 	};
 
 	// Trigger search when the filter changes and searchTerm is not empty
@@ -426,7 +394,7 @@ export default function SearchScreen() {
 				<TouchableOpacity
 					onPress={() => search()}
 					style={styles.BtnSearch}>
-					<Text style={styles.TextSearch}>Rechercher</Text>
+					<Entypo name="magnifying-glass" size={20} color="#000" />
 				</TouchableOpacity>
 			</View>
 
@@ -481,7 +449,7 @@ export default function SearchScreen() {
 						<Text style={styles.providerFilterTitle}>
 							Plateformes
 						</Text>
-						<TouchableOpacity onPress={clearSelectedProviders}>
+						<TouchableOpacity onPress={clearProviders}>
 							<Text style={styles.clearText}>Effacer tout</Text>
 						</TouchableOpacity>
 					</View>
@@ -518,7 +486,7 @@ export default function SearchScreen() {
 					<View style={styles.providerFilterActions}>
 						<TouchableOpacity
 							style={styles.providerFilterApplyButton}
-							onPress={saveSelectedProviders}>
+							onPress={applyProviders}>
 							<Text style={styles.providerFilterApplyText}>
 								Appliquer
 							</Text>
