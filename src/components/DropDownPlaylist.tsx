@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
 	View,
 	Modal,
@@ -6,7 +6,6 @@ import {
 	Text,
 	TouchableOpacity,
 	FlatList,
-	Alert,
 	Share,
 	ActivityIndicator
 } from "react-native";
@@ -38,26 +37,25 @@ const DropDownPlaylist = ({
 	const [isFetchingPlaylists, setIsFetchingPlaylists] = useState(false); // État permettant de suivre si des listes de lecture sont récupérées
 	const [isAdding, setIsAdding] = useState(false); // État permettant de suivre si un film est en cours d'ajout à une liste de lecture
 
-	const buttonRef = useRef<View>(null); // Référence pour le bouton du menu
-
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	const MENU_WIDTH = 220; // Largeur approximative du menu, à ajuster selon le style
-	const MENU_HEIGHT = 220; // Largeur approximative du menu, à ajuster selon le style
-	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
+	const buttonRef = useRef<View>(null);
+	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+	const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+
+	const OFFSET_X = 30;
+	const OFFSET_Y = -15;
 
 	const openMenu = () => {
 		buttonRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
 			setMenuPosition({
-				x: pageX + width,
-				y: pageY + height
+				x: pageX + width - menuSize.width - OFFSET_X,
+				y: pageY - menuSize.height - height - OFFSET_Y
 			});
 			setVisible(true);
 		});
 	};
-	const closeMenu = () => {
-		setVisible(false);
-	};
+	const closeMenu = () => setVisible(false);
 
 	// Fetch user playlists from API
 	const fetchUserPlaylists = async (userId: string) => {
@@ -172,11 +170,10 @@ const DropDownPlaylist = ({
 	return (
 		<View style={styles.container}>
 			<View ref={buttonRef}>
-				<TouchableOpacity style={styles.button}>
+				<TouchableOpacity style={styles.button} onPress={openMenu}>
 					<IconButton
 						icon="dots-vertical"
 						size={24}
-						onPress={openMenu}
 						iconColor="#FFFFFF"
 					/>
 				</TouchableOpacity>
@@ -187,28 +184,34 @@ const DropDownPlaylist = ({
 				onDismiss={closeMenu}
 				anchor={menuPosition}
 				contentStyle={styles.menuContent}>
-				<Menu.Item
-					onPress={() => {
-						closeMenu();
-						openModal();
-					}}
-					title="Ajouter à une playlist"
-					leadingIcon="playlist-plus"
-					style={styles.menuItem}
-					titleStyle={styles.menuItemTitle}
-					contentStyle={styles.menuItemContent}
-				/>
-				<Menu.Item
-					onPress={() => {
-						closeMenu();
-						onShare();
-					}}
-					title="Partager"
-					leadingIcon="share-variant"
-					style={styles.menuItem}
-					titleStyle={styles.menuItemTitle}
-					contentStyle={styles.menuItemContent}
-				/>
+				<View
+					onLayout={(e) => {
+						const { width, height } = e.nativeEvent.layout;
+						setMenuSize({ width, height });
+					}}>
+					<Menu.Item
+						onPress={() => {
+							closeMenu();
+							openModal();
+						}}
+						title="Ajouter à une playlist"
+						leadingIcon="playlist-plus"
+						style={styles.menuItem}
+						titleStyle={styles.menuItemTitle}
+						contentStyle={styles.menuItemContent}
+					/>
+					<Menu.Item
+						onPress={() => {
+							closeMenu();
+							onShare();
+						}}
+						title="Partager"
+						leadingIcon="share-variant"
+						style={styles.menuItem}
+						titleStyle={styles.menuItemTitle}
+						contentStyle={styles.menuItemContent}
+					/>
+				</View>
 			</Menu>
 
 			<Modal

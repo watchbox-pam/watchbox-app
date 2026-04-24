@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
 		borderRadius: 30,
 		paddingVertical: 0,
 		paddingHorizontal: 0,
-		minWidth: 160
+		minWidth: 160,
+		marginTop: -10
 	},
 	menuItemContent: {
 		paddingLeft: 0,
