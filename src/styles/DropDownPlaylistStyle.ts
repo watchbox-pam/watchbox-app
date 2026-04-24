@@ -30,9 +30,11 @@ const styles = StyleSheet.create({
 		minWidth: 180
 	},
 	menuItem: {
-		paddingVertical: 10,
+		flexDirection: "row",
+		alignItems: "center",
+		paddingVertical: 12,
 		paddingHorizontal: 15,
-		borderRadius: 30
+		gap: 10
 	},
 	menuItemTitle: {
 		color: "#FFFFFF",
