@@ -4,13 +4,14 @@ import * as FileSystem from "expo-file-system/legacy";
 import useSessionStore from "@/src/zustand/sessionStore";
 import useFiltersStore from "@/src/zustand/filtersStore";
 import UserProfile from "@/src/models/UserProfile";
-import {
+import getPasswordResetToken, {
 	deleteAccount,
 	getUserProfile,
 	updateSettings
 } from "@/src/services/ProfileService";
 import { providerService } from "@/src/services/ProviderService";
 import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 
 type Provider = {
 	id: number;
@@ -220,6 +221,24 @@ export const useSettings = () => {
 		}
 	};
 
+	const redirectToPasswordReset = async () => {
+		try {
+			const passwordResetTokenResult =
+				await getPasswordResetToken(userId);
+			if (passwordResetTokenResult.success) {
+				router.navigate(
+					`/resetPassword/${passwordResetTokenResult.data}`
+				);
+			} else {
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: "Impossible de réinitialiser le mot de passe"
+				});
+			}
+		} catch (error: any) {}
+	};
+
 	return {
 		notifications,
 		publicProfile,
@@ -243,6 +262,7 @@ export const useSettings = () => {
 		toggleProvider,
 		calculateCacheSize,
 		clearCache,
+		redirectToPasswordReset,
 		handleDeleteAccount
 	};
 };

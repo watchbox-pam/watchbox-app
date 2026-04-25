@@ -18,7 +18,7 @@ export async function getUserProfile(userId: string) {
 
 	try {
 		// Send GET request to retrieve the user's profile
-		const result = await ApiHelper.get(`/users/${userId}`);
+		const result = await ApiHelper.get(`/users/profile`);
 
 		if (result.success) {
 			return {
@@ -54,7 +54,7 @@ export async function updateSettings(
 	historyPrivate: boolean
 ): Promise<{ success: boolean; message?: string }> {
 	try {
-		const result = await ApiHelper.patch(`/users/${userId}/settings`, {
+		const result = await ApiHelper.patch(`/users/settings`, {
 			adult_content: adultContent,
 			is_private: isPrivate,
 			history_private: historyPrivate
@@ -94,7 +94,7 @@ export async function deleteAccount(): Promise<{
 		}
 
 		// Call API to delete account using ApiHelper
-		const result = await ApiHelper.delete(`/users/${userId}`);
+		const result = await ApiHelper.delete(`/users`);
 
 		if (result.success) {
 			return { success: true, message: "Compte supprimé avec succès" };
@@ -106,6 +106,26 @@ export async function deleteAccount(): Promise<{
 		}
 	} catch (error) {
 		console.error("Erreur deleteAccount:", error);
+		return {
+			success: false,
+			message: error instanceof Error ? error.message : "Erreur inconnue"
+		};
+	}
+}
+
+export default async function getPasswordResetToken(userId: string) {
+	try {
+		const result = await ApiHelper.get(`/users/password_reset_token`);
+		if (result.success) {
+			return { success: true, data: result.data };
+		} else {
+			return {
+				success: false,
+				message: result.data || "Erreur lors de la récupération"
+			};
+		}
+	} catch (error) {
+		console.error("Error fetching password reset token", error);
 		return {
 			success: false,
 			message: error instanceof Error ? error.message : "Erreur inconnue"

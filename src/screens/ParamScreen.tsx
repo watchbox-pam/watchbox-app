@@ -31,6 +31,7 @@ const ParamScreen: React.FC = () => {
 		setAdultContent,
 		toggleProvider,
 		clearCache,
+		redirectToPasswordReset,
 		handleDeleteAccount
 	} = useSettings();
 
@@ -103,6 +104,11 @@ const ParamScreen: React.FC = () => {
 				title="Vider le cache"
 				description={isCalculatingCache ? "Calcul..." : cacheSize}
 				onPress={() => setShowClearCacheModal(true)}
+			/>
+
+			<SettingItem
+				title="Réinitialiser votre mot de passe"
+				onPress={() => redirectToPasswordReset()}
 			/>
 
 			<SettingItem
