@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
 	View,
 	Modal,
@@ -6,11 +6,10 @@ import {
 	Text,
 	TouchableOpacity,
 	FlatList,
-	Alert,
 	Share,
 	ActivityIndicator
 } from "react-native";
-import { Menu, IconButton } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import {
 	addMediaToPlaylist,
 	getUserPlaylists
@@ -19,47 +18,33 @@ import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
 import Toast from "react-native-toast-message";
 
-const DropDownPlaylist = ({
-	movieId
-	//movieTitle
-}: {
-	movieId: number;
-	//movieTitle?: string;
-}) => {
-	const [visible, setVisible] = useState(false);
+const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
+	const [menuVisible, setMenuVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [userPlaylists, setUserPlaylists] = useState<
 		{ id: string; title: string }[]
 	>([]);
 	const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(
 		null
-	); // Currently selected playlist ID
+	);
+	const [isFetchingPlaylists, setIsFetchingPlaylists] = useState(false);
+	const [isAdding, setIsAdding] = useState(false);
+	const [menuTop, setMenuTop] = useState(0);
+	const [menuLeft, setMenuLeft] = useState(0);
 
-	const [isFetchingPlaylists, setIsFetchingPlaylists] = useState(false); // État permettant de suivre si des listes de lecture sont récupérées
-	const [isAdding, setIsAdding] = useState(false); // État permettant de suivre si un film est en cours d'ajout à une liste de lecture
-
-	const buttonRef = useRef<View>(null); // Référence pour le bouton du menu
-
+	const buttonRef = useRef<View>(null);
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	const MENU_WIDTH = 220; // Largeur approximative du menu, à ajuster selon le style
-	const MENU_HEIGHT = 220; // Largeur approximative du menu, à ajuster selon le style
-	const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 }); // Position du menu
-
 	const openMenu = () => {
-		buttonRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
-			setMenuPosition({
-				x: pageX + width,
-				y: pageY + height
-			});
-			setVisible(true);
+		buttonRef.current?.measureInWindow((x, y, width, height) => {
+			setMenuTop(y + height - 20);
+			setMenuLeft(x + width);
+			setMenuVisible(true);
 		});
 	};
-	const closeMenu = () => {
-		setVisible(false);
-	};
 
-	// Fetch user playlists from API
+	const closeMenu = () => setMenuVisible(false);
+
 	const fetchUserPlaylists = async (userId: string) => {
 		setIsFetchingPlaylists(true);
 		try {
@@ -67,10 +52,6 @@ const DropDownPlaylist = ({
 			if (response.success) {
 				setUserPlaylists(response.data || []);
 			} else {
-				console.error(
-					"Error fetching user playlists:",
-					response.message
-				);
 				setUserPlaylists([]);
 			}
 		} finally {
@@ -80,19 +61,9 @@ const DropDownPlaylist = ({
 
 	const onShare = async () => {
 		try {
-			const shareMessage = movieId
-				? `Je te recommande de regarder "${movieId}" sur WatchBox!`
-				: "Découvre ce film sur WatchBox!";
-			const result = await Share.share({
-				message:
-					shareMessage +
-					`\n\nRegarde-le ici: https://watchbox.com/movies/${movieId}`
+			await Share.share({
+				message: `Je te recommande de regarder ce film sur WatchBox!\n\nhttps://watchbox.com/movies/${movieId}`
 			});
-			if (result.action === Share.sharedAction) {
-				// Partage réussi
-			} else if (result.action === Share.dismissedAction) {
-				// Partage annulé
-			}
 		} catch (error: any) {
 			Toast.show({
 				type: "error",
@@ -102,36 +73,23 @@ const DropDownPlaylist = ({
 		}
 	};
 
-	// Open modal and load playlists for the current user
 	const openModal = async () => {
 		const userId = currentUser?.id;
 		setModalVisible(true);
-		if (userId) {
-			await fetchUserPlaylists(userId);
-		}
+		if (userId) await fetchUserPlaylists(userId);
 	};
 
 	const closeModal = () => {
 		setModalVisible(false);
-		setSelectedPlaylistId(null); // Reset selected playlist when modal closes
+		setSelectedPlaylistId(null);
 	};
 
-	// Add the movie to the selected playlist via API
 	const handleAddToPlaylist = async () => {
 		if (!selectedPlaylistId) {
 			Toast.show({
 				type: "error",
 				text1: "Sélection requise",
-				text2: "Veuillez sélectionner une playlist avant d'ajouter le film."
-			});
-			return;
-		}
-
-		if (!movieId) {
-			Toast.show({
-				type: "error",
-				text1: "Erreur",
-				text2: "Identifiant du film invalide. Veuillez réessayer."
+				text2: "Veuillez sélectionner une playlist."
 			});
 			return;
 		}
@@ -159,9 +117,7 @@ const DropDownPlaylist = ({
 				Toast.show({
 					type: "error",
 					text1: "Erreur",
-					text2:
-						response.message ||
-						"Impossible d'ajouter le film à la playlist."
+					text2: response.message || "Impossible d'ajouter le film."
 				});
 			}
 		} finally {
@@ -172,49 +128,109 @@ const DropDownPlaylist = ({
 	return (
 		<View style={styles.container}>
 			<View ref={buttonRef}>
-				<TouchableOpacity style={styles.button}>
+				<TouchableOpacity style={styles.button} onPress={openMenu}>
 					<IconButton
 						icon="dots-vertical"
 						size={24}
-						onPress={openMenu}
 						iconColor="#FFFFFF"
 					/>
 				</TouchableOpacity>
 			</View>
 
-			<Menu
-				visible={visible}
-				onDismiss={closeMenu}
-				anchor={menuPosition}
-				contentStyle={styles.menuContent}>
-				<Menu.Item
-					onPress={() => {
-						closeMenu();
-						openModal();
-					}}
-					title="Ajouter à une playlist"
-					leadingIcon="playlist-plus"
-					style={styles.menuItem}
-					titleStyle={styles.menuItemTitle}
-					contentStyle={styles.menuItemContent}
-				/>
-				<Menu.Item
-					onPress={() => {
-						closeMenu();
-						onShare();
-					}}
-					title="Partager"
-					leadingIcon="share-variant"
-					style={styles.menuItem}
-					titleStyle={styles.menuItemTitle}
-					contentStyle={styles.menuItemContent}
-				/>
-			</Menu>
+			<Modal
+				visible={menuVisible}
+				transparent
+				animationType="none"
+				onRequestClose={closeMenu}>
+				<TouchableOpacity
+					style={{ flex: 1 }}
+					activeOpacity={1}
+					onPress={closeMenu}>
+					<View
+						style={{
+							position: "absolute",
+							top: menuTop,
+							left: menuLeft,
+							transform: [{ translateX: -260 }],
+							backgroundColor: "#0A1E38",
+							borderRadius: 12,
+							borderWidth: 1,
+							borderColor: "#1a3a5c",
+							minWidth: 220,
+							overflow: "hidden",
+							elevation: 5,
+							shadowColor: "#000",
+							shadowOffset: { width: 0, height: 2 },
+							shadowOpacity: 0.3,
+							shadowRadius: 4
+						}}>
+						<TouchableOpacity
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								paddingVertical: 14,
+								paddingHorizontal: 16,
+								gap: 10
+							}}
+							onPress={() => {
+								closeMenu();
+								openModal();
+							}}>
+							<IconButton
+								icon="playlist-plus"
+								size={20}
+								iconColor="#FFFFFF"
+								style={{ margin: 0 }}
+							/>
+							<Text
+								style={{
+									color: "#FFFFFF",
+									fontWeight: "bold",
+									fontSize: 14
+								}}>
+								Ajouter à une playlist
+							</Text>
+						</TouchableOpacity>
+
+						<View
+							style={{ height: 1, backgroundColor: "#1a3a5c" }}
+						/>
+
+						<TouchableOpacity
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								paddingVertical: 14,
+								paddingHorizontal: 16,
+								gap: 10
+							}}
+							onPress={() => {
+								closeMenu();
+								onShare();
+							}}>
+							<IconButton
+								icon="share-variant"
+								size={20}
+								iconColor="#FFFFFF"
+								style={{ margin: 0 }}
+							/>
+							<Text
+								style={{
+									color: "#FFFFFF",
+									fontWeight: "bold",
+									fontSize: 14
+								}}>
+								Partager
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</TouchableOpacity>
+			</Modal>
 
 			<Modal
 				visible={modalVisible}
-				transparent={true}
-				animationType="slide"
+				transparent
+				animationType="fade"
 				onRequestClose={closeModal}>
 				<TouchableOpacity
 					style={styles.modalContainer}
@@ -231,9 +247,7 @@ const DropDownPlaylist = ({
 							<ActivityIndicator
 								size="large"
 								color="#FFFFFF"
-								style={{
-									marginVertical: 20
-								}}
+								style={{ marginVertical: 20 }}
 							/>
 						) : (
 							<FlatList
@@ -262,10 +276,7 @@ const DropDownPlaylist = ({
 									</TouchableOpacity>
 								)}
 								ListEmptyComponent={
-									<Text
-										style={{
-											color: "#FFFFFF"
-										}}>
+									<Text style={{ color: "#FFFFFF" }}>
 										Aucune playlist trouvée.
 									</Text>
 								}

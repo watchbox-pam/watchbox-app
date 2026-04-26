@@ -52,29 +52,63 @@ export const styles = StyleSheet.create({
 	},
 	personInfoContainer: {
 		justifyContent: "center",
-		alignItems: "center",
+		alignItems: "flex-start",
 		flex: 1,
-		flexWrap: "wrap"
+		gap: 12
 	},
 	personName: {
-		fontSize: 30,
+		fontSize: 28,
 		fontWeight: "bold",
-		textAlign: "center",
-		width: "100%"
+		color: "#FFFFFF",
+		marginBottom: 4
+	},
+	infoRow: {
+		flexDirection: "row",
+		alignItems: "flex-start",
+		gap: 14
+	},
+	infoText: {
+		fontSize: 12,
+		color: "#B0C8D9",
+		flex: 1,
+		lineHeight: 20,
+		alignContent: "center",
+		alignSelf: "center"
+	},
+	ageBadge: {
+		marginTop: 4,
+		backgroundColor: "#1A3A5C",
+		borderRadius: 20,
+		paddingHorizontal: 12,
+		paddingVertical: 4,
+		alignSelf: "flex-start"
+	},
+	ageBadgeText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "#7EB8D4"
 	},
 	birthPlaceLabel: {
-		textAlign: "center"
+		fontSize: 11,
+		textAlign: "center",
+		textTransform: "uppercase",
+		letterSpacing: 1
 	},
 	birthPlaceValue: {
-		fontSize: 20,
-		fontWeight: "bold"
+		fontSize: 16,
+		fontWeight: "bold",
+		color: "#FFFFFF"
 	},
 	ageText: {
-		fontSize: 30
+		fontSize: 11,
+		color: "#FFFFFF",
+		textTransform: "uppercase",
+		letterSpacing: 1
 	},
 	ageUnit: {
-		fontSize: 20,
-		fontWeight: "bold"
+		fontSize: 16,
+		fontWeight: "bold",
+		color: "#FFFFFF"
 	},
 	mediaSection: {
 		marginBottom: 20
