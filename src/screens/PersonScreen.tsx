@@ -1,11 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import {
-	Image,
-	RefreshControl,
-	ScrollView,
-	View,
-	useWindowDimensions
-} from "react-native";
+import { Image, RefreshControl, ScrollView, View } from "react-native";
 import styles from "@/src/styles/PersonStyle";
 import BackButton from "../components/BackButton";
 import { useCallback, useEffect, useState } from "react";
@@ -369,59 +363,6 @@ export default function PersonScreen() {
 							</View>
 						)}
 					</View>
-
-					{/* <View style={styles.personInfoContainer}>
-						<StyledText style={styles.personName}>
-							{person?.name}
-						</StyledText>
-						{person?.birthday && (
-							<StyledText style={styles.ageText}>
-								né le{" "}
-								<StyledText style={styles.birthPlaceValue}>
-									{formatDateFR(person.birthday)}
-								</StyledText>{" "}
-							</StyledText>
-						)}
-						{person?.birthday && (
-							<StyledText style={styles.birthPlaceLabel}>
-								{person?.place_of_birth && (
-									<StyledText style={styles.birthPlaceLabel}>
-										en{" "}
-										<StyledText
-											style={styles.birthPlaceValue}>
-											{formatBirthPlace(
-												person?.place_of_birth
-											)}
-										</StyledText>
-									</StyledText>
-								)}
-							</StyledText>
-						)}
-						{person?.deathday && (
-							<StyledText style={styles.birthPlaceLabel}>
-								décédé le{" "}
-								<StyledText style={styles.birthPlaceValue}>
-									{formatDateFR(person.deathday)}
-								</StyledText>
-							</StyledText>
-						)}
-						{person?.birthday && (
-							<StyledText style={styles.ageUnit}>
-								<StyledText style={styles.ageText}>
-									{" à "}
-								</StyledText>
-								{person.deathday
-									? convertDateToAgeAtDeath(
-											person.birthday,
-											person.deathday
-										)
-									: convertDateToAge(person.birthday)}
-								<StyledText style={styles.ageText}>
-									{" ans"}
-								</StyledText>
-							</StyledText>
-						)}
-					</View> */}
 				</View>
 				<ReadMore data={person?.biography} />
 				{moviesCast && moviesCast.length > 0 && (
