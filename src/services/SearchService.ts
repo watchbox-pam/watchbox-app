@@ -82,6 +82,27 @@ export const searchService = {
 		}
 	},
 
+	/**
+	 * Search only users
+	 * @param searchTerm The term to search for
+	 * @returns Users search results
+	 */
+	searchUsers: async (searchTerm: string) => {
+		try {
+			const validSearchTerm = searchTerm.trim();
+			const response = await ApiHelper.get(
+				`/search/users/${validSearchTerm}`
+			);
+			console.log(response);
+			return response;
+		} catch (error) {
+			return {
+				success: false,
+				data: []
+			};
+		}
+	},
+
 	getSuggestions: async (searchTerm: string, providers?: number[]) => {
 		try {
 			const params = new URLSearchParams({ query: searchTerm });

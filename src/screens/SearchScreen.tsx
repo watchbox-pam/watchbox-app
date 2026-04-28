@@ -10,11 +10,10 @@ import {
 	RefreshControl,
 	Keyboard
 } from "react-native";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, use } from "react";
 import { searchService } from "@/src/services/SearchService";
 import { providerService } from "@/src/services/ProviderService";
 import styles from "@/src/styles/SearchStyle";
-import { router } from "expo-router";
 import StyledText from "../components/StyledText";
 import Header from "../components/Header";
 import CadrePublicitaire from "../components/CadrePublicitaire";
@@ -23,8 +22,11 @@ import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
 import useFiltersStore from "@/src/zustand/filtersStore";
 import { ErrorMessage } from "../components/ErrorMessage";
-import FallbackImage from "../components/FallbackImage";
 import Entypo from "@expo/vector-icons/Entypo";
+import MovieSearchResult from "@/src/components/search/MovieSearchResult";
+import PersonSearchResult from "@/src/components/search/PersonSearchResult";
+import UserSearchResultModel from "@/src/models/UserSearchResultModel";
+import UserSearchResult from "@/src/components/search/UserSearchResult";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -32,6 +34,7 @@ export default function SearchScreen() {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [actors, setActors] = useState<Person[]>([]);
+	const [users, setUsers] = useState<UserSearchResultModel[]>([]);
 	const [selectedFilter, setSelectedFilter] = useState("all");
 	const [error, setError] = useState(false);
 	const [searchError, setSearchError] = useState(false);
@@ -78,7 +81,8 @@ export default function SearchScreen() {
 	const filters = [
 		{ key: "all", label: "Tous" },
 		{ key: "films", label: "Films" },
-		{ key: "actors", label: "Personnes" }
+		{ key: "actors", label: "Personnes" },
+		{ key: "users", label: "Utilisateurs" }
 	];
 
 	// Load providers and selected providers when component mounts
@@ -180,6 +184,14 @@ export default function SearchScreen() {
 						}
 						break;
 
+					case "users":
+						const userResults =
+							await searchService.searchUsers(term);
+						if (userResults.success) {
+							setUsers(userResults.data);
+						}
+						break;
+
 					case "all":
 					default:
 						const allResults = await searchService.searchAll(
@@ -191,6 +203,7 @@ export default function SearchScreen() {
 						if (allResults.success) {
 							setMovies(allResults.data.movies || []);
 							setActors(allResults.data.people || []);
+							setUsers(allResults.data.users || []);
 						}
 						break;
 				}
@@ -218,94 +231,6 @@ export default function SearchScreen() {
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedFilter]);
 
-	// Render single movie item
-	const renderMovieItem = (item: Movie) => (
-		<View key={item.id} style={styles.viewResult}>
-			<TouchableOpacity
-				onPress={() => router.push(`/(app)/(tabs)/movie/${item.id}`)}
-				style={styles.resultatInfo}>
-				<FallbackImage
-					uri={
-						item.poster_path
-							? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-							: null
-					}
-					style={styles.image}
-					fallbackStyle={{
-						borderWidth: 1,
-						borderColor: "#AC2821",
-						borderRadius: 10,
-						aspectRatio: 2 / 3
-					}}
-				/>
-				<View style={styles.resultInfo}>
-					<Text style={styles.resultTitle} numberOfLines={2}>
-						{item.title}
-					</Text>
-					<Text style={styles.resultDetails}>
-						{item.original_title
-							? `${item.original_title}`
-							: "Titre original inconnue"}
-					</Text>
-					<Text style={styles.resultDetails}>
-						{item.release_date
-							? new Date(item.release_date).getFullYear()
-							: "N/A"}
-					</Text>
-				</View>
-			</TouchableOpacity>
-		</View>
-	);
-
-	// Render single actor item
-	// const renderActorItem = (item: Person) => (
-	// 	<View key={item.id} style={styles.viewResult}>
-	// 		<TouchableOpacity
-	// 			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
-	// 			style={styles.resultatInfo}>
-	// 			<Image
-	// 				source={{
-	// 					uri: item.profile_path
-	// 						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
-	// 						: "https://via.placeholder.com/500x750?text=No+Image"
-	// 				}}
-	// 				style={styles.image}
-	// 				resizeMode="cover"
-	// 			/>
-	// 			<View style={styles.resultInfo}>
-	// 				<Text style={styles.resultTitle} numberOfLines={2}>
-	// 					{item.name}
-	// 				</Text>
-	// 				<Text style={styles.resultDetails}>
-	// 					{item.known_for_department || "Actor/Actress"}
-	// 				</Text>
-	// 			</View>
-	// 		</TouchableOpacity>
-	// 	</View>
-	// );
-
-	const renderActorItem = (item: Person) => (
-		<TouchableOpacity
-			key={item.id}
-			onPress={() => router.push(`/(app)/(tabs)/person/${item.id}`)}
-			style={styles.actorCard}>
-			<FallbackImage
-				uri={
-					item.profile_path
-						? `https://image.tmdb.org/t/p/w500${item.profile_path}`
-						: null
-				}
-				style={styles.actorImage}
-				resizeMode="cover"
-			/>
-			<Text style={styles.actorName} numberOfLines={2}>
-				{item.name}
-			</Text>
-			<Text style={styles.actorDepartment} numberOfLines={1}>
-				{item.known_for_department || "Actor/Actress"}
-			</Text>
-		</TouchableOpacity>
-	);
 	const renderSuggestionItem = (item: Movie | Person) => {
 		const isMovie = item.media_type === "movie";
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
@@ -370,6 +295,7 @@ export default function SearchScreen() {
 								hasInteracted.current = false;
 								setMovies([]);
 								setActors([]);
+								setUsers([]);
 							}}>
 							<Entypo name="cross" size={20} color="black" />
 						</TouchableOpacity>
@@ -533,7 +459,7 @@ export default function SearchScreen() {
 								)}
 								{movies.map((movie, index) => (
 									<View key={`movie-${movie.id}`}>
-										{renderMovieItem(movie)}
+										<MovieSearchResult movie={movie} />
 										{/* {((index + 1) % 11 === 5 ||
 											(index + 1) % 11 === 0) && (
 											<CadrePublicitaire
@@ -584,10 +510,28 @@ export default function SearchScreen() {
 										<View
 											key={`actor-${actor.id}`}
 											style={styles.actorGridItem}>
-											{renderActorItem(actor)}
+											<PersonSearchResult
+												person={actor}
+											/>
 										</View>
 									))}
 								</View>
+							</View>
+						)}
+
+						{users.length > 0 && (
+							<View>
+								{/* Show section title only if filter is not strictly movies */}
+								{selectedFilter !== "users" && (
+									<StyledText style={styles.sectionTitle}>
+										Utilisateurs
+									</StyledText>
+								)}
+								{users.map((user, index) => (
+									<View key={`user-${user.id}`}>
+										<UserSearchResult user={user} />
+									</View>
+								))}
 							</View>
 						)}
 
@@ -595,7 +539,8 @@ export default function SearchScreen() {
 						{!isLoading &&
 							searchTerm.trim() &&
 							movies.length === 0 &&
-							actors.length === 0 && (
+							actors.length === 0 &&
+							users.length === 0 && (
 								<StyledText style={styles.NoResult}>
 									Aucun résultat
 								</StyledText>
