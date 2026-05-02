@@ -19,7 +19,7 @@ export const fetchRecommendations = async (
 			`/recommendations/recommended/${emotion}${suffix}`
 		);
 		return response;
-	} catch (error) {
+	} catch {
 		return {
 			success: false,
 			data: "Impossible de charger les recommandations."
