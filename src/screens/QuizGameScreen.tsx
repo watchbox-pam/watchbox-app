@@ -112,6 +112,7 @@ export default function QuizGameScreen() {
 				return next;
 			});
 		}, 1000);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const doValidate = useCallback(
@@ -150,6 +151,7 @@ export default function QuizGameScreen() {
 				}
 			}, 1500);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[startTimer]
 	);
 
@@ -220,6 +222,7 @@ export default function QuizGameScreen() {
 			mountedRef.current = false;
 			clearTimer();
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [genre]);
 
 	const handleSelectAnswer = (answer: string) => {

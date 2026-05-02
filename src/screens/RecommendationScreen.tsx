@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Animated, StatusBar, View, ActivityIndicator } from "react-native";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
