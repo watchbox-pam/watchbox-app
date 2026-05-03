@@ -3,65 +3,53 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
 	container: {
 		height: 180,
-		paddingHorizontal: 15,
-		marginVertical: 8
+		paddingHorizontal: 16,
+		marginTop: 4,
+		marginBottom: 16
 	},
 	imageContainer: {
-		marginRight: 15,
-		height: 160,
-		width: 110,
-		alignItems: "center",
-		borderRadius: 12,
-		overflow: "hidden",
-		shadowColor: "#000",
-		shadowOffset: {
-			width: 0,
-			height: 4
-		},
-		shadowOpacity: 0.3,
-		shadowRadius: 5,
-		elevation: 8
+		width: 108,
+		aspectRatio: 2 / 3
+		// borderRadius: 10,
+		// overflow: "hidden",
+		// borderWidth: 1,
+		// borderColor: "rgba(255,255,255,0.07)",
 	},
 	image: {
-		width: 110,
-		height: 160,
-		borderRadius: 12,
-		backgroundColor: "#e8e8e8"
+		width: "100%",
+		height: "100%"
+		// borderRadius: 10,
+		// backgroundColor: "#0d2240",
 	},
 	emptyContainer: {
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#0D1321",
+		backgroundColor: "rgba(255,255,255,0.03)",
 		borderRadius: 12,
-		paddingVertical: 30,
-		paddingHorizontal: 20,
-		marginHorizontal: 10
-	},
-	emptyIcon: {
-		fontSize: 48,
-		marginBottom: 15,
-		color: "#D0BFFF"
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.06)",
+		borderStyle: "dashed",
+		marginHorizontal: 4,
+		paddingVertical: 24,
+		paddingHorizontal: 20
 	},
 	emptyText: {
-		fontSize: 20,
-		color: "#FFF",
-		fontWeight: "bold",
+		fontSize: 14,
+		color: "rgba(255,255,255,0.4)",
+		fontWeight: "500",
 		textAlign: "center",
-		marginBottom: 10,
-		letterSpacing: 1
+		marginBottom: 6
 	},
 	emptySubText: {
-		fontSize: 14,
-		color: "#FFF",
+		fontSize: 12,
+		color: "rgba(255,255,255,0.25)",
 		textAlign: "center",
-		lineHeight: 20,
-		opacity: 0.8,
-		fontWeight: "500"
+		lineHeight: 18
 	},
 	emptyHighlight: {
-		color: "#FF4A4A",
-		fontWeight: "bold"
+		color: "#1E90FF",
+		fontWeight: "600"
 	}
 });
 

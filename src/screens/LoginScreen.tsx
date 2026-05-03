@@ -5,8 +5,9 @@ import Logo from "@/src/components/Logo";
 import StyledText from "@/src/components/StyledText";
 import { useState } from "react";
 import { loginUser } from "@/src/services/LoginService";
-import { router } from "expo-router";
+import { router, Link } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
@@ -28,7 +29,11 @@ export default function LoginScreen() {
 			router.replace("/");
 			return;
 		} else {
-			alert(result.message);
+			Toast.show({
+				type: "error",
+				text1: "Erreur de login",
+				text2: result.message
+			});
 		}
 	};
 
@@ -53,12 +58,28 @@ export default function LoginScreen() {
 					secureTextEntry
 					onChangeText={setPassword}
 				/>
+
+				<View style={styles.forgotPasswordContainer}>
+					<Link href="/forgotPassword" style={styles.linkRedirection}>
+						Mot de passe oublié
+					</Link>
+				</View>
+
 				<View style={styles.btnForm}>
 					<TouchableOpacity
 						style={styles.button}
 						onPress={handleSubmit}>
 						<Text style={styles.buttonText}>Connexion</Text>
 					</TouchableOpacity>
+				</View>
+
+				<View style={styles.linkContainer}>
+					<Text style={styles.linkText}>
+						Pas encore de compte ? &nbsp;
+						<Link href="/signup" style={styles.linkRedirection}>
+							Inscrivez vous
+						</Link>
+					</Text>
 				</View>
 			</View>
 		</View>

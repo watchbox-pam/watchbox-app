@@ -2,51 +2,91 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		margin: 15
-	},
-	topBar: {
-		flexDirection: "row",
-		justifyContent: "space-between"
+		flex: 1,
+		paddingHorizontal: 24,
+		paddingTop: 16
 	},
 	title: {
-		fontSize: 40,
-		fontWeight: "bold",
-		marginBottom: 15
+		fontSize: 24,
+		fontWeight: "600",
+		color: "#fff",
+		marginBottom: 8,
+		marginTop: 8
+	},
+	subtitle: {
+		fontSize: 14,
+		color: "rgba(255,255,255,0.45)",
+		lineHeight: 21,
+		marginBottom: 32
+	},
+	inputLabel: {
+		fontSize: 11,
+		fontWeight: "600",
+		letterSpacing: 1,
+		color: "rgba(255,255,255,0.4)",
+		textTransform: "uppercase",
+		marginBottom: 12
+	},
+	inputWrapper: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: "rgba(255,255,255,0.06)",
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.1)",
+		borderRadius: 12,
+		paddingHorizontal: 14,
+		height: 52,
+		gap: 10
 	},
 	input: {
-		height: 40,
-		borderWidth: 1,
-		borderRadius: 4,
-		borderColor: "#6B737A",
-		marginBottom: 15,
+		flex: 1,
 		color: "#fff",
-		padding: 5
+		fontSize: 15
 	},
-	picker: {
-		height: 75,
+	codeRow: {
+		flexDirection: "row",
+		gap: 10,
+		marginBottom: 8
+	},
+	codeBox: {
+		flex: 1,
+		aspectRatio: 1,
+		backgroundColor: "rgba(255,255,255,0.06)",
 		borderWidth: 1,
-		borderRadius: 4,
-		borderColor: "#6B737A",
-		marginBottom: 15,
-		color: "#fff",
-		padding: 5
+		borderColor: "rgba(255,255,255,0.1)",
+		borderRadius: 10,
+		alignItems: "center",
+		justifyContent: "center"
 	},
-	btnSignUp: {
-		width: "100%",
-		alignItems: "center"
+	codeBoxActive: {
+		borderColor: "#AC2128",
+		backgroundColor: "rgba(172,33,40,0.1)"
+	},
+	codeText: {
+		color: "#fff",
+		fontSize: 20,
+		fontWeight: "500"
 	},
 	button: {
 		backgroundColor: "#AC2128",
-		width: "75%",
-		borderRadius: 12,
-		padding: 10,
+		borderRadius: 14,
+		paddingVertical: 16,
 		alignItems: "center",
-		margin: 8
+		marginTop: 28
 	},
 	buttonText: {
 		color: "#fff",
-		fontWeight: "bold",
-		fontSize: 17
+		fontWeight: "600",
+		fontSize: 15
+	},
+	helperText: {
+		textAlign: "center",
+		color: "rgba(255,255,255,0.3)",
+		marginTop: 16
+	},
+	helperLink: {
+		color: "#AC2128",
+		fontWeight: "600"
 	}
 });
 

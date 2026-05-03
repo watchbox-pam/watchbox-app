@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, Animated } from "react-native";
+import { View, TouchableOpacity, Animated, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "@/src/styles/CarouselSelectionStyle";
 
@@ -38,7 +38,7 @@ const RadialMenu = () => {
 	// Icon names (intended to be emotion labels or icons)
 	const icons = [
 		"Frisson",
-		"Excitation",
+		"Adrénaline",
 		"Émerveillement",
 		"Rire",
 		"Romantisme",
@@ -73,11 +73,14 @@ const RadialMenu = () => {
 							transform: [{ translateX }, { translateY }]
 						}}>
 						<TouchableOpacity style={styles.button}>
-							<Ionicons
-								name={icons[index]}
-								size={24}
-								color="#fff"
-							/>
+							<Text
+								style={{
+									color: "#fff",
+									fontSize: 10,
+									textAlign: "center"
+								}}>
+								{icons[index]}
+							</Text>
 						</TouchableOpacity>
 					</Animated.View>
 				);

@@ -1,13 +1,15 @@
 import { Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import styles from "@/src/styles/ReviewStyle";
 import StyledText from "@/src/components/StyledText";
-import Slider from "@react-native-community/slider";
 import { useState } from "react";
 import useSessionStore from "@/src/zustand/sessionStore";
 import Review from "@/src/models/Review";
 import { router, useLocalSearchParams } from "expo-router";
 import { createReview } from "@/src/services/ReviewService";
 import BackButton from "@/src/components/BackButton";
+import Toast from "react-native-toast-message";
+import StarsRatings from "../components/StarsRatings";
+
 export default function ReviewScreen() {
 	// Get the media ID from the route params
 	const { id } = useLocalSearchParams();
@@ -24,7 +26,7 @@ export default function ReviewScreen() {
 	const addReview = async () => {
 		const review: Review = {
 			userId: currentUser.id,
-			mediaId: id,
+			mediaId: Array.isArray(id) ? id[0] : id,
 			rating: rating,
 			comment: comment,
 			isSpoiler: isSpoiler
@@ -33,7 +35,11 @@ export default function ReviewScreen() {
 		if (result.success) {
 			router.back();
 		} else {
-			alert("Echec de la publication de la review");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Echec de la publication de la review"
+			});
 		}
 	};
 
@@ -52,15 +58,9 @@ export default function ReviewScreen() {
 				textAlignVertical={"top"}
 			/>
 			<StyledText>Ajouter une note au film</StyledText>
-			<View>
-				<StyledText>{rating}</StyledText>
-				<Slider
-					step={1}
-					minimumValue={0}
-					maximumValue={10}
-					onValueChange={(value: number) => setRating(value)}
-				/>
-			</View>
+
+			<StarsRatings value={rating} onChange={setRating} />
+
 			<View style={styles.spoilerView}>
 				<StyledText>Ajouter un spoiler warning</StyledText>
 				<Switch

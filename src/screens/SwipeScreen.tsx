@@ -20,14 +20,18 @@ import {
 	withTiming
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { fetchMovies } from "../services/SwipeService";
+import { fetchMovies, postSwipe } from "../services/SwipeService";
+import { postFeedback } from "../services/ReviewService";
 import SwipeCard, { Movie } from "../components/SwipeCard";
 import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
+import MovieLoader from "../components/MovieLoader";
+import useSessionStore from "../zustand/sessionStore";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 const SWIPE_OUT_DURATION = 250;
+const PREFETCH_THRESHOLD = 10;
 
 type SwipeDirection = "left" | "right" | "up";
 
@@ -42,8 +46,8 @@ export default function SwipeScreen() {
 	const [skippedCount, setSkippedCount] = useState(0);
 
 	const router = useRouter();
+	const currentUser = useSessionStore((state) => state.user);
 
-	//const [cards, setCards] = useState<Card[]>(data);
 	const translateX = useSharedValue(0);
 	const translateY = useSharedValue(0);
 	const dummyTranslate = useSharedValue(0);
@@ -53,6 +57,8 @@ export default function SwipeScreen() {
 	const moviesRef = useRef<Movie[]>([]);
 	const tapStartTime = useRef(0);
 	const isAnimatingRef = useRef(false);
+	const isFetchingMoreRef = useRef(false);
+	const seenMovieIdsRef = useRef<Set<number>>(new Set());
 
 	useEffect(() => {
 		currentIndexRef.current = currentIndex;
@@ -63,9 +69,36 @@ export default function SwipeScreen() {
 	}, [movies]);
 
 	useEffect(() => {
+		const remaining = movies.length - currentIndex;
+		if (
+			remaining > PREFETCH_THRESHOLD ||
+			movies.length === 0 ||
+			isFetchingMoreRef.current
+		)
+			return;
+
+		isFetchingMoreRef.current = true;
+		fetchMovies()
+			.then((newMovies) => {
+				const fresh = newMovies.filter(
+					(m) => !seenMovieIdsRef.current.has(m.id)
+				);
+				fresh.forEach((m) => seenMovieIdsRef.current.add(m.id));
+				if (fresh.length > 0) {
+					setMovies((prev) => [...prev, ...fresh]);
+				}
+				isFetchingMoreRef.current = false;
+			})
+			.catch(() => {
+				isFetchingMoreRef.current = false;
+			});
+	}, [currentIndex, movies.length]);
+
+	useEffect(() => {
 		const load = async () => {
 			try {
 				const res = await fetchMovies();
+				res.forEach((m) => seenMovieIdsRef.current.add(m.id));
 				setMovies(res);
 			} catch (err) {
 				console.error("Erreur lors du chargement des films :", err);
@@ -82,17 +115,31 @@ export default function SwipeScreen() {
 		translateY.value = 0;
 	}, [currentIndex, translateX, translateY]);
 
+	// Runs on JS thread — no runOnJS needed
 	const handleSwipeComplete = useCallback(
 		(direction: SwipeDirection) => {
 			const movie = moviesRef.current[currentIndexRef.current];
 			if (!movie) return;
+
+			const apiDirection =
+				direction === "right"
+					? "like"
+					: direction === "left"
+						? "dislike"
+						: "skip";
+			postSwipe(movie.id, apiDirection);
+
+			if (apiDirection === "like" || apiDirection === "dislike") {
+				const rating = apiDirection === "like" ? 8 : 2;
+				postFeedback(movie.id, currentUser.id, rating);
+			}
 
 			if (direction === "right") setLikedCount((n) => n + 1);
 			else if (direction === "left") setDislikedCount((n) => n + 1);
 			else setSkippedCount((n) => n + 1);
 
 			setCurrentIndex((prev) => prev + 1);
-			nextCardScale.value = withSpring(0.95, { duration: 400 });
+			nextCardScale.value = withTiming(0.95, { duration: 400 });
 			isAnimatingRef.current = false;
 			setIsAnimating(false);
 		},
@@ -131,7 +178,7 @@ export default function SwipeScreen() {
 	const resetPosition = useCallback(() => {
 		translateX.value = withSpring(0, { damping: 15 });
 		translateY.value = withSpring(0, { damping: 15 });
-		nextCardScale.value = withSpring(0.95, { duration: 300 });
+		nextCardScale.value = withTiming(0.95, { duration: 300 });
 	}, [nextCardScale, translateX, translateY]);
 
 	const panResponder = useRef(
@@ -156,6 +203,7 @@ export default function SwipeScreen() {
 				nextCardScale.value = 0.95 + 0.05 * progress;
 			},
 
+			// PanResponder callbacks are already on the JS thread — no runOnJS needed
 			onPanResponderRelease: (_, gesture) => {
 				if (isAnimatingRef.current) return;
 				const tapDuration = Date.now() - tapStartTime.current;
@@ -182,17 +230,17 @@ export default function SwipeScreen() {
 
 				if (absDy > absDx) {
 					if (gesture.dy < -SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("up");
+						forceSwipe("up");
 					} else {
-						runOnJS(resetPosition)();
+						resetPosition();
 					}
 				} else {
 					if (gesture.dx > SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("right");
+						forceSwipe("right");
 					} else if (gesture.dx < -SWIPE_THRESHOLD) {
-						runOnJS(forceSwipe)("left");
+						forceSwipe("left");
 					} else {
-						runOnJS(resetPosition)();
+						resetPosition();
 					}
 				}
 			}
@@ -210,12 +258,7 @@ export default function SwipeScreen() {
 		!loading && movies.length > 0 && currentIndex < movies.length;
 
 	if (loading) {
-		return (
-			<View style={styles.centered}>
-				<ActivityIndicator size="large" color="#0A1E38" />
-				<Text style={styles.loadingText}>Chargement des films...</Text>
-			</View>
-		);
+		return <MovieLoader />;
 	}
 
 	if (movies.length === 0) {

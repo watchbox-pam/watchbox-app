@@ -9,6 +9,7 @@ import ProvidersSection from "../components/Param/ProvidersSection";
 import DeleteAccountModal from "../components/Param/DeleteAccountModal";
 import ClearCacheModal from "../components/Param/ClearCacheModal";
 import { useSettings } from "@/src/components/Param/useSettings";
+import Toast from "react-native-toast-message";
 
 const ParamScreen: React.FC = () => {
 	const {
@@ -30,6 +31,7 @@ const ParamScreen: React.FC = () => {
 		setAdultContent,
 		toggleProvider,
 		clearCache,
+		redirectToPasswordReset,
 		handleDeleteAccount
 	} = useSettings();
 
@@ -81,27 +83,32 @@ const ParamScreen: React.FC = () => {
 				title="Profile Public"
 				description="Profile visible à tous"
 				checked={publicProfile}
-				onToggle={() => setPublicProfile(!publicProfile)}
+				onToggle={() => setPublicProfile()}
 			/>
 
 			<SettingCheckboxItem
 				title="Historique"
 				description="Historique visible pour tous"
 				checked={history}
-				onToggle={() => setHistory(!history)}
+				onToggle={() => setHistory()}
 			/>
 
 			<SettingCheckboxItem
 				title="Contenu pour adultes"
 				description="Contenu +18 ans"
 				checked={adultContent}
-				onToggle={() => setAdultContent(!adultContent)}
+				onToggle={() => setAdultContent()}
 			/>
 
 			<SettingItem
 				title="Vider le cache"
 				description={isCalculatingCache ? "Calcul..." : cacheSize}
 				onPress={() => setShowClearCacheModal(true)}
+			/>
+
+			<SettingItem
+				title="Réinitialiser votre mot de passe"
+				onPress={() => redirectToPasswordReset()}
 			/>
 
 			<SettingItem
@@ -123,10 +130,11 @@ const ParamScreen: React.FC = () => {
 				onConfirm={async () => {
 					await clearCache();
 					setShowClearCacheModal(false);
-					Alert.alert(
-						"Cache vidé",
-						"Le cache a été vidé avec succès !"
-					);
+					Toast.show({
+						type: "success",
+						text1: "Cache vidé",
+						text2: "Le cache a été vidé avec succès !"
+					});
 				}}
 				cacheSize={cacheSize}
 			/>

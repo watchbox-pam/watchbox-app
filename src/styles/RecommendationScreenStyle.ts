@@ -22,6 +22,12 @@ const styles = StyleSheet.create({
 	},
 	scrollContainer: {
 		flex: 1
+	},
+	loadingOverlay: {
+		...StyleSheet.absoluteFillObject,
+		justifyContent: "center",
+		alignItems: "center",
+		zIndex: 1000
 	}
 });
 

@@ -21,9 +21,10 @@ import CadrePublicitaire from "../components/CadrePublicitaire";
 import Movie from "@/src/models/Movie";
 import Person from "@/src/models/Person";
 import Provider from "@/src/models/Provider";
-import * as SecureStore from "expo-secure-store";
+import useFiltersStore from "@/src/zustand/filtersStore";
 import { ErrorMessage } from "../components/ErrorMessage";
 import FallbackImage from "../components/FallbackImage";
+import Entypo from "@expo/vector-icons/Entypo";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -40,9 +41,15 @@ export default function SearchScreen() {
 
 	// State variables for providers
 	const [allProviders, setAllProviders] = useState<Provider[]>([]);
-	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 	const [showProviderFilter, setShowProviderFilter] =
 		useState<boolean>(false);
+	const {
+		selectedProviders,
+		isLoaded,
+		loadProviders,
+		toggleProvider,
+		clearProviders
+	} = useFiltersStore();
 
 	const hasInteracted = useRef(false);
 
@@ -71,13 +78,13 @@ export default function SearchScreen() {
 	const filters = [
 		{ key: "all", label: "Tous" },
 		{ key: "films", label: "Films" },
-		{ key: "actors", label: "Acteurs" }
+		{ key: "actors", label: "Personnes" }
 	];
 
 	// Load providers and selected providers when component mounts
 	useEffect(() => {
 		fetchProviders();
-		loadSelectedProviders();
+		if (!isLoaded) loadProviders();
 		if (refreshing) {
 			setRefreshing(false);
 		}
@@ -96,65 +103,26 @@ export default function SearchScreen() {
 		}
 	};
 
-	// Load selected providers from AsyncStorage
-	const loadSelectedProviders = async () => {
-		try {
-			const savedProviders =
-				await SecureStore.getItemAsync("selectedProviders");
-			if (savedProviders) {
-				const parsedProviders = JSON.parse(savedProviders);
-				setSelectedProviders(parsedProviders);
-			}
-		} catch (error) {
-			console.error("Error loading selected providers:", error);
-		}
-	};
-
 	const fetchSuggestions = async () => {
 		setIsLoadingSuggestions(true);
 		try {
-			let suggestionResults: (Movie | Person)[] = [];
+			const results = await searchService.getSuggestions(
+				searchTerm,
+				selectedProviders.length > 0 ? selectedProviders : undefined
+			);
+			if (results.success) {
+				const seenTitles = new Set<string>();
+				const unique = results.data.filter((item: any) => {
+					const title = item.title || item.name;
+					if (seenTitles.has(title)) return false;
+					seenTitles.add(title);
+					return true;
+				});
 
-			switch (selectedFilter) {
-				case "films":
-					const movieResults = await searchService.searchMovies(
-						searchTerm,
-						selectedProviders.length > 0
-							? selectedProviders
-							: undefined
-					);
-					if (movieResults.success) {
-						suggestionResults = movieResults.data.slice(0, 5);
-					}
-					break;
-
-				case "actors":
-					const actorResults =
-						await searchService.searchActors(searchTerm);
-					if (actorResults.success) {
-						suggestionResults = actorResults.data.slice(0, 5);
-					}
-					break;
-
-				case "all":
-				default:
-					const allResults = await searchService.searchAll(
-						searchTerm,
-						selectedProviders.length > 0
-							? selectedProviders
-							: undefined
-					);
-					if (allResults.success) {
-						const movies = allResults.data.movies || [];
-						const people = allResults.data.people || [];
-						suggestionResults = [...movies, ...people].slice(0, 5);
-					}
-					break;
-			}
-
-			setSuggestions(suggestionResults);
-			if (hasInteracted.current) {
-				setShowSuggestions(suggestionResults.length > 0);
+				setSuggestions(unique);
+				if (hasInteracted.current) {
+					setShowSuggestions(unique.length > 0);
+				}
 			}
 		} catch (error) {
 			console.error("Error fetching suggestions:", error);
@@ -165,7 +133,10 @@ export default function SearchScreen() {
 	};
 
 	const handleSuggestionSelect = (item: Movie | Person) => {
-		const title = "title" in item ? item.title : item.name;
+		const title =
+			item.media_type === "movie"
+				? (item as Movie).title
+				: (item as Person).name;
 		hasInteracted.current = false;
 		setShowSuggestions(false);
 		setSearchTerm(title);
@@ -200,8 +171,12 @@ export default function SearchScreen() {
 						const actorResults =
 							await searchService.searchActors(term);
 						if (actorResults.success) {
-							setActors(actorResults.data);
-							setMovies([]); // Clear movies when filtering actors
+							const sortedActors = actorResults.data.sort(
+								(a: Person, b: Person) =>
+									(b.popularity ?? 0) - (a.popularity ?? 0)
+							);
+							setActors(sortedActors);
+							setMovies([]);
 						}
 						break;
 
@@ -228,35 +203,11 @@ export default function SearchScreen() {
 		}
 	};
 
-	// Toggle provider selection
-	const toggleProvider = (providerId: number) => {
-		setSelectedProviders((prev) =>
-			prev.includes(providerId)
-				? prev.filter((id) => id !== providerId)
-				: [...prev, providerId]
-		);
-	};
-
-	// Save selected providers to AsyncStorage
-	const saveSelectedProviders = async () => {
-		try {
-			await SecureStore.setItemAsync(
-				"selectedProviders",
-				JSON.stringify(selectedProviders)
-			);
-			setShowProviderFilter(false);
-			// Trigger search again with new providers
-			if (searchTerm.trim()) {
-				search();
-			}
-		} catch (error) {
-			console.error("Error saving selected providers:", error);
+	const applyProviders = () => {
+		setShowProviderFilter(false);
+		if (searchTerm.trim()) {
+			search();
 		}
-	};
-
-	// Clear all selected providers
-	const clearSelectedProviders = () => {
-		setSelectedProviders([]);
 	};
 
 	// Trigger search when the filter changes and searchTerm is not empty
@@ -356,26 +307,15 @@ export default function SearchScreen() {
 		</TouchableOpacity>
 	);
 	const renderSuggestionItem = (item: Movie | Person) => {
-		const isMovie = "title" in item;
+		const isMovie = item.media_type === "movie";
 		const title = isMovie ? (item as Movie).title : (item as Person).name;
-		/* const imagePath = isMovie
-            ? (item as Movie).poster_path
-            : (item as Person).profile_path; */
+		const uniqueKey = `${item.media_type}-${item.id}`;
 
 		return (
 			<TouchableOpacity
-				key={item.id}
+				key={uniqueKey}
 				style={styles.suggestionItem}
 				onPress={() => handleSuggestionSelect(item)}>
-				{/* <Image
-                    source={{
-                        uri: imagePath
-                            ? `https://image.tmdb.org/t/p/w500${imagePath}`
-                            : "https://via.placeholder.com/500x750?text=No+Image"
-                    }}
-                    style={styles.suggestionImage}
-                    resizeMode="cover"
-                /> */}
 				<Text style={styles.suggestionText} numberOfLines={1}>
 					{title}
 				</Text>
@@ -419,6 +359,21 @@ export default function SearchScreen() {
 							}
 						}}
 					/>
+					{/* Bouton Clear */}
+					{searchTerm.length > 0 && (
+						<TouchableOpacity
+							style={styles.clearButton}
+							onPress={() => {
+								setSearchTerm("");
+								setSuggestions([]);
+								setShowSuggestions(false);
+								hasInteracted.current = false;
+								setMovies([]);
+								setActors([]);
+							}}>
+							<Entypo name="cross" size={20} color="black" />
+						</TouchableOpacity>
+					)}
 					{/* Suggestions dropdown */}
 					{showSuggestions && (
 						<View style={styles.suggestionsContainer}>
@@ -439,7 +394,7 @@ export default function SearchScreen() {
 				<TouchableOpacity
 					onPress={() => search()}
 					style={styles.BtnSearch}>
-					<Text style={styles.TextSearch}>Rechercher</Text>
+					<Entypo name="magnifying-glass" size={20} color="#000" />
 				</TouchableOpacity>
 			</View>
 
@@ -494,7 +449,7 @@ export default function SearchScreen() {
 						<Text style={styles.providerFilterTitle}>
 							Plateformes
 						</Text>
-						<TouchableOpacity onPress={clearSelectedProviders}>
+						<TouchableOpacity onPress={clearProviders}>
 							<Text style={styles.clearText}>Effacer tout</Text>
 						</TouchableOpacity>
 					</View>
@@ -531,7 +486,7 @@ export default function SearchScreen() {
 					<View style={styles.providerFilterActions}>
 						<TouchableOpacity
 							style={styles.providerFilterApplyButton}
-							onPress={saveSelectedProviders}>
+							onPress={applyProviders}>
 							<Text style={styles.providerFilterApplyText}>
 								Appliquer
 							</Text>
@@ -621,7 +576,7 @@ export default function SearchScreen() {
 							<View key={`actors-section`}>
 								{selectedFilter !== "actors" && (
 									<StyledText style={styles.sectionTitle}>
-										Acteurs
+										Personnes
 									</StyledText>
 								)}
 								<View style={styles.actorsGrid}>

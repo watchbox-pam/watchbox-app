@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import useSessionStore from "@/src/zustand/sessionStore";
+import useFiltersStore from "@/src/zustand/filtersStore";
 import UserProfile from "@/src/models/UserProfile";
-import { deleteAccount, getUserProfile } from "@/src/services/ProfileService";
+import getPasswordResetToken, {
+	deleteAccount,
+	getUserProfile,
+	updateSettings
+} from "@/src/services/ProfileService";
 import { providerService } from "@/src/services/ProviderService";
+import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 
 type Provider = {
 	id: number;
@@ -15,6 +22,8 @@ type Provider = {
 export const useSettings = () => {
 	const userId = useSessionStore((state) => state.user.id);
 	const signOut = useSessionStore((state) => state.signOut);
+	const { selectedProviders, isLoaded, loadProviders, toggleProvider } =
+		useFiltersStore();
 
 	// Toggles
 	const [notifications, setNotifications] = useState(false);
@@ -25,7 +34,6 @@ export const useSettings = () => {
 	// Data
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [providers, setProviders] = useState<Provider[]>([]);
-	const [selectedProviders, setSelectedProviders] = useState<number[]>([]);
 
 	// Loading
 	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -39,6 +47,7 @@ export const useSettings = () => {
 	useEffect(() => {
 		fetchUserProfile();
 		fetchProviders();
+		if (!isLoaded) loadProviders();
 	}, []);
 
 	/* ---------- PROFILE ---------- */
@@ -53,13 +62,75 @@ export const useSettings = () => {
 				setHistory(!result.data.history_private);
 				setAdultContent(result.data.adult_content);
 			} else {
-				Alert.alert("Erreur", "Impossible de charger le profil");
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: "Impossible de charger le profil"
+				});
 			}
 		} catch (error) {
 			console.error(error);
 		} finally {
 			setIsLoadingProfile(false);
 		}
+	};
+
+	const saveSettings = async (
+		newAdultContent: boolean,
+		newPublicProfile: boolean,
+		newHistory: boolean
+	) => {
+		const result = await updateSettings(
+			userId,
+			newAdultContent,
+			!newPublicProfile,
+			!newHistory
+		);
+		if (!result.success) {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2:
+					result.message ?? "Impossible de sauvegarder les paramètres"
+			});
+		}
+	};
+
+	const handleToggleAdultContent = () => {
+		if (!adultContent) {
+			Alert.alert(
+				"Contenu adulte",
+				"Êtes-vous sûr d'avoir plus de 18 ans ?",
+				[
+					{
+						text: "Non",
+						style: "cancel"
+					},
+					{
+						text: "Oui",
+						onPress: () => {
+							setAdultContent(true);
+							saveSettings(true, publicProfile, history);
+						}
+					}
+				]
+			);
+		} else {
+			setAdultContent(false);
+			saveSettings(false, publicProfile, history);
+		}
+	};
+
+	const handleTogglePublicProfile = () => {
+		const next = !publicProfile;
+		setPublicProfile(next);
+		saveSettings(adultContent, next, history);
+	};
+
+	const handleToggleHistory = () => {
+		const next = !history;
+		setHistory(next);
+		saveSettings(adultContent, publicProfile, next);
 	};
 
 	/* ---------- PROVIDERS ---------- */
@@ -72,14 +143,6 @@ export const useSettings = () => {
 		} finally {
 			setIsLoadingProviders(false);
 		}
-	};
-
-	const toggleProvider = (providerId: number) => {
-		setSelectedProviders((prev) =>
-			prev.includes(providerId)
-				? prev.filter((id) => id !== providerId)
-				: [...prev, providerId]
-		);
 	};
 
 	/* ---------- CACHE ---------- */
@@ -135,15 +198,45 @@ export const useSettings = () => {
 			const result = await deleteAccount();
 			if (result.success) {
 				await signOut();
-				Alert.alert("Compte supprimé", result.message);
+				Toast.show({
+					type: "error",
+					text1: "Compte supprimé",
+					text2: result.message
+				});
 			} else {
-				Alert.alert("Erreur", result.message);
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: result.message
+				});
 			}
 		} catch {
-			Alert.alert("Erreur", "Une erreur inattendue est survenue");
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Une erreur inattendue est survenue"
+			});
 		} finally {
 			setIsDeletingAccount(false);
 		}
+	};
+
+	const redirectToPasswordReset = async () => {
+		try {
+			const passwordResetTokenResult =
+				await getPasswordResetToken(userId);
+			if (passwordResetTokenResult.success) {
+				router.navigate(
+					`/resetPassword/${passwordResetTokenResult.data}`
+				);
+			} else {
+				Toast.show({
+					type: "error",
+					text1: "Erreur",
+					text2: "Impossible de réinitialiser le mot de passe"
+				});
+			}
+		} catch (error: any) {}
 	};
 
 	return {
@@ -162,13 +255,14 @@ export const useSettings = () => {
 		isDeletingAccount,
 
 		setNotifications,
-		setPublicProfile,
-		setHistory,
-		setAdultContent,
+		setPublicProfile: handleTogglePublicProfile,
+		setHistory: handleToggleHistory,
+		setAdultContent: handleToggleAdultContent,
 
 		toggleProvider,
 		calculateCacheSize,
 		clearCache,
+		redirectToPasswordReset,
 		handleDeleteAccount
 	};
 };

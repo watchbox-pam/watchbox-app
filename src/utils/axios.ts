@@ -132,6 +132,39 @@ export abstract class ApiHelper {
 		}
 	}
 
+	public static async patch(
+		url: string,
+		data: any,
+		options?: AxiosRequestConfig
+	) {
+		try {
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("token");
+			} else {
+				userToken = localStorage.getItem("token");
+			}
+			const jsonData: string = JSON.stringify(data);
+			const response = await this.instance.patch(url, jsonData, {
+				...options,
+				...{
+					headers: {
+						Authorization: `Bearer ${userToken}`
+					}
+				}
+			});
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.response?.data?.detail ?? error.message
+			};
+		}
+	}
+
 	public static async delete(url: string, options?: AxiosRequestConfig) {
 		try {
 			let userToken: string | null;

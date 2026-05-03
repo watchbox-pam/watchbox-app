@@ -6,6 +6,8 @@ import styles from "@/src/styles/LayoutStyle";
 import { useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import * as NavigationBar from "expo-navigation-bar";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "@/src/utils/toastConfig";
 
 const STATUS_BAR_BG = "#0A1E38"; // barre du haut
 
@@ -54,6 +56,7 @@ export default function Root() {
 					<Slot />
 				</SafeAreaView>
 			</PaperProvider>
+			<Toast position={"top"} topOffset={75} config={toastConfig} />
 		</SafeAreaProvider>
 	);
 }

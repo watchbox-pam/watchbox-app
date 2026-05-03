@@ -5,6 +5,7 @@ import { ApiHelper } from "@/src/utils/axios";
  * @param movieId The unique identifier of the movie.
  * @returns An object containing success status and movie data or an error message.
  */
+
 export const fetchMovieDetails = async (movieId: number) => {
 	try {
 		const data: { success: boolean; data: any } = await ApiHelper.get(

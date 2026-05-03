@@ -55,7 +55,7 @@ describe("<RecommendationScreen />", () => {
 
 		expect(getByText("ROMANTISME")).toBeTruthy();
 		expect(getByText("ÉMERVEILLEMENT")).toBeTruthy();
-		expect(getByText("EXCITATION")).toBeTruthy();
+		expect(getByText("ADRÉNALINE")).toBeTruthy();
 		expect(getByText("FRISSON")).toBeTruthy();
 		expect(getByText("NOSTALGIE")).toBeTruthy();
 		expect(getByText("RÉFLEXION")).toBeTruthy();

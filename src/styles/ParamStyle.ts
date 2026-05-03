@@ -179,13 +179,14 @@ const styles = StyleSheet.create({
 		height: 60,
 		margin: 5,
 		borderRadius: 8,
+		borderWidth: 2,
+		borderColor: "transparent",
 		backgroundColor: "#0A1E38",
 		justifyContent: "center",
 		alignItems: "center",
 		overflow: "hidden"
 	},
 	selectedProvider: {
-		borderWidth: 2,
 		borderColor: "#FFF"
 	},
 	providerLogo: {

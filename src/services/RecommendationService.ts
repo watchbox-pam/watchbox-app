@@ -1,19 +1,25 @@
 import { ApiHelper } from "@/src/utils/axios";
 
-/**
- * Fetch personalized movie recommendations based on user's emotion
- * @param emotion A string representing the user's current emotion (e.g., "happy", "sad")
- * @returns Recommendations data or error message
- */
-export const fetchRecommendations = async (emotion: string) => {
+export const fetchRecommendations = async (
+	emotion: string,
+	options?: { limit?: number; excludeIds?: number[] }
+) => {
 	try {
-		// Send GET request to fetch recommendations based on the emotion
+		const params = new URLSearchParams();
+
+		if (options?.limit !== undefined) {
+			params.set("limit", String(options.limit));
+		}
+		if (options?.excludeIds?.length) {
+			params.set("exclude_ids", options.excludeIds.join(","));
+		}
+
+		const suffix = params.toString() ? `?${params.toString()}` : "";
 		const response = await ApiHelper.get(
-			`/recommendations/recommended/${emotion}`
+			`/recommendations/recommended/${emotion}${suffix}`
 		);
 		return response;
 	} catch (error) {
-		// Return error response if the request fails
 		return {
 			success: false,
 			data: "Impossible de charger les recommandations."
