@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
+import CarouselBigPoster from "../components/CarouselBigPoster";
+import CarouselEmotions from "../components/CarouselEmotions";
 //import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
@@ -53,13 +55,20 @@ export default function HomeScreen() {
 			// Build the movie sections
 			list.push(
 				{
-					title: "Populaires aujourd'hui",
+					title: "Populaires cette semaine",
+					subtitle: "Découvre les films sortis récemment",
 					movies: popularDay.data["results"]
 				},
 				{
-					title: "Populaires cette semaine",
+					title: "Populaires aujourd'hui",
+					subtitle: "Films populaires et tendance",
 					movies: popularWeek.data["results"]
 				},
+                {
+                    title: "Émotions",
+                    subtitle: "Envie de ressentir une émotion particulière pendant ton prochain film ?",
+                    movies: popularWeek.data["results"]
+                },
 				{
 					title: "Action",
 					movies: actionGenre.data["results"]
@@ -67,14 +76,6 @@ export default function HomeScreen() {
 				{
 					title: "Comédie",
 					movies: comedyGenre.data["results"]
-				},
-				{
-					title: "Drama",
-					movies: dramaGenre.data["results"]
-				},
-				{
-					title: "Drama",
-					movies: dramaGenre.data["results"]
 				},
 				{
 					title: "Drama",
@@ -132,7 +133,7 @@ export default function HomeScreen() {
 				<Header title={`Hello there, ${currentUser.identifier}`} />
 
 				{movies &&
-					movies.map(({ title, movies }, index) => (
+					movies.map(({ title, subtitle, movies }, index) => (
 						<View key={index}>
 							<View style={styles.WatchList}>
 								<View style={styles.TitleWatchList}>
@@ -140,8 +141,19 @@ export default function HomeScreen() {
 										style={styles.MainTitleWatchList}>
 										{title}
 									</StyledText>
+									{index <= 2 && subtitle && (
+                                        <StyledText style={styles.SubTitleWatchList}>
+                                            {subtitle}
+                                        </StyledText>
+                                    )}
 								</View>
-								{movies && <CarouselPoster data={movies} />}
+								{movies && (
+                                    index === 0
+                                        ? <CarouselBigPoster data={movies} />
+                                        : index === 2
+                                            ? <CarouselEmotions />
+                                            : <CarouselPoster data={movies} />
+                                )}
 							</View>
 							{(index + 1) % 5 === 0 && <Quizz />}
 							{/* {(index + 1) % 3 === 0 && (
