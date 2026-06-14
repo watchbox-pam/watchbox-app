@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Animated, StatusBar, View, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
@@ -230,12 +230,12 @@ export default function RecommendationScreen() {
 		} catch {}
 	}, [selectedEmotion, movies]);
 
-    useEffect(() => {
-        if (emotionId) {
-            const emotion = emotions.find(e => e.id === Number(emotionId));
-            if (emotion) handleSelectEmotion(emotion);
-        }
-    }, [emotionId]);
+	useEffect(() => {
+		if (emotionId) {
+			const emotion = emotions.find((e) => e.id === Number(emotionId));
+			if (emotion) handleSelectEmotion(emotion);
+		}
+	}, [emotionId, handleSelectEmotion]);
 
 	return (
 		<View style={styles.container}>

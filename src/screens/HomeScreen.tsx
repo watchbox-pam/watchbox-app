@@ -17,9 +17,9 @@ import Quizz from "../components/QuizzButton";
 import { BackgroundLine } from "../assets/background/BackgroundLine";
 
 export default function HomeScreen() {
-	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
-		[]
-	);
+	const [movies, setMovies] = useState<
+		{ title?: string; subtitle?: string; movies: any[] }[]
+	>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 
@@ -64,11 +64,12 @@ export default function HomeScreen() {
 					subtitle: "Films populaires et tendance",
 					movies: popularWeek.data["results"]
 				},
-                {
-                    title: "Émotions",
-                    subtitle: "Envie de ressentir une émotion particulière pendant ton prochain film ?",
-                    movies: popularWeek.data["results"]
-                },
+				{
+					title: "Émotions",
+					subtitle:
+						"Envie de ressentir une émotion particulière pendant ton prochain film ?",
+					movies: popularWeek.data["results"]
+				},
 				{
 					title: "Action",
 					movies: actionGenre.data["results"]
@@ -142,18 +143,20 @@ export default function HomeScreen() {
 										{title}
 									</StyledText>
 									{index <= 2 && subtitle && (
-                                        <StyledText style={styles.SubTitleWatchList}>
-                                            {subtitle}
-                                        </StyledText>
-                                    )}
+										<StyledText
+											style={styles.SubTitleWatchList}>
+											{subtitle}
+										</StyledText>
+									)}
 								</View>
-								{movies && (
-                                    index === 0
-                                        ? <CarouselBigPoster data={movies} />
-                                        : index === 2
-                                            ? <CarouselEmotions />
-                                            : <CarouselPoster data={movies} />
-                                )}
+								{movies &&
+									(index === 0 ? (
+										<CarouselBigPoster data={movies} />
+									) : index === 2 ? (
+										<CarouselEmotions />
+									) : (
+										<CarouselPoster data={movies} />
+									))}
 							</View>
 							{(index + 1) % 5 === 0 && <Quizz />}
 							{/* {(index + 1) % 3 === 0 && (
