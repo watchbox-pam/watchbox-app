@@ -18,6 +18,7 @@ import styles from "@/src/styles/QuizHomeStyle";
 import {
 	fetchUserScores,
 	fetchLeaderboard,
+	prewarmQuiz,
 	type LeaderboardEntry
 } from "@/src/services/QuizService";
 
@@ -91,6 +92,9 @@ export default function QuizHomeScreen() {
 
 	useFocusEffect(
 		useCallback(() => {
+			// Démarre la génération des questions dès l'arrivée sur la home quiz,
+			// pour qu'elles soient prêtes quand l'utilisateur choisit une catégorie.
+			prewarmQuiz();
 			fetchUserScores().then((res) => {
 				if (res.success) setGlobalScore(res.data.global_score ?? 0);
 			});

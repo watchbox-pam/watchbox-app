@@ -43,6 +43,10 @@ export async function fetchQuizQuestions(genre: string) {
 	return ApiHelper.get(`/quiz/questions/${genre}`);
 }
 
+export async function prewarmQuiz() {
+	return ApiHelper.post("/quiz/prewarm", {});
+}
+
 export async function submitQuizAnswers(
 	genre_slug: string,
 	answers: AnswerPayload[]

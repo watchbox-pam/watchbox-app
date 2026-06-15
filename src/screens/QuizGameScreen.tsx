@@ -47,6 +47,7 @@ export default function QuizGameScreen() {
 	const [validated, setValidated] = useState(false);
 	const [timer, setTimer] = useState(TIMER_MAX);
 	const [loading, setLoading] = useState(true);
+	const [generating, setGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [quizDone, setQuizDone] = useState(false);
 	const [result, setResult] = useState<QuizResult | null>(null);
@@ -67,14 +68,14 @@ export default function QuizGameScreen() {
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		if (loading || quizDone) return;
+		if (loading || generating || quizDone) return;
 		const unsubscribe = navigation.addListener("beforeRemove", (e) => {
 			e.preventDefault();
 			pendingActionRef.current = e.data.action;
 			setQuitModalVisible(true);
 		});
 		return unsubscribe;
-	}, [navigation, loading, quizDone]);
+	}, [navigation, loading, generating, quizDone]);
 
 	const confirmQuit = () => {
 		setQuitModalVisible(false);
@@ -179,6 +180,7 @@ export default function QuizGameScreen() {
 	const loadQuestions = useCallback(async () => {
 		clearTimer();
 		setLoading(true);
+		setGenerating(false);
 		setError(null);
 		setCurrentIndex(0);
 		setSelectedAnswer(null);
@@ -198,17 +200,19 @@ export default function QuizGameScreen() {
 			questionsRef.current = res.data;
 			setQuestions(res.data);
 			setLoading(false);
+			setGenerating(false);
 			startTimer();
 		} else if (
 			!res.success &&
 			res.data ===
 				"Questions en cours de préparation, réessaie dans quelques secondes."
 		) {
-			setError("Questions en cours de génération…");
+			setGenerating(true);
 			setLoading(false);
+			setError(null);
 			setTimeout(() => {
 				if (mountedRef.current) loadQuestions();
-			}, 8000);
+			}, 4000);
 		} else {
 			setError("Impossible de charger les questions.");
 			setLoading(false);
@@ -255,12 +259,14 @@ export default function QuizGameScreen() {
 	const currentQuestion = questions[currentIndex];
 	const timerProgress = timer / TIMER_MAX;
 
-	if (loading) {
+	if (loading || generating) {
 		return (
 			<View style={[styles.container, styles.loadingContainer]}>
 				<ActivityIndicator size="large" color="#AC2821" />
 				<Text style={styles.loadingText}>
-					Chargement des questions…
+					{generating
+						? "Génération des questions…\nça peut prendre quelques secondes"
+						: "Chargement des questions…"}
 				</Text>
 			</View>
 		);
