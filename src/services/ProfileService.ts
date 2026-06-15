@@ -18,7 +18,7 @@ export async function getUserProfile(userId: string) {
 
 	try {
 		// Send GET request to retrieve the user's profile
-		const result = await ApiHelper.get(`/users/profile`);
+		const result = await ApiHelper.get(`/users/profile/${userId}`);
 
 		if (result.success) {
 			return {

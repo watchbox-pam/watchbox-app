@@ -168,6 +168,7 @@ export default function SearchScreen() {
 						if (movieResults.success) {
 							setMovies(movieResults.data);
 							setActors([]); // Clear actors when filtering movies
+							setUsers([]);
 						}
 						break;
 
@@ -181,6 +182,7 @@ export default function SearchScreen() {
 							);
 							setActors(sortedActors);
 							setMovies([]);
+							setUsers([]);
 						}
 						break;
 
@@ -189,6 +191,8 @@ export default function SearchScreen() {
 							await searchService.searchUsers(term);
 						if (userResults.success) {
 							setUsers(userResults.data);
+							setMovies([]);
+							setActors([]);
 						}
 						break;
 

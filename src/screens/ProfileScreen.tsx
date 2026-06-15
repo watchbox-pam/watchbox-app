@@ -288,11 +288,19 @@ export default function ProfileScreen() {
 										{formatRuntime(totalRuntime)}
 									</Text>
 								</View>
-								<View style={styles.badge}>
-									<Text style={styles.badgeText}>
-										Publique
-									</Text>
-								</View>
+								{historyPlaylist.is_private ? (
+									<View style={styles.badgePrivate}>
+										<Text style={styles.badgePrivateText}>
+											Privée
+										</Text>
+									</View>
+								) : (
+									<View style={styles.badge}>
+										<Text style={styles.badgeText}>
+											Publique
+										</Text>
+									</View>
+								)}
 							</View>
 							<CarouselWatchList
 								providers={historyPlaylist}
