@@ -12,7 +12,8 @@ import HomeIcon from "@/src/assets/icons/HomeIcon";
 import SearchIcon from "@/src/assets/icons/SearchIcon";
 import RecommendationIcon from "@/src/assets/icons/RecommendationIcon";
 import SwipeIcon from "@/src/assets/icons/SwipeIcon";
-import CalendarIcon from "@/src/assets/icons/CalendarIcon";
+//import CalendarIcon from "@/src/assets/icons/CalendarIcon";
+import ProfileIcon from "@/src/assets/icons/ProfileIcon";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const TAB_COUNT = 5;
@@ -20,7 +21,7 @@ const TAB_WIDTH = 80;
 const OFFSET = (SCREEN_WIDTH - TAB_WIDTH * TAB_COUNT) / 2;
 const INDICATOR_WIDTH = 60;
 
-const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "calendar"];
+const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "profile"];
 
 export default function CustomNavBar({
 	state,
@@ -102,15 +103,15 @@ export default function CustomNavBar({
 						accessibilityLabel={options.tabBarAccessibilityLabel}
 						style={styles.tab}>
 						{route.name === "index" ? (
-							<HomeIcon color={color} size={30} />
+							<HomeIcon color={color} size={35} />
 						) : route.name === "search" ? (
-							<SearchIcon color={color} size={30} />
+							<SearchIcon color={color} size={35} />
 						) : route.name === "recommendation" ? (
-							<RecommendationIcon color={color} size={30} />
+							<RecommendationIcon color={color} size={35} />
 						) : route.name === "swipe" ? (
-							<SwipeIcon color={color} size={30} />
+							<SwipeIcon color={color} size={35} />
 						) : (
-							<CalendarIcon color={color} size={30} />
+							<ProfileIcon color={color} size={35} />
 						)}
 					</Pressable>
 				);
