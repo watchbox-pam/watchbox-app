@@ -27,7 +27,7 @@ export default function ReviewScreen() {
 		const review: Review = {
 			userId: currentUser.id,
 			mediaId: Array.isArray(id) ? id[0] : id,
-			rating: rating,
+			rating: rating! * 2,
 			comment: comment,
 			isSpoiler: isSpoiler
 		};

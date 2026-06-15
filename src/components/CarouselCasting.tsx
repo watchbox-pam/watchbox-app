@@ -19,7 +19,7 @@ export default function CarouselCasting({
 			<FlatList
 				overScrollMode="never"
 				data={cast}
-				keyExtractor={(item) => item.id.toString()}
+				keyExtractor={(item, index) => `${item.id}-${index}`}
 				horizontal
 				testID={testID}
 				renderItem={({ item }) => (

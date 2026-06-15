@@ -21,6 +21,7 @@ import DropDownModifyPlaylist from "../components/DropDownModifyPlaylist";
 import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
 import { ErrorMessage } from "../components/ErrorMessage";
+import useSessionStore from "@/src/zustand/sessionStore";
 
 type MovieItem = {
 	id: number;
@@ -39,9 +40,11 @@ export default function Index() {
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState(false);
+	const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
 
 	const restrictedNames = ["Watchlist", "Historique", "Favoris"];
 	const shouldShowEditButton = !restrictedNames.includes(playlistTitle);
+	const currentUser = useSessionStore((state: any) => state.user);
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
@@ -61,6 +64,9 @@ export default function Index() {
 
 				if (playlistResult.success) {
 					setPlaylistTitle(playlistResult.data.title);
+					if (playlistResult.data.user_id == currentUser.id) {
+						setIsCurrentUser(true);
+					}
 				} else {
 					setError(true);
 					return;
@@ -136,7 +142,7 @@ export default function Index() {
 				<Text style={styles.playlistName} numberOfLines={1}>
 					{playlistTitle}
 				</Text>
-				{shouldShowEditButton ? (
+				{shouldShowEditButton && isCurrentUser ? (
 					<DropDownModifyPlaylist
 						playlistId={stringifiedId}
 						initialTitle={playlistTitle}
@@ -181,15 +187,17 @@ export default function Index() {
 										.split("-")[0] ?? "Date inconnue"}
 								</Text>
 							</View>
-							<TouchableOpacity
-								onPress={() => handleDeleteMedia(movie.id)}
-								style={styles.deleteIconContainer}>
-								<MaterialIcons
-									name="delete"
-									size={20}
-									color="#e05a5a"
-								/>
-							</TouchableOpacity>
+							{isCurrentUser && (
+								<TouchableOpacity
+									onPress={() => handleDeleteMedia(movie.id)}
+									style={styles.deleteIconContainer}>
+									<MaterialIcons
+										name="delete"
+										size={20}
+										color="#e05a5a"
+									/>
+								</TouchableOpacity>
+							)}
 						</TouchableOpacity>
 					</View>
 				))
