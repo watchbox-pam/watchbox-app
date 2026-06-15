@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Animated, StatusBar, View, ActivityIndicator } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
 import styles from "@/src/styles/RecommendationScreenStyle";
 import Emotion from "@/src/models/Emotion";
@@ -114,6 +115,8 @@ export default function RecommendationScreen() {
 	const opacity = useRef(new Animated.Value(1)).current;
 	const scaleRef = useRef(new Animated.Value(1)).current;
 
+	const { emotionId } = useLocalSearchParams<{ emotionId?: string }>();
+
 	const animateFade = useCallback(
 		(toValue: number, duration: number = 300) =>
 			new Promise<void>((resolve) => {
@@ -226,6 +229,13 @@ export default function RecommendationScreen() {
 			}
 		} catch {}
 	}, [selectedEmotion, movies]);
+
+	useEffect(() => {
+		if (emotionId) {
+			const emotion = emotions.find((e) => e.id === Number(emotionId));
+			if (emotion) handleSelectEmotion(emotion);
+		}
+	}, [emotionId, handleSelectEmotion]);
 
 	return (
 		<View style={styles.container}>

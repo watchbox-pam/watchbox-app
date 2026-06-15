@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import CarouselPoster from "../components/CarouselPoster";
+import CarouselBigPoster from "../components/CarouselBigPoster";
+import CarouselEmotions from "../components/CarouselEmotions";
 //import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import { View, ScrollView, RefreshControl } from "react-native";
@@ -12,11 +14,12 @@ import { ErrorMessage } from "../components/ErrorMessage";
 //import IconProfile from "@/src/components/IconProfile";
 import Header from "../components/Header";
 import Quizz from "../components/QuizzButton";
+import { BackgroundLine } from "../assets/background/BackgroundLine";
 
 export default function HomeScreen() {
-	const [movies, setMovies] = useState<{ title?: string; movies: any[] }[]>(
-		[]
-	);
+	const [movies, setMovies] = useState<
+		{ title?: string; subtitle?: string; movies: any[] }[]
+	>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 
@@ -52,11 +55,19 @@ export default function HomeScreen() {
 			// Build the movie sections
 			list.push(
 				{
-					title: "Populaires aujourd'hui",
+					title: "Populaires cette semaine",
+					subtitle: "Découvre les films sortis récemment",
 					movies: popularDay.data["results"]
 				},
 				{
-					title: "Populaires cette semaine",
+					title: "Populaires aujourd'hui",
+					subtitle: "Films populaires et tendance",
+					movies: popularWeek.data["results"]
+				},
+				{
+					title: "Émotions",
+					subtitle:
+						"Envie de ressentir une émotion particulière pendant ton prochain film ?",
 					movies: popularWeek.data["results"]
 				},
 				{
@@ -66,14 +77,6 @@ export default function HomeScreen() {
 				{
 					title: "Comédie",
 					movies: comedyGenre.data["results"]
-				},
-				{
-					title: "Drama",
-					movies: dramaGenre.data["results"]
-				},
-				{
-					title: "Drama",
-					movies: dramaGenre.data["results"]
 				},
 				{
 					title: "Drama",
@@ -114,37 +117,59 @@ export default function HomeScreen() {
 	}
 
 	return (
-		<ScrollView
-			style={styles.container}
-			contentContainerStyle={styles.contentContainer}
-			showsVerticalScrollIndicator={false}
-			refreshControl={
-				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-			}>
-			<Header title={`Hello there, ${currentUser.identifier}`} />
+		<View style={styles.wrapper}>
+			<ScrollView
+				style={styles.container}
+				contentContainerStyle={styles.contentContainer}
+				showsVerticalScrollIndicator={false}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+					/>
+				}>
+				<BackgroundLine />
+				<BackgroundLine />
 
-			{movies &&
-				movies.map(({ title, movies }, index) => (
-					<View key={index}>
-						<View style={styles.WatchList}>
-							<View style={styles.TitleWatchList}>
-								<StyledText style={styles.MainTitleWatchList}>
-									{title}
-								</StyledText>
+				<Header title={`Hello there, ${currentUser.identifier}`} />
+
+				{movies &&
+					movies.map(({ title, subtitle, movies }, index) => (
+						<View key={index}>
+							<View style={styles.WatchList}>
+								<View style={styles.TitleWatchList}>
+									<StyledText
+										style={styles.MainTitleWatchList}>
+										{title}
+									</StyledText>
+									{index <= 2 && subtitle && (
+										<StyledText
+											style={styles.SubTitleWatchList}>
+											{subtitle}
+										</StyledText>
+									)}
+								</View>
+								{movies &&
+									(index === 0 ? (
+										<CarouselBigPoster data={movies} />
+									) : index === 2 ? (
+										<CarouselEmotions />
+									) : (
+										<CarouselPoster data={movies} />
+									))}
 							</View>
-							{movies && <CarouselPoster data={movies} />}
+							{(index + 1) % 5 === 0 && <Quizz />}
+							{/* {(index + 1) % 3 === 0 && (
+                                <CadrePublicitaire
+                                    title="🎬 Streaming Premium"
+                                    description="Profitez de 30 jours gratuits sur toutes les plateformes"
+                                    imageUrl="https://via.placeholder.com/150"
+                                    link="https://example.com"
+                                />
+                            )} */}
 						</View>
-						{(index + 1) % 5 === 0 && <Quizz />}
-						{/* {(index + 1) % 3 === 0 && (
-							<CadrePublicitaire
-								title="🎬 Streaming Premium"
-								description="Profitez de 30 jours gratuits sur toutes les plateformes"
-								imageUrl="https://via.placeholder.com/150"
-								link="https://example.com"
-							/>
-						)} */}
-					</View>
-				))}
-		</ScrollView>
+					))}
+			</ScrollView>
+		</View>
 	);
 }

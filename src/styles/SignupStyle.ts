@@ -31,17 +31,13 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		padding: 5
 	},
-	btnSignUp: {
-		width: "100%",
-		alignItems: "center"
-	},
 	button: {
-		backgroundColor: "#AC2128",
 		width: "75%",
+		alignItems: "center",
+		backgroundColor: "#AC2128",
 		borderRadius: 12,
 		padding: 10,
-		alignItems: "center",
-		margin: 8
+		margin: "auto"
 	},
 	buttonText: {
 		color: "#fff",

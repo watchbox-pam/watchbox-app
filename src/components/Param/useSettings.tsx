@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import useSessionStore from "@/src/zustand/sessionStore";
 import useFiltersStore from "@/src/zustand/filtersStore";
@@ -48,6 +47,7 @@ export const useSettings = () => {
 		fetchUserProfile();
 		fetchProviders();
 		if (!isLoaded) loadProviders();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	/* ---------- PROFILE ---------- */
@@ -96,29 +96,20 @@ export const useSettings = () => {
 		}
 	};
 
+	const isAdult = (() => {
+		if (!userProfile?.birthdate) return false;
+		const birth = new Date(userProfile.birthdate);
+		const today = new Date();
+		let age = today.getFullYear() - birth.getFullYear();
+		const m = today.getMonth() - birth.getMonth();
+		if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+		return age >= 18;
+	})();
+
 	const handleToggleAdultContent = () => {
-		if (!adultContent) {
-			Alert.alert(
-				"Contenu adulte",
-				"Êtes-vous sûr d'avoir plus de 18 ans ?",
-				[
-					{
-						text: "Non",
-						style: "cancel"
-					},
-					{
-						text: "Oui",
-						onPress: () => {
-							setAdultContent(true);
-							saveSettings(true, publicProfile, history);
-						}
-					}
-				]
-			);
-		} else {
-			setAdultContent(false);
-			saveSettings(false, publicProfile, history);
-		}
+		const next = !adultContent;
+		setAdultContent(next);
+		saveSettings(next, publicProfile, history);
 	};
 
 	const handleTogglePublicProfile = () => {
@@ -236,7 +227,7 @@ export const useSettings = () => {
 					text2: "Impossible de réinitialiser le mot de passe"
 				});
 			}
-		} catch (error: any) {}
+		} catch {}
 	};
 
 	return {
@@ -244,6 +235,7 @@ export const useSettings = () => {
 		publicProfile,
 		history,
 		adultContent,
+		isAdult,
 		userProfile,
 		providers,
 		selectedProviders,

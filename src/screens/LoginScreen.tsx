@@ -65,13 +65,9 @@ export default function LoginScreen() {
 					</Link>
 				</View>
 
-				<View style={styles.btnForm}>
-					<TouchableOpacity
-						style={styles.button}
-						onPress={handleSubmit}>
-						<Text style={styles.buttonText}>Connexion</Text>
-					</TouchableOpacity>
-				</View>
+				<TouchableOpacity style={styles.button} onPress={handleSubmit}>
+					<Text style={styles.buttonText}>Connexion</Text>
+				</TouchableOpacity>
 
 				<View style={styles.linkContainer}>
 					<Text style={styles.linkText}>

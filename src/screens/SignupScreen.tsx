@@ -111,11 +111,10 @@ export default function SignupScreen() {
 					maximumDate={new Date(Date.now())}
 				/>
 			)}
-			<View style={styles.btnSignUp}>
-				<TouchableOpacity style={styles.button} onPress={signupUser}>
-					<Text style={styles.buttonText}>Créez votre compte</Text>
-				</TouchableOpacity>
-			</View>
+
+			<TouchableOpacity style={styles.button} onPress={signupUser}>
+				<Text style={styles.buttonText}>Créez votre compte</Text>
+			</TouchableOpacity>
 
 			<View style={styles.linkContainer}>
 				<Text style={styles.linkText}>

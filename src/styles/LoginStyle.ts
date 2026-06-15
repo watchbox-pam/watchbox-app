@@ -37,11 +37,8 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		padding: 5
 	},
-	btnForm: {
-		width: "100%",
-		marginTop: 15
-	},
 	button: {
+		marginTop: 15,
 		backgroundColor: "#AC2128",
 		width: "75%",
 		borderRadius: 12,

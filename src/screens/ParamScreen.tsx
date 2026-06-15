@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, View, Text, Alert } from "react-native";
+import { ScrollView, View, Text } from "react-native";
 import BackButton from "../components/BackButton";
 import Logo from "../components/Logo";
 import styles from "../styles/ParamStyle";
@@ -17,6 +17,7 @@ const ParamScreen: React.FC = () => {
 		publicProfile,
 		history,
 		adultContent,
+		isAdult,
 		userProfile,
 		providers,
 		selectedProviders,
@@ -93,12 +94,14 @@ const ParamScreen: React.FC = () => {
 				onToggle={() => setHistory()}
 			/>
 
-			<SettingCheckboxItem
-				title="Contenu pour adultes"
-				description="Contenu +18 ans"
-				checked={adultContent}
-				onToggle={() => setAdultContent()}
-			/>
+			{isAdult && (
+				<SettingCheckboxItem
+					title="Contenu pour adultes"
+					description="Contenu +18 ans"
+					checked={adultContent}
+					onToggle={() => setAdultContent()}
+				/>
+			)}
 
 			<SettingItem
 				title="Vider le cache"

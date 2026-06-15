@@ -1,9 +1,12 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+	wrapper: {
+		flex: 1,
+		backgroundColor: "#1B2755"
+	},
 	container: {
 		flex: 1,
-		backgroundColor: "#0A1E38",
 		margin: 0,
 		padding: 0
 	},
@@ -17,17 +20,18 @@ const styles = StyleSheet.create({
 	},
 	TitleWatchList: {
 		flex: 1,
-		flexDirection: "row",
-		alignItems: "flex-end",
+		flexDirection: "column",
+		alignItems: "flex-start",
 		marginLeft: 10,
 		marginBottom: 10
 	},
 	MainTitleWatchList: {
 		color: "#ffffff",
-		fontSize: 28
+		fontSize: 35
 	},
 	SubTitleWatchList: {
-		color: "#ffffff",
+		color: "#ffffff85",
+		padding: 0,
 		fontSize: 18
 	},
 	loading: {
