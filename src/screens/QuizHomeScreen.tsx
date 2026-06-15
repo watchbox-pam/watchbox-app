@@ -19,6 +19,7 @@ import {
 	fetchUserScores,
 	fetchLeaderboard,
 	prewarmQuiz,
+	fetchQuizStatus,
 	type LeaderboardEntry
 } from "@/src/services/QuizService";
 
@@ -89,15 +90,39 @@ export default function QuizHomeScreen() {
 	const [leaderboardVisible, setLeaderboardVisible] = useState(false);
 	const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 	const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+	const [readiness, setReadiness] = useState<Record<string, boolean>>({});
 
 	useFocusEffect(
 		useCallback(() => {
-			// Démarre la génération des questions dès l'arrivée sur la home quiz,
-			// pour qu'elles soient prêtes quand l'utilisateur choisit une catégorie.
+			let active = true;
+			let timeout: ReturnType<typeof setTimeout>;
+
 			prewarmQuiz();
 			fetchUserScores().then((res) => {
 				if (res.success) setGlobalScore(res.data.global_score ?? 0);
 			});
+
+			const pollStatus = async () => {
+				const res = await fetchQuizStatus();
+				if (!active) return;
+				if (res.success && res.data) {
+					const map: Record<string, boolean> = {};
+					for (const slug of Object.keys(res.data)) {
+						map[slug] = res.data[slug]?.ready ?? false;
+					}
+					setReadiness(map);
+					const allReady = GENRES.every((g) => map[g.slug]);
+					if (!allReady) timeout = setTimeout(pollStatus, 3000);
+				} else {
+					timeout = setTimeout(pollStatus, 3000);
+				}
+			};
+			pollStatus();
+
+			return () => {
+				active = false;
+				clearTimeout(timeout);
+			};
 		}, [])
 	);
 
@@ -184,27 +209,41 @@ export default function QuizHomeScreen() {
 				<Text style={styles.sectionTitle}>Genres</Text>
 
 				<View style={styles.genreGrid}>
-					{GENRES.map((genre) => (
-						<TouchableOpacity
-							key={genre.slug}
-							style={styles.genreCard}
-							activeOpacity={0.85}
-							onPress={() =>
-								router.push(`/(app)/quiz/${genre.slug}` as any)
-							}>
-							<Image
-								source={genre.image}
-								style={styles.genreImage}
-							/>
-							<LinearGradient
-								colors={["transparent", "rgba(0,0,0,0.75)"]}
-								style={styles.genreOverlay}>
-								<Text style={styles.genreName}>
-									{genre.name}
-								</Text>
-							</LinearGradient>
-						</TouchableOpacity>
-					))}
+					{GENRES.map((genre) => {
+						const ready = readiness[genre.slug] ?? false;
+						return (
+							<TouchableOpacity
+								key={genre.slug}
+								style={[
+									styles.genreCard,
+									!ready && styles.genreCardDisabled
+								]}
+								activeOpacity={0.85}
+								disabled={!ready}
+								onPress={() =>
+									router.push(
+										`/(app)/quiz/${genre.slug}` as any
+									)
+								}>
+								<Image
+									source={genre.image}
+									style={styles.genreImage}
+								/>
+								<LinearGradient
+									colors={["transparent", "rgba(0,0,0,0.75)"]}
+									style={styles.genreOverlay}>
+									<Text style={styles.genreName}>
+										{genre.name}
+									</Text>
+								</LinearGradient>
+								{!ready && (
+									<View style={styles.genreLoadingOverlay}>
+										<ActivityIndicator color="#fff" />
+									</View>
+								)}
+							</TouchableOpacity>
+						);
+					})}
 				</View>
 			</ScrollView>
 

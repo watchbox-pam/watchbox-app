@@ -127,6 +127,15 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		overflow: "hidden"
 	},
+	genreCardDisabled: {
+		opacity: 0.5
+	},
+	genreLoadingOverlay: {
+		...StyleSheet.absoluteFillObject,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0,0,0,0.45)"
+	},
 	genreImage: {
 		width: "100%",
 		height: "100%",

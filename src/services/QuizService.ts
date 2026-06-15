@@ -47,6 +47,12 @@ export async function prewarmQuiz() {
 	return ApiHelper.post("/quiz/prewarm", {});
 }
 
+export type QuizStatus = Record<string, { count: number; ready: boolean }>;
+
+export async function fetchQuizStatus() {
+	return ApiHelper.get("/quiz/status");
+}
+
 export async function submitQuizAnswers(
 	genre_slug: string,
 	answers: AnswerPayload[]
