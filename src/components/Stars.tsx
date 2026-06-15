@@ -31,7 +31,7 @@ export default function Stars({ rating, size = "sm" }: StarsProps) {
 	return (
 		<View style={styles.wrapper}>
 			<StyledText style={[styles.score, size === "md" && styles.scoreLg]}>
-				{rating.toFixed(1)}
+				{(rating / 2).toFixed(1)}
 			</StyledText>
 			<View style={styles.stars}>
 				{stars.map((name, i) => (
