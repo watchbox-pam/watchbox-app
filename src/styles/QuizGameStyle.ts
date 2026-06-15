@@ -156,7 +156,8 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		color: "rgba(255,255,255,0.6)",
-		fontSize: 15
+		fontSize: 15,
+		textAlign: "center"
 	},
 	errorText: {
 		color: "#ff6b6b",
