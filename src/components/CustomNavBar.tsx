@@ -15,13 +15,13 @@ import SwipeIcon from "@/src/assets/icons/SwipeIcon";
 //import CalendarIcon from "@/src/assets/icons/CalendarIcon";
 import ProfileIcon from "@/src/assets/icons/ProfileIcon";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const TAB_COUNT = 5;
-const TAB_WIDTH = 80;
-const OFFSET = (SCREEN_WIDTH - TAB_WIDTH * TAB_COUNT) / 2;
-const INDICATOR_WIDTH = 60;
-
 const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "profile"];
+
+const PADDING = 16;
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const TAB_COUNT = VISIBLE_TABS.length;
+const TAB_WIDTH = (SCREEN_WIDTH - PADDING * 2) / TAB_COUNT;
+const INDICATOR_WIDTH = TAB_WIDTH * 0.6;
 
 export default function CustomNavBar({
 	state,
@@ -57,7 +57,7 @@ export default function CustomNavBar({
 					visibleRoutes.map((_, i) => i),
 					visibleRoutes.map(
 						(_, i) =>
-							OFFSET +
+							PADDING +
 							i * TAB_WIDTH +
 							(TAB_WIDTH - INDICATOR_WIDTH) / 2
 					)
@@ -126,11 +126,11 @@ const styles = StyleSheet.create({
 		backgroundColor: "#0F2E57",
 		height: 80,
 		alignItems: "center",
-		paddingHorizontal: OFFSET,
-		position: "relative"
+		position: "relative",
+		paddingHorizontal: 16
 	},
 	tab: {
-		width: TAB_WIDTH,
+		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 		height: "100%"

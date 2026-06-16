@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import IconProfile from "./IconProfile";
+import IconCalendar from "@/src/components/IconCalendar";
 import styles from "@/src/styles/HeaderStyle";
 
 const Header = ({ title }: { title: string }) => {
@@ -11,7 +11,7 @@ const Header = ({ title }: { title: string }) => {
 				ellipsizeMode="tail">
 				{title}
 			</Text>
-			<IconProfile />
+			<IconCalendar />
 		</View>
 	);
 };
