@@ -4,6 +4,7 @@ import { Image, ScrollView, View, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Provider, ActivityIndicator } from "react-native-paper";
+import { startScreenTracking, endScreenTracking, trackMovieOpened } from "@/src/services/analytics";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";
@@ -38,6 +39,14 @@ export default function MovieScreen() {
 		setRefreshing(true);
 	}, []);
 
+	useEffect(() => {
+	startScreenTracking("MovieDetail");
+
+	return () => {
+		endScreenTracking();
+	};
+}, []);
+
 	const fetchData = async () => {
 		try {
 			setLoading(true);
@@ -45,6 +54,10 @@ export default function MovieScreen() {
 			const response = await fetchMovieDetails(+id);
 			if (response.success && response.data) {
 				setMedia(response.data);
+				await trackMovieOpened(
+					response.data.id ?? id,
+					response.data.title
+				);
 			} else {
 				setError(true);
 			}
@@ -243,6 +256,7 @@ export default function MovieScreen() {
 }
 
 export type MovieProps = {
+	id?: number;
 	backdrop_path: string;
 	poster_path: string;
 	title: string;
