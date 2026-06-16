@@ -241,7 +241,8 @@ const styles = StyleSheet.create({
 	btnLogoutText: {
 		color: "#ff4444",
 		fontSize: 15,
-		fontWeight: "500"
+		fontWeight: "500",
+		marginLeft: 8
 	},
 
 	// Modal
