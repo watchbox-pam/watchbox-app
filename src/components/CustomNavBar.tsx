@@ -8,12 +8,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 
-import HomeIcon from "@/src/assets/icons/HomeIcon";
-import SearchIcon from "@/src/assets/icons/SearchIcon";
-import RecommendationIcon from "@/src/assets/icons/RecommendationIcon";
-import SwipeIcon from "@/src/assets/icons/SwipeIcon";
-//import CalendarIcon from "@/src/assets/icons/CalendarIcon";
-import ProfileIcon from "@/src/assets/icons/ProfileIcon";
+import HomeIcon from "@/src/components/icons/HomeIcon";
+import SearchIcon from "@/src/components/icons/SearchIcon";
+import RecommendationIcon from "@/src/components/icons/RecommendationIcon";
+import SwipeIcon from "@/src/components/icons/SwipeIcon";
+//import CalendarIcon from "@/src/components/icons/CalendarIcon";
+import ProfileIcon from "@/src/components/icons/ProfileIcon";
 
 const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "profile"];
 

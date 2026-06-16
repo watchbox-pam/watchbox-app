@@ -1,6 +1,6 @@
 import { TouchableOpacity } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import CalendarIcon from "@/src/assets/icons/CalendarIcon";
+import CalendarIcon from "@/src/components/icons/CalendarIcon";
 
 type RootStackParamList = {
 	calendar: undefined;
