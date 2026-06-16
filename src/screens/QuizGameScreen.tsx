@@ -397,6 +397,7 @@ export default function QuizGameScreen() {
 		<ScrollView
 			style={styles.container}
 			contentContainerStyle={{ paddingBottom: 40 }}
+			alwaysBounceVertical={false}
 			showsVerticalScrollIndicator={false}>
 			<View style={styles.header}>
 				<BackButton />
@@ -433,7 +434,11 @@ export default function QuizGameScreen() {
 			</View>
 
 			{imageUri != null ? (
-				<View style={styles.movieImageContainer}>
+				<View
+					style={[
+						styles.movieImageContainer,
+						isPosterGuess && styles.movieImageContainerCompact
+					]}>
 					<Image
 						source={{ uri: imageUri }}
 						style={styles.movieImage}
