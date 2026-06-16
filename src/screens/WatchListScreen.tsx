@@ -22,6 +22,7 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "@/src/styles/WatchListScreenStyle";
 import { ErrorMessage } from "../components/ErrorMessage";
 import useSessionStore from "@/src/zustand/sessionStore";
+import { endScreenTracking, startScreenTracking } from "../services/analytics";
 
 type MovieItem = {
 	id: number;
@@ -49,6 +50,14 @@ export default function Index() {
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 	}, []);
+
+	useEffect(() => {
+  startScreenTracking('WatchList');
+
+  return () => {
+    endScreenTracking();
+  };
+}, []);
 
 	useEffect(() => {
 		if (error && !refreshing) return;

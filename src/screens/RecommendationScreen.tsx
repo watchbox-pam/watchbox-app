@@ -9,6 +9,7 @@ import EmotionsList from "../components/EmotionsList";
 import { fetchRecommendations } from "@/src/services/RecommendationService";
 import Header from "../components/Header";
 import useSessionStore from "@/src/zustand/sessionStore";
+import { endScreenTracking, startScreenTracking } from "../services/analytics";
 
 interface Movie {
 	id: number;
@@ -116,6 +117,14 @@ export default function RecommendationScreen() {
 	const scaleRef = useRef(new Animated.Value(1)).current;
 
 	const { emotionId } = useLocalSearchParams<{ emotionId?: string }>();
+
+	useEffect(() => {
+  startScreenTracking('Recommendation');
+
+  return () => {
+    endScreenTracking();
+  };
+}, []);
 
 	const animateFade = useCallback(
 		(toValue: number, duration: number = 300) =>
