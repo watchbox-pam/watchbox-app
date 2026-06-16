@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
-import { Menu, Provider, Portal } from "react-native-paper";
+import { useState } from "react";
+import { TouchableOpacity, Text } from "react-native";
+import { Menu } from "react-native-paper";
 import { router } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "../styles/DropDownButtonStyle";

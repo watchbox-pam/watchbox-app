@@ -115,20 +115,14 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		letterSpacing: -0.3
 	},
-
-	divider: {
-		height: 1,
-		backgroundColor: "rgba(30,144,255,0.18)",
-		marginVertical: 16
-	},
-
-	// Stats
 	handle: {
 		color: "#4a6a8a",
 		fontSize: 13,
 		marginTop: 2,
 		marginBottom: 14
 	},
+
+	// Stats
 	statsRow: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -152,6 +146,15 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: "400",
 		marginTop: 1
+	},
+
+	// Divider
+	divider: {
+		height: 1,
+		backgroundColor: "rgba(30,144,255,0.18)",
+		marginVertical: 16,
+		width: "90%",
+		margin: "auto"
 	},
 
 	// Sections
@@ -221,6 +224,26 @@ const styles = StyleSheet.create({
 		borderRadius: 20
 	},
 	badgePrivateText: { color: "#6a8aaa", fontSize: 10, fontWeight: "600" },
+
+	// Logout button
+	btnLogout: {
+		marginHorizontal: 24,
+		marginTop: 20,
+		paddingVertical: 14,
+		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: "rgba(255, 59, 59, 0.4)",
+		backgroundColor: "rgba(255, 59, 59, 0.1)",
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	btnLogoutText: {
+		color: "#ff4444",
+		fontSize: 15,
+		fontWeight: "500",
+		marginLeft: 8
+	},
 
 	// Modal
 	modalOverlay: {
