@@ -66,7 +66,10 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: "rgba(255,255,255,0.15)",
 		marginBottom: 20,
-		height: 200
+		height: 140
+	},
+	movieImageContainerCompact: {
+		height: 160
 	},
 	movieImage: {
 		width: "100%",
@@ -268,12 +271,13 @@ const styles = StyleSheet.create({
 	posterGrid: {
 		flexDirection: "row",
 		flexWrap: "wrap",
+		justifyContent: "center",
 		paddingHorizontal: 16,
 		gap: 10,
-		marginBottom: 24
+		marginBottom: 16
 	},
 	posterCard: {
-		width: "47.5%",
+		width: "33%",
 		aspectRatio: 2 / 3,
 		borderRadius: 10,
 		overflow: "hidden",
