@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import IconCalendar from "@/src/components/IconCalendar";
+import IconCalendar from "@/src/components/icons/IconCalendar";
 import styles from "@/src/styles/HeaderStyle";
 
 const Header = ({ title }: { title: string }) => {
