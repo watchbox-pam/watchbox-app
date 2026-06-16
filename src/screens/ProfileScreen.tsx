@@ -13,6 +13,7 @@ import {
 	Animated
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import Toast from "react-native-toast-message";
 
@@ -21,6 +22,7 @@ import CarouselWatchList from "../components/CarouselWatchList";
 import DropDownButton from "../components/DropDownButton";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { getUserProfile } from "../services/ProfileService";
+import BtnRow from "../components/BtnRow";
 import {
 	createPlaylist,
 	getMovieRuntime,
@@ -215,7 +217,6 @@ export default function ProfileScreen() {
 								}}>
 								<Text style={styles.btnEditText}>Modifier</Text>
 							</TouchableOpacity>
-							<DropDownButton />
 						</View>
 					</View>
 
@@ -261,6 +262,35 @@ export default function ProfileScreen() {
 						<Text style={styles.statLabel}>Visionnés</Text>
 					</View>
 				</View>
+
+				{/* Divider */}
+				<View style={styles.divider} />
+
+				{/* Bouton */}
+				<BtnRow
+					items={[
+						{
+							label: "Commentaires",
+							icon: "chatbubble",
+							route: "/commentary"
+						},
+						{
+							label: "Notifications",
+							icon: "notifications",
+							route: "/notifs"
+						},
+						{
+							label: "Amis",
+							icon: "people",
+							route: "/friends"
+						},
+						{
+							label: "Paramètres",
+							icon: "settings",
+							route: "/param"
+						}
+					]}
+				/>
 
 				{/* Playlists */}
 				<View style={styles.section}>
@@ -346,6 +376,18 @@ export default function ProfileScreen() {
 						</Text>
 					)}
 				</View>
+
+				{/* Déconnexion */}
+				<TouchableOpacity
+					style={styles.btnLogout}
+					onPress={useSessionStore.getState().signOut}>
+					<Ionicons
+						name="log-out-outline"
+						size={18}
+						color="#ff4444"
+					/>
+					<Text style={styles.btnLogoutText}>Se déconnecter</Text>
+				</TouchableOpacity>
 			</ScrollView>
 
 			{/* Modal bottom sheet */}
