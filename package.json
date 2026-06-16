@@ -22,6 +22,8 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.6.0",
     "@react-native-community/slider": "5.1.2",
+    "@react-native-firebase/analytics": "^24.1.1",
+    "@react-native-firebase/app": "^24.1.1",
     "@react-native-picker/picker": "2.11.4",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/native": "^7.1.33",
@@ -79,7 +81,7 @@
     "jest": "~29.7.0",
     "jest-expo": "~55.0.16",
     "prettier": "^3.8.1",
-    "react-test-renderer": "^19.2.5",
+    "react-test-renderer": "^19.2.0",
     "typescript": "~5.9.2"
   },
   "private": true

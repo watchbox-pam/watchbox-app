@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "510025851921",
+    "project_id": "watchbox-a2473",
+    "storage_bucket": "watchbox-a2473.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510025851921:android:c6d8514cb0f3f802967db0",
+        "android_client_info": {
+          "package_name": "com.watchbox.watchbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNNX7d-2CXIbBhE5YRiR6x7mkjmdMn8iA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

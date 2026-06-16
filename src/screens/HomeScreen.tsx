@@ -1,4 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
+import { testFirebaseAnalytics } from '@/src/services/firebase-test';
+import {
+  startScreenTracking,
+  endScreenTracking,
+} from '@/src/services/analytics';
 import CarouselPoster from "../components/CarouselPoster";
 //import LogoButton from "../components/Logo";
 import CadrePublicitaire from "../components/CadrePublicitaire";
@@ -27,6 +32,14 @@ export default function HomeScreen() {
 	}, []);
 
 	const currentUser = useSessionStore((state: any) => state.user);
+
+		useEffect(() => {
+		startScreenTracking("Home");
+	
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	// Fetch movie data from multiple endpoints
 	const fetchMovies = async () => {
@@ -94,6 +107,7 @@ export default function HomeScreen() {
 	};
 
 	useEffect(() => {
+		testFirebaseAnalytics();
 		setLoading(true);
 
 		fetchMovies();
