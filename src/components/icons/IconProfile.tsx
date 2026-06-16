@@ -1,6 +1,6 @@
 import { Image, View, TouchableOpacity } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import styles from "../styles/IconProfilStyle";
+import styles from "../../styles/IconProfilStyle";
 
 type RootStackParamList = {
 	profile: undefined;

@@ -45,13 +45,12 @@ export default function TabLayout() {
 					}}
 				/>
 				<Tabs.Screen
-					name="calendar"
+					name="profile"
 					options={{
 						title: ""
 					}}
 				/>
 				{/* Routes cachées (href: null) */}
-				<Tabs.Screen name="profile" options={{ href: null }} />
 				<Tabs.Screen name="commentary" options={{ href: null }} />
 				<Tabs.Screen name="friends" options={{ href: null }} />
 				<Tabs.Screen name="notifs" options={{ href: null }} />

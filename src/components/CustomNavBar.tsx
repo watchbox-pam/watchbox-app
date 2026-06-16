@@ -8,19 +8,20 @@ import Animated, {
 } from "react-native-reanimated";
 import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 
-import HomeIcon from "@/src/assets/icons/HomeIcon";
-import SearchIcon from "@/src/assets/icons/SearchIcon";
-import RecommendationIcon from "@/src/assets/icons/RecommendationIcon";
-import SwipeIcon from "@/src/assets/icons/SwipeIcon";
-import CalendarIcon from "@/src/assets/icons/CalendarIcon";
+import HomeIcon from "@/src/components/icons/HomeIcon";
+import SearchIcon from "@/src/components/icons/SearchIcon";
+import RecommendationIcon from "@/src/components/icons/RecommendationIcon";
+import SwipeIcon from "@/src/components/icons/SwipeIcon";
+//import CalendarIcon from "@/src/components/icons/CalendarIcon";
+import ProfileIcon from "@/src/components/icons/ProfileIcon";
 
+const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "profile"];
+
+const PADDING = 16;
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const TAB_COUNT = 5;
-const TAB_WIDTH = 80;
-const OFFSET = (SCREEN_WIDTH - TAB_WIDTH * TAB_COUNT) / 2;
-const INDICATOR_WIDTH = 60;
-
-const VISIBLE_TABS = ["index", "search", "recommendation", "swipe", "calendar"];
+const TAB_COUNT = VISIBLE_TABS.length;
+const TAB_WIDTH = (SCREEN_WIDTH - PADDING * 2) / TAB_COUNT;
+const INDICATOR_WIDTH = TAB_WIDTH * 0.6;
 
 export default function CustomNavBar({
 	state,
@@ -56,7 +57,7 @@ export default function CustomNavBar({
 					visibleRoutes.map((_, i) => i),
 					visibleRoutes.map(
 						(_, i) =>
-							OFFSET +
+							PADDING +
 							i * TAB_WIDTH +
 							(TAB_WIDTH - INDICATOR_WIDTH) / 2
 					)
@@ -102,15 +103,15 @@ export default function CustomNavBar({
 						accessibilityLabel={options.tabBarAccessibilityLabel}
 						style={styles.tab}>
 						{route.name === "index" ? (
-							<HomeIcon color={color} size={30} />
+							<HomeIcon color={color} size={35} />
 						) : route.name === "search" ? (
-							<SearchIcon color={color} size={30} />
+							<SearchIcon color={color} size={35} />
 						) : route.name === "recommendation" ? (
-							<RecommendationIcon color={color} size={30} />
+							<RecommendationIcon color={color} size={35} />
 						) : route.name === "swipe" ? (
-							<SwipeIcon color={color} size={30} />
+							<SwipeIcon color={color} size={35} />
 						) : (
-							<CalendarIcon color={color} size={30} />
+							<ProfileIcon color={color} size={35} />
 						)}
 					</Pressable>
 				);
@@ -125,11 +126,11 @@ const styles = StyleSheet.create({
 		backgroundColor: "#0F2E57",
 		height: 80,
 		alignItems: "center",
-		paddingHorizontal: OFFSET,
-		position: "relative"
+		position: "relative",
+		paddingHorizontal: 16
 	},
 	tab: {
-		width: TAB_WIDTH,
+		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 		height: "100%"

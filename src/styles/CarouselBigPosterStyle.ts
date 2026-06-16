@@ -2,17 +2,17 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {
-		marginVertical: 5
+		height: 200,
+		paddingLeft: 10
 	},
 	itemContainer: {
-		width: 170,
-		marginHorizontal: 5,
-		alignItems: "flex-start"
+		marginRight: 5,
+		alignItems: "center"
 	},
 	image: {
-		width: 170,
-		height: 250,
-		borderRadius: 8
+		width: 130,
+		aspectRatio: 2 / 3,
+		borderRadius: 5
 	},
 	title: {
 		color: "#ffffff",

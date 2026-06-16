@@ -34,12 +34,6 @@ export default function CarouselBigPoster({ data }: any) {
 							style={styles.image}
 							resizeMode="cover"
 						/>
-						<StyledText style={styles.title} ellipsizeMode="tail">
-							{item.title}
-						</StyledText>
-						<StyledText style={styles.overview} numberOfLines={2}>
-							{item.overview}
-						</StyledText>
 					</Pressable>
 				)}
 			/>
