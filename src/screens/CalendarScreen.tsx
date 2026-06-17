@@ -1,76 +1,47 @@
-import React, { useState, useRef, useMemo, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
 	View,
 	Text,
 	TouchableOpacity,
 	ScrollView,
-	Animated,
-	PanResponder,
 	Modal,
 	TextInput,
-	Platform
+	Pressable
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { IconButton } from "react-native-paper";
-import { useRouter } from "expo-router";
-import Header from "../components/Header";
+import {
+	Gesture,
+	GestureDetector,
+	GestureHandlerRootView
+} from "react-native-gesture-handler";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	runOnJS
+} from "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import CadrePublicitaire from "../components/CadrePublicitaire";
 import styles from "@/src/styles/CalendarScreenStyle";
 import Toast from "react-native-toast-message";
 
-interface TimePickerModalProps {
-	visible: boolean;
-	onClose: () => void;
-	onConfirm: (time: string) => void;
-	initialTime?: string;
-}
+const STORAGE_KEY = "calendar_events";
 
-const TimePickerModal: React.FC<TimePickerModalProps> = ({
-	visible,
-	onClose,
-	onConfirm,
-	initialTime = ""
-}) => {
-	const [time, setTime] = useState(new Date());
-
-	const handleConfirm = () => {
-		const hours = String(time.getHours()).padStart(2, "0");
-		const minutes = String(time.getMinutes()).padStart(2, "0");
-		onConfirm(`${hours}:${minutes}`);
-		onClose();
-	};
-
-	return (
-		<Modal visible={visible} transparent animationType="fade">
-			<View style={styles.modalContainer}>
-				<View style={styles.modalContent}>
-					<Text style={styles.modalTitle}>Sélectionner l'heure</Text>
-					<DateTimePicker
-						value={time}
-						mode="time"
-						display={Platform.OS === "ios" ? "spinner" : "default"}
-						onChange={(event, selectedTime) => {
-							if (selectedTime) setTime(selectedTime);
-						}}
-					/>
-					<TouchableOpacity
-						style={styles.createButton}
-						onPress={handleConfirm}>
-						<Text style={styles.createButtonText}>Confirmer</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[
-							styles.createButton,
-							{ backgroundColor: "#666" }
-						]}
-						onPress={onClose}>
-						<Text style={styles.createButtonText}>Annuler</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-		</Modal>
-	);
-};
+const MONTH_NAMES = [
+	"Janvier ",
+	"Février ",
+	"Mars ",
+	"Avril ",
+	"Mai ",
+	"Juin ",
+	"Juillet ",
+	"Août ",
+	"Septembre ",
+	"Octobre ",
+	"Novembre ",
+	"Décembre "
+];
+const DAY_NAMES = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 interface Event {
 	id: string;
@@ -78,631 +49,391 @@ interface Event {
 	time: string;
 	title: string;
 	description: string;
-	type?: "movie" | "show" | "custom";
-	movieData?: {
-		id: number;
-		title: string;
-		poster_path: string;
-		vote_average: number;
-	};
+	// type?: "movie" | "show" | "custom";
+	// movieData?: {
+	// 	id: number;
+	// 	title: string;
+	// 	poster_path: string;
+	// 	vote_average: number;
+	// };
 }
 
-const CalendarScreen: React.FC = () => {
-	const router = useRouter();
+function formatDate(date: Date): string {
+	return `${String(date.getDate()).padStart(2, "0")}-${String(
+		date.getMonth() + 1
+	).padStart(2, "0")}-${date.getFullYear()}`;
+}
+
+export default function CalendarScreen() {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 	const [events, setEvents] = useState<Event[]>([]);
-	const [showEventModal, setShowEventModal] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
 	const [newEvent, setNewEvent] = useState({
 		time: "",
 		title: "",
 		description: ""
 	});
-	const [showTimePicker, setShowTimePicker] = useState(false);
-	const [tempHour, setTempHour] = useState("12");
-	const [tempMinute, setTempMinute] = useState("00");
-	const pan = useRef(new Animated.Value(0)).current;
-	const currentDateRef = useRef(currentDate);
-	currentDateRef.current = currentDate;
+
+	const translateX = useSharedValue(0);
+
+	// Chargement AsyncStorage
+	useEffect(() => {
+		AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+			if (raw) setEvents(JSON.parse(raw));
+		});
+	}, []);
+
+	const saveEvents = useCallback(async (updated: Event[]) => {
+		setEvents(updated);
+		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+	}, []);
 
 	// Mois précédent
-	const goToPreviousMonth = useCallback(() => {
-		setCurrentDate(
-			new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-		);
-	}, [currentDate]);
+	const goToPrev = useCallback(() => {
+		setCurrentDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+	}, []);
 
 	// Mois suivant
-	const goToNextMonth = useCallback(() => {
-		setCurrentDate(
-			new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-		);
-	}, [currentDate]);
+	const goToNext = useCallback(() => {
+		setCurrentDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+	}, []);
 
-	// PanResponder pour le swipe
-	const panResponder = useMemo(
+	const SwipeGesture = useMemo(
 		() =>
-			PanResponder.create({
-				onStartShouldSetPanResponder: () => true,
-				onStartShouldSetPanResponderCapture: () => false,
-				onMoveShouldSetPanResponder: (_, gestureState) => {
-					return (
-						Math.abs(gestureState.dx) > 10 &&
-						Math.abs(gestureState.dy) < Math.abs(gestureState.dx)
-					);
-				},
-				onMoveShouldSetPanResponderCapture: (_, gestureState) => {
-					return Math.abs(gestureState.dx) > 10;
-				},
-				onPanResponderMove: (_, gestureState) => {
-					pan.setValue(gestureState.dx * 0.3);
-				},
-				onPanResponderRelease: (_, gestureState) => {
-					if (
-						gestureState.dx > 50 &&
-						Math.abs(gestureState.vx) > 0.3
-					) {
-						// Swipe vers la droite = mois précédent
-						Animated.timing(pan, {
-							toValue: 400,
-							duration: 300,
-							useNativeDriver: true
-						}).start(() => {
-							pan.setValue(0);
-							goToPreviousMonth();
-						});
-					} else if (
-						gestureState.dx < -50 &&
-						Math.abs(gestureState.vx) > 0.3
-					) {
-						// Swipe vers la gauche = mois suivant
-						Animated.timing(pan, {
-							toValue: -400,
-							duration: 300,
-							useNativeDriver: true
-						}).start(() => {
-							pan.setValue(0);
-							goToNextMonth();
-						});
-					} else {
-						// Retour à la position initiale si swipe incomplet
-						Animated.spring(pan, {
-							toValue: 0,
-							useNativeDriver: true,
-							friction: 7
-						}).start();
+			Gesture.Pan()
+				.activeOffsetX([-20, 20])
+				.failOffsetY([-10, 10])
+				.onUpdate((e) => {
+					translateX.value = e.translationX * 0.2;
+				})
+				.onEnd((e) => {
+					if (e.translationX < -50) {
+						runOnJS(goToNext)();
+					} else if (e.translationX > 50) {
+						runOnJS(goToPrev)();
 					}
-				},
-				onPanResponderTerminate: () => {
-					Animated.spring(pan, {
-						toValue: 0,
-						useNativeDriver: true
-					}).start();
-				}
-			}),
-		[pan, goToPreviousMonth, goToNextMonth]
+					translateX.value = withSpring(0, { damping: 20 });
+				}),
+		[goToNext, goToPrev]
 	);
 
-	// Obtenir le nombre de jours dans un mois
-	const getDaysInMonth = (date: Date) => {
-		return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translateX.value }]
+	}));
+
+	// helpers calendrier
+	const getDaysInMonth = (d: Date) =>
+		new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+	const getFirstDay = (d: Date) => {
+		const fd = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+		return fd === 0 ? 6 : fd - 1;
 	};
 
-	const getFirstDayOfMonth = (date: Date) => {
-		const firstDay = new Date(
-			date.getFullYear(),
-			date.getMonth(),
-			1
-		).getDay();
-		return firstDay === 0 ? 6 : firstDay - 1;
+	const isToday = (day: number) => {
+		const t = new Date();
+		return (
+			day === t.getDate() &&
+			currentDate.getMonth() === t.getMonth() &&
+			currentDate.getFullYear() === t.getFullYear()
+		);
 	};
 
 	// Sélectionner une date
-	const selectDate = (day: number) => {
-		const newDate = new Date(
-			currentDate.getFullYear(),
-			currentDate.getMonth(),
-			day
-		);
-		setSelectedDate(newDate);
-	};
+	const isSelected = (day: number) =>
+		!!selectedDate &&
+		day === selectedDate.getDate() &&
+		currentDate.getMonth() === selectedDate.getMonth() &&
+		currentDate.getFullYear() === selectedDate.getFullYear();
 
-	// Vérifier si c'est aujourd'hui
-	const isToday = (day: number) => {
-		const today = new Date();
-		return (
-			day === today.getDate() &&
-			currentDate.getMonth() === today.getMonth() &&
-			currentDate.getFullYear() === today.getFullYear()
-		);
-	};
-
-	// Vérifier si c'est la date sélectionnée
-	const isSelected = (day: number) => {
-		if (!selectedDate) return false;
-		return (
-			day === selectedDate.getDate() &&
-			currentDate.getMonth() === selectedDate.getMonth() &&
-			currentDate.getFullYear() === selectedDate.getFullYear()
-		);
-	};
-
-	// Verifie si un jour a des événements
 	const hasEvents = (day: number) => {
-		const dateStr = formatDateToString(
+		const str = formatDate(
 			new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
 		);
-		return events.some((event) => event.date === dateStr);
+		return events.some((e) => e.date === str);
 	};
 
-	// Formater une date string "YYYY-MM-DD" en "DD-MM-YYYY"
-	const formatDateToString = (date: Date) => {
-		return `${String(date.getDate()).padStart(2, "0")}-${String(
-			date.getMonth() + 1
-		).padStart(2, "0")}-${date.getFullYear()}`;
-	};
-
-	//Récuperer des evenements pour une date donnée
-	const getEventsForDate = (date: Date) => {
-		const dateStr = formatDateToString(date);
-		return events.filter((event) => event.date === dateStr);
-	};
-
-	// ouvrir le modal pour créer un événement
-	const openCreateEventModal = () => {
-		if (!selectedDate) {
-			Toast.show({
-				type: "error",
-				text1: "Erreur",
-				text2: "Veuillez sélectionner une date pour ajouter un événement."
-			});
-			return;
-		}
-		setNewEvent({ time: "", title: "", description: "" });
-		setShowEventModal(true);
-	};
+	const getEventsForDay = (date: Date) =>
+		events.filter((e) => e.date === formatDate(date));
 
 	// Créer un nouvel événement
-	const createEvent = () => {
-		if (!selectedDate || !newEvent.title) {
+	const createEvent = async () => {
+		if (!selectedDate || !newEvent.title.trim()) {
 			Toast.show({
 				type: "error",
-				text1: "Erreur",
-				text2: "Veuillez remplir au moins le titre"
+				text1: "Titre requis"
 			});
 			return;
 		}
-		const event: Event = {
-			id: Date.now().toString(),
-			date: formatDateToString(selectedDate),
-			time: newEvent.time,
-			title: newEvent.title,
-			description: newEvent.description,
-			type: "custom"
-		};
-		setEvents([...events, event]);
-		setShowEventModal(false);
+		const updated = [
+			...events,
+			{
+				id: Date.now().toString(),
+				date: formatDate(selectedDate),
+				time: newEvent.time,
+				title: newEvent.title,
+				description: newEvent.description
+			}
+		];
+		await saveEvents(updated);
+		setModalVisible(false);
 		setNewEvent({ time: "", title: "", description: "" });
 	};
 
 	// supprimer un événement
-	const deleteEvent = (eventId: string) => {
-		setEvents(events.filter((event) => event.id !== eventId));
+	const deleteEvent = async (id: string) => {
+		await saveEvents(events.filter((e) => e.id !== id));
 	};
 
 	// Générer le calendrier
-	const renderCalendar = () => {
-		const daysInMonth = getDaysInMonth(currentDate);
-		const firstDay = getFirstDayOfMonth(currentDate);
+	const renderDays = () => {
 		const days = [];
+		const total = getDaysInMonth(currentDate);
+		const first = getFirstDay(currentDate);
 
 		// Cellules vides avant le premier jour du mois
-		for (let i = 0; i < firstDay; i++) {
-			days.push(
-				<View key={`empty-${i}`} style={styles.emptyDay}>
-					<Text></Text>
-				</View>
-			);
+		for (let i = 0; i < first; i++) {
+			days.push(<View key={`e-${i}`} style={styles.dayCell} />);
 		}
 
 		// Jours du mois
-		for (let day = 1; day <= daysInMonth; day++) {
-			const isCurrentDay = isToday(day);
-			const isSelectedDay = isSelected(day);
-
+		for (let day = 1; day <= total; day++) {
+			const today = isToday(day);
+			const selected = isSelected(day);
+			const dot = hasEvents(day);
 			days.push(
 				<TouchableOpacity
 					key={day}
 					style={[
 						styles.dayCell,
-						isCurrentDay && styles.today,
-						isSelectedDay && styles.selectedDay
+						today && styles.today,
+						selected && styles.selectedDay
 					]}
-					onPress={() => selectDate(day)}>
+					onPress={() =>
+						setSelectedDate(
+							new Date(
+								currentDate.getFullYear(),
+								currentDate.getMonth(),
+								day
+							)
+						)
+					}>
 					<Text
 						style={[
 							styles.dayText,
-							isCurrentDay && styles.todayText,
-							isSelectedDay && styles.selectedDayText
+							today && styles.todayText,
+							selected && !today && styles.selectedDayText
 						]}>
 						{day}
 					</Text>
 					{/* Indicateur d'événement (optionnel) */}
-					{hasEvents(day) ? <View style={styles.eventDot} /> : null}
+					{dot && (
+						<View
+							style={[
+								styles.eventDot,
+								today && { backgroundColor: "#ffffff" }
+							]}
+						/>
+					)}
 				</TouchableOpacity>
 			);
 		}
-
 		return days;
 	};
 
-	// Noms des mois
-	const monthNames = [
-		"Janvier",
-		"Février",
-		"Mars",
-		"Avril",
-		"Mai",
-		"Juin",
-		"Juillet",
-		"Août",
-		"Septembre",
-		"Octobre",
-		"Novembre",
-		"Décembre"
-	];
-
-	// Noms des jours
-	const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-
 	return (
-		<ScrollView style={styles.container}>
-			<Header title="Calendrier" />
-
-			<TouchableOpacity
-				style={styles.todayButton}
-				onPress={() => {
-					setCurrentDate(new Date());
-					setSelectedDate(new Date());
-				}}>
-				<Text style={styles.todayButtonText}>Aujourd'hui</Text>
-			</TouchableOpacity>
-
-			{/* Navigation du mois */}
-			<View style={styles.monthNavigation}>
-				<IconButton
-					icon="chevron-left"
-					size={28}
-					iconColor="#FFFFFF"
-					onPress={goToPreviousMonth}
-				/>
-				<Text style={styles.monthYearText}>
-					{monthNames[currentDate.getMonth()]}{" "}
-					{currentDate.getFullYear()}
-				</Text>
-				<IconButton
-					icon="chevron-right"
-					size={28}
-					iconColor="#FFFFFF"
-					onPress={goToNextMonth}
-				/>
-			</View>
-
-			{/* Calendrier avec swipe */}
-			<Animated.View
-				{...panResponder.panHandlers}
-				style={[
-					styles.calendarContainer,
-					{
-						transform: [{ translateX: pan }]
-					}
-				]}>
-				{/* En-têtes des jours */}
-				<View style={styles.weekDaysContainer}>
-					{dayNames.map((day) => (
-						<View key={day} style={styles.weekDayCell}>
-							<Text style={styles.weekDayText}>{day}</Text>
-						</View>
-					))}
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<ScrollView
+				style={styles.container}
+				showsVerticalScrollIndicator={false}>
+				{/* Navigation du mois */}
+				<View style={styles.monthNavigation}>
+					<TouchableOpacity onPress={goToPrev} style={styles.navBtn}>
+						<Ionicons name="chevron-back" size={20} color="#fff" />
+					</TouchableOpacity>
+					<Text style={styles.monthYearText}>
+						{MONTH_NAMES[currentDate.getMonth()]}
+						{currentDate.getFullYear()}
+					</Text>
+					<TouchableOpacity onPress={goToNext} style={styles.navBtn}>
+						<Ionicons
+							name="chevron-forward"
+							size={20}
+							color="#fff"
+						/>
+					</TouchableOpacity>
 				</View>
 
-				{/* Grille du calendrier */}
-				<View style={styles.daysGrid}>{renderCalendar()}</View>
-			</Animated.View>
-			{/* <CadrePublicitaire
+				{/* Calendrier avec swipe */}
+				<GestureDetector gesture={SwipeGesture}>
+					<Animated.View
+						style={[styles.calendarContainer, animatedStyle]}>
+						{/* En-têtes des jours */}
+						<View style={styles.weekDaysContainer}>
+							{DAY_NAMES.map((d) => (
+								<View key={d} style={styles.weekDayCell}>
+									<Text style={styles.weekDayText}>{d}</Text>
+								</View>
+							))}
+						</View>
+						{/* Grille du calendrier */}
+						<View style={styles.daysGrid}>{renderDays()}</View>
+					</Animated.View>
+				</GestureDetector>
+
+				{/* <CadrePublicitaire
 				title="🎬 Streaming Premium"
 				description="Profitez de 30 jours gratuits sur toutes les plateformes"
 				imageUrl="https://via.placeholder.com/150"
 				link="https://example.com"
 			/> */}
 
-			{/* Section des événements pour le jour sélectionné */}
-			{selectedDate && (
-				<View style={styles.eventsSection}>
-					<View style={styles.eventsSectionHeader}>
-						<Text style={styles.eventsSectionTitle}>
-							Événements du{" "}
-							{selectedDate.toLocaleDateString("fr-FR", {
-								day: "numeric",
-								month: "long",
-								year: "numeric"
-							})}
-						</Text>
-						<TouchableOpacity
-							style={styles.addEventButton}
-							onPress={openCreateEventModal}>
-							<IconButton
-								icon="plus"
-								size={24}
-								iconColor="#FFFFFF"
-							/>
-						</TouchableOpacity>
-					</View>
+				{/* Bouton Aujourd'hui */}
+				<TouchableOpacity
+					style={styles.todayButton}
+					onPress={() => {
+						setCurrentDate(new Date());
+						setSelectedDate(new Date());
+					}}>
+					<Text style={styles.todayButtonText}>Aujourd'hui</Text>
+				</TouchableOpacity>
 
-					{/* Liste des événements */}
-					{getEventsForDate(selectedDate).length > 0 ? (
-						getEventsForDate(selectedDate).map((event) => (
-							<View key={event.id} style={styles.eventCard}>
-								{event.time && (
-									<Text style={styles.eventTime}>
-										{event.time}
-									</Text>
-								)}
-								<View style={styles.eventDetails}>
-									<Text style={styles.eventTitle}>
-										{event.title}
-									</Text>
-									{event.description && (
-										<Text style={styles.eventDescription}>
-											{event.description}
-										</Text>
-									)}
-								</View>
-								<TouchableOpacity
-									onPress={() => deleteEvent(event.id)}>
-									<IconButton
-										icon="delete"
-										size={20}
-										iconColor="#FF4444"
-									/>
-								</TouchableOpacity>
-							</View>
-						))
-					) : (
-						<View style={styles.noEvents}>
-							<Text style={styles.noEventsText}>
-								Aucun événement ce jour
-							</Text>
-						</View>
-					)}
-				</View>
-			)}
-
-			{/* Modal de création d'événement */}
-			<Modal
-				visible={showEventModal}
-				animationType="slide"
-				transparent={true}
-				onRequestClose={() => setShowEventModal(false)}>
-				<View style={styles.modalContainer}>
-					<View style={styles.modalContent}>
-						<View style={styles.modalHeader}>
-							<Text style={styles.modalTitle}>
-								Créer un événement
+				{/* Section des événements pour le jour sélectionné */}
+				{selectedDate && (
+					<View style={styles.eventsSection}>
+						<View style={styles.eventsSectionHeader}>
+							<Text style={styles.eventsSectionTitle}>
+								{selectedDate.toLocaleDateString("fr-FR", {
+									day: "numeric",
+									month: "long",
+									year: "numeric"
+								})}
 							</Text>
 							<TouchableOpacity
-								onPress={() => setShowEventModal(false)}>
-								<IconButton
-									icon="close"
-									size={24}
-									iconColor="#FFFFFF"
+								style={styles.addEventButton}
+								onPress={() => {
+									if (!selectedDate) {
+										Toast.show({
+											type: "error",
+											text1: "Veuillez sélectionner une date"
+										});
+										return;
+									}
+									setModalVisible(true);
+								}}>
+								<Ionicons
+									name="add"
+									size={20}
+									color="#1E90FF"
 								/>
 							</TouchableOpacity>
 						</View>
 
-						<Text style={styles.inputLabel}>Heure (Optionnel)</Text>
-						<TouchableOpacity
-							style={styles.input}
-							onPress={() => setShowTimePicker(true)}>
-							<Text
-								style={[
-									styles.inputText,
-									!newEvent.time && { color: "#888" }
-								]}>
-								{newEvent.time || "Choisir une heure"}
+						{/* Liste des événements */}
+						{getEventsForDay(selectedDate).length === 0 ? (
+							<Text style={styles.noEventsText}>
+								Aucun événement ce jour
 							</Text>
-						</TouchableOpacity>
-
-						{/* Modal Time Picker personnalisé */}
-						<Modal
-							visible={showTimePicker}
-							animationType="fade"
-							transparent={true}
-							onRequestClose={() => setShowTimePicker(false)}>
-							<View style={styles.timePickerOverlay}>
-								<View style={styles.timePickerModal}>
-									<Text style={styles.timePickerTitle}>
-										Choisir l'heure
-									</Text>
-
-									<View style={styles.timePickerContainer}>
-										{/* Heures */}
-										<View style={styles.timeInputWrapper}>
-											<TextInput
-												style={styles.timeInput}
-												value={tempHour}
-												onChangeText={(text) => {
-													const num =
-														parseInt(text) || 0;
-													if (num >= 0 && num <= 23) {
-														setTempHour(
-															String(
-																num
-															).padStart(2, "0")
-														);
-													}
-												}}
-												keyboardType="number-pad"
-												maxLength={2}
-												selectTextOnFocus
-											/>
-											<Text style={styles.timeLabel}>
-												H
+						) : (
+							getEventsForDay(selectedDate).map((event) => (
+								<View key={event.id} style={styles.eventCard}>
+									<View style={styles.eventLeftBar} />
+									<View style={styles.eventDetails}>
+										{event.time ? (
+											<Text style={styles.eventTime}>
+												{event.time}
 											</Text>
-										</View>
-
-										<Text style={styles.timeSeparator}>
-											:
+										) : null}
+										<Text style={styles.eventTitle}>
+											{event.title}
 										</Text>
-
-										{/* Minutes */}
-										<View style={styles.timeInputWrapper}>
-											<TextInput
-												style={styles.timeInput}
-												value={tempMinute}
-												onChangeText={(text) => {
-													const num =
-														parseInt(text) || 0;
-													if (num >= 0 && num <= 59) {
-														setTempMinute(
-															String(
-																num
-															).padStart(2, "0")
-														);
-													}
-												}}
-												keyboardType="number-pad"
-												maxLength={2}
-												selectTextOnFocus
-											/>
-											<Text style={styles.timeLabel}>
-												M
-											</Text>
-										</View>
-									</View>
-
-									{/* Boutons de raccourci */}
-									<View style={styles.quickTimeButtons}>
-										<TouchableOpacity
-											style={styles.quickTimeButton}
-											onPress={() => {
-												setTempHour("08");
-												setTempMinute("00");
-											}}>
-											<Text style={styles.quickTimeText}>
-												08:00
-											</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={styles.quickTimeButton}
-											onPress={() => {
-												setTempHour("12");
-												setTempMinute("00");
-											}}>
-											<Text style={styles.quickTimeText}>
-												12:00
-											</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={styles.quickTimeButton}
-											onPress={() => {
-												setTempHour("18");
-												setTempMinute("00");
-											}}>
-											<Text style={styles.quickTimeText}>
-												18:00
-											</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={styles.quickTimeButton}
-											onPress={() => {
-												setTempHour("20");
-												setTempMinute("00");
-											}}>
-											<Text style={styles.quickTimeText}>
-												20:00
-											</Text>
-										</TouchableOpacity>
-									</View>
-
-									{/* Boutons d'action */}
-									<View style={styles.timePickerActions}>
-										<TouchableOpacity
-											style={
-												styles.timePickerCancelButton
-											}
-											onPress={() =>
-												setShowTimePicker(false)
-											}>
+										{event.description ? (
 											<Text
-												style={
-													styles.timePickerCancelText
-												}>
-												Annuler
+												style={styles.eventDescription}>
+												{event.description}
 											</Text>
-										</TouchableOpacity>
-										<TouchableOpacity
-											style={
-												styles.timePickerConfirmButton
-											}
-											onPress={() => {
-												setNewEvent({
-													...newEvent,
-													time: `${tempHour}:${tempMinute}`
-												});
-												setShowTimePicker(false);
-											}}>
-											<Text
-												style={
-													styles.timePickerConfirmText
-												}>
-												Confirmer
-											</Text>
-										</TouchableOpacity>
+										) : null}
 									</View>
+									<TouchableOpacity
+										onPress={() => deleteEvent(event.id)}
+										style={styles.deleteBtn}>
+										<Ionicons
+											name="trash-outline"
+											size={16}
+											color="#FF4444"
+										/>
+									</TouchableOpacity>
 								</View>
-							</View>
-						</Modal>
+							))
+						)}
+					</View>
+				)}
+			</ScrollView>
 
+			{/* Modal de création d'événement */}
+			<Modal
+				visible={modalVisible}
+				transparent
+				animationType="fade"
+				onRequestClose={() => setModalVisible(false)}>
+				<Pressable
+					style={styles.modalOverlay}
+					onPress={() => setModalVisible(false)}>
+					<Pressable
+						style={styles.modalSheet}
+						onPress={(e) => e.stopPropagation()}>
+						<View style={styles.modalHandle} />
+						<Text style={styles.modalTitle}>Nouvel événement</Text>
+						<Text style={styles.inputLabel}>Heure (HH:MM)</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="Ex: 14:30"
+							placeholderTextColor="rgba(255,255,255,0.25)"
+							value={newEvent.time}
+							onChangeText={(t) =>
+								setNewEvent({ ...newEvent, time: t })
+							}
+							keyboardType="numbers-and-punctuation"
+						/>
 						<Text style={styles.inputLabel}>Titre</Text>
 						<TextInput
 							style={styles.input}
 							placeholder="Titre de l'événement"
-							placeholderTextColor="#888"
+							placeholderTextColor="rgba(255,255,255,0.25)"
 							value={newEvent.title}
-							onChangeText={(text) =>
-								setNewEvent({ ...newEvent, title: text })
+							onChangeText={(t) =>
+								setNewEvent({ ...newEvent, title: t })
 							}
+							autoFocus
 						/>
-
-						<Text style={styles.inputLabel}>
-							Description (Optionnel)
-						</Text>
+						<Text style={styles.inputLabel}>Description</Text>
 						<TextInput
-							style={styles.input}
-							placeholder="Description de l'événement"
-							placeholderTextColor="#888"
+							style={[styles.input, { height: 80 }]}
+							placeholder="Description (optionnelle)"
+							placeholderTextColor="rgba(255,255,255,0.25)"
 							value={newEvent.description}
-							onChangeText={(text) =>
-								setNewEvent({
-									...newEvent,
-									description: text
-								})
+							onChangeText={(t) =>
+								setNewEvent({ ...newEvent, description: t })
 							}
+							multiline
 						/>
-					</View>
-
-					<TouchableOpacity
-						style={styles.createButton}
-						onPress={createEvent}>
-						<Text style={styles.createButtonText}>
-							Créer l'événement
-						</Text>
-					</TouchableOpacity>
-				</View>
+						<View style={styles.modalButtons}>
+							<Pressable
+								style={styles.btnCancel}
+								onPress={() => setModalVisible(false)}>
+								<Text style={styles.btnCancelText}>
+									Annuler
+								</Text>
+							</Pressable>
+							<Pressable
+								style={styles.btnConfirm}
+								onPress={createEvent}>
+								<Text style={styles.btnConfirmText}>Créer</Text>
+							</Pressable>
+						</View>
+					</Pressable>
+				</Pressable>
 			</Modal>
-		</ScrollView>
+		</GestureHandlerRootView>
 	);
-};
-
-export default CalendarScreen;
+}
