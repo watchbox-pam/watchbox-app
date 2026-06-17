@@ -3,168 +3,119 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#0A1E38",
+		backgroundColor: "#07192e",
 		paddingTop: 20
 	},
-	todayButton: {
-		backgroundColor: "#007AFF",
-		paddingHorizontal: 16,
-		paddingVertical: 10,
-		borderRadius: 10,
-		marginHorizontal: 16,
-		marginBottom: 16,
-		alignItems: "center"
-	},
-	todayButtonText: {
-		color: "#FFFFFF",
-		fontSize: 15,
-		fontWeight: "600"
-	},
 
-	// Navigation du mois
+	// Navigation mois
 	monthNavigation: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		paddingHorizontal: 16,
-		marginBottom: 20
+		paddingHorizontal: 20,
+		marginBottom: 24
 	},
 	monthYearText: {
-		fontSize: 20,
+		fontSize: 18,
 		fontWeight: "600",
-		color: "#FFFFFF"
+		color: "#ffffff",
+		letterSpacing: 0.3
+	},
+	navBtn: {
+		padding: 8
+	},
+
+	// Bouton aujourd'hui
+	todayButton: {
+		alignSelf: "center",
+		paddingHorizontal: 20,
+		paddingVertical: 7,
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: "rgba(30,144,255,0.4)",
+		marginBottom: 20
+	},
+	todayButtonText: {
+		color: "#1E90FF",
+		fontSize: 13,
+		fontWeight: "500"
 	},
 
 	// Calendrier
 	calendarContainer: {
 		paddingHorizontal: 16,
-		marginBottom: 20
+		marginBottom: 8
 	},
 	weekDaysContainer: {
 		flexDirection: "row",
-		justifyContent: "space-around",
-		marginBottom: 10
+		marginBottom: 8
 	},
 	weekDayCell: {
 		width: "14.28%",
-		alignItems: "center"
+		alignItems: "center",
+		paddingVertical: 4
 	},
 	weekDayText: {
-		fontSize: 14,
-		fontWeight: "600",
-		color: "#888888"
+		fontSize: 12,
+		fontWeight: "500",
+		color: "#4a6a8a",
+		textTransform: "uppercase",
+		letterSpacing: 0.5
 	},
 	daysGrid: {
 		flexDirection: "row",
 		flexWrap: "wrap"
 	},
-	emptyDay: {
-		width: "14.28%",
-		height: 50,
-		justifyContent: "center",
-		alignItems: "center"
-	},
 	dayCell: {
 		width: "14.28%",
-		height: 50,
+		height: 48,
 		justifyContent: "center",
 		alignItems: "center",
-		borderRadius: 8,
 		position: "relative"
 	},
 	dayText: {
-		fontSize: 16,
-		color: "#FFFFFF"
+		fontSize: 15,
+		color: "#ccd6e0",
+		fontWeight: "400"
 	},
 	today: {
-		backgroundColor: "#007AFF"
+		backgroundColor: "#1E90FF",
+		borderRadius: 24
 	},
 	todayText: {
-		color: "#FFFFFF",
-		fontWeight: "bold"
+		color: "#ffffff",
+		fontWeight: "700"
 	},
 	selectedDay: {
-		backgroundColor: "#FFD700"
+		borderRadius: 24,
+		borderWidth: 1,
+		borderColor: "#1E90FF"
 	},
 	selectedDayText: {
-		color: "#000000",
-		fontWeight: "bold"
+		color: "#1E90FF",
+		fontWeight: "600"
 	},
 	eventDot: {
 		width: 4,
 		height: 4,
 		borderRadius: 2,
-		backgroundColor: "#FF3B30",
+		backgroundColor: "#1E90FF",
 		position: "absolute",
-		bottom: 8
+		bottom: 6
 	},
 
-	// Section des événements
+	// Séparateur
+	divider: {
+		height: 1,
+		backgroundColor: "rgba(255,255,255,0.06)",
+		marginHorizontal: 16,
+		marginVertical: 20
+	},
+
+	// Événements
 	eventsSection: {
 		paddingHorizontal: 16,
-		marginTop: 20
-	},
-	eventsSectionTitle: {
-		fontSize: 18,
-		fontWeight: "600",
-		color: "#FFFFFF",
-		marginBottom: 16
-	},
-	eventCard: {
-		flexDirection: "row",
-		backgroundColor: "#1C1C1E",
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 12,
-		borderLeftWidth: 4,
-		borderLeftColor: "#007AFF"
-	},
-	eventTime: {
-		fontSize: 16,
-		fontWeight: "600",
-		color: "#007AFF",
-		marginRight: 16,
-		width: 60
-	},
-	eventDetails: {
-		flex: 1
-	},
-	eventTitle: {
-		fontSize: 16,
-		fontWeight: "600",
-		color: "#FFFFFF",
-		marginBottom: 4
-	},
-	eventDescription: {
-		fontSize: 14,
-		color: "#888888"
-	},
-	noEvents: {
-		padding: 32,
-		alignItems: "center"
-	},
-	noEventsText: {
-		fontSize: 16,
-		color: "#888888"
-	},
-	eventPoster: {
-		width: 50,
-		height: 75,
-		borderRadius: 6,
-		marginRight: 12
-	},
-	eventMeta: {
-		flexDirection: "row",
-		gap: 8,
-		marginTop: 4
-	},
-	eventRating: {
-		fontSize: 12,
-		color: "#FFD700"
-	},
-	eventGenre: {
-		fontSize: 12,
-		color: "#888"
+		paddingBottom: 40
 	},
 	eventsSectionHeader: {
 		flexDirection: "row",
@@ -172,174 +123,138 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 16
 	},
+	eventsSectionTitle: {
+		fontSize: 15,
+		fontWeight: "500",
+		color: "#ffffff"
+	},
 	addEventButton: {
-		backgroundColor: "#6C5CE7",
-		borderRadius: 8,
-		width: 40,
-		height: 40,
+		width: 32,
+		height: 32,
+		borderRadius: 16,
+		borderWidth: 1,
+		borderColor: "rgba(30,144,255,0.4)",
 		justifyContent: "center",
 		alignItems: "center"
 	},
-	modalContainer: {
+	eventCard: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: "rgba(255,255,255,0.03)",
+		borderRadius: 10,
+		marginBottom: 8,
+		overflow: "hidden"
+	},
+	eventLeftBar: {
+		width: 3,
+		alignSelf: "stretch",
+		backgroundColor: "#1E90FF"
+	},
+	eventDetails: {
 		flex: 1,
-		backgroundColor: "rgba(0, 0, 0, 0.7)",
+		paddingVertical: 12,
+		paddingHorizontal: 14,
+		gap: 2
+	},
+	eventTime: {
+		color: "#1E90FF",
+		fontSize: 12,
+		fontWeight: "500"
+	},
+	eventTitle: {
+		color: "#ffffff",
+		fontSize: 15,
+		fontWeight: "500"
+	},
+	eventDescription: {
+		color: "#4a6a8a",
+		fontSize: 13,
+		marginTop: 2
+	},
+	deleteBtn: {
+		padding: 12
+	},
+	noEventsText: {
+		color: "#4a6a8a",
+		fontSize: 14,
+		textAlign: "center",
+		paddingVertical: 32
+	},
+
+	// Modal
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: "rgba(0,0,0,0.6)",
 		justifyContent: "flex-end"
 	},
-	modalContent: {
-		backgroundColor: "#1E1E1E",
+	modalSheet: {
+		backgroundColor: "#0d2137",
 		borderTopLeftRadius: 20,
 		borderTopRightRadius: 20,
+		paddingHorizontal: 24,
 		paddingBottom: 40,
-		maxHeight: "80%"
+		paddingTop: 12
 	},
-	modalHeader: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		padding: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: "#333"
+	modalHandle: {
+		width: 36,
+		height: 4,
+		borderRadius: 2,
+		backgroundColor: "rgba(255,255,255,0.15)",
+		alignSelf: "center",
+		marginBottom: 20
 	},
 	modalTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		color: "#FFFFFF"
-	},
-	modalBody: {
-		padding: 20
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#ffffff",
+		marginBottom: 20
 	},
 	inputLabel: {
-		fontSize: 14,
-		color: "#CCCCCC",
+		fontSize: 12,
+		fontWeight: "500",
+		color: "#4a6a8a",
+		textTransform: "uppercase",
+		letterSpacing: 0.5,
 		marginBottom: 8,
 		marginTop: 16
 	},
-	required: {
-		color: "#FF4444"
-	},
 	input: {
-		backgroundColor: "#2A2A2A",
-		borderRadius: 8,
-		padding: 12,
-		color: "#FFFFFF",
-		fontSize: 16,
+		backgroundColor: "rgba(255,255,255,0.05)",
+		borderRadius: 10,
+		padding: 14,
+		color: "#ffffff",
+		fontSize: 15,
 		borderWidth: 1,
-		borderColor: "#444"
+		borderColor: "rgba(255,255,255,0.08)"
 	},
-	textArea: {
-		height: 80,
-		textAlignVertical: "top"
+	modalButtons: {
+		flexDirection: "row",
+		gap: 12,
+		marginTop: 28
 	},
-	createButton: {
-		backgroundColor: "#6C5CE7",
-		borderRadius: 8,
-		padding: 16,
-		alignItems: "center",
-		marginTop: 24
-	},
-	createButtonText: {
-		color: "#FFFFFF",
-		fontSize: 16,
-		fontWeight: "bold"
-	},
-	inputText: {
-		color: "#FFFFFF",
-		fontSize: 16
-	},
-	timePickerOverlay: {
+	btnCancel: {
 		flex: 1,
-		backgroundColor: "rgba(0, 0, 0, 0.7)",
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	timePickerModal: {
-		backgroundColor: "#1E1E1E",
-		borderRadius: 20,
-		padding: 24,
-		width: "85%",
-		maxWidth: 400
-	},
-	timePickerTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		color: "#FFFFFF",
-		textAlign: "center",
-		marginBottom: 24
-	},
-	timePickerContainer: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		marginBottom: 20
-	},
-	timeInputWrapper: {
-		alignItems: "center"
-	},
-	timeInput: {
-		backgroundColor: "#2A2A2A",
-		borderRadius: 12,
-		width: 80,
-		height: 80,
-		fontSize: 32,
-		fontWeight: "bold",
-		color: "#FFFFFF",
-		textAlign: "center",
-		borderWidth: 2,
-		borderColor: "#E50914"
-	},
-	timeLabel: {
-		color: "#888",
-		fontSize: 14,
-		marginTop: 8
-	},
-	timeSeparator: {
-		fontSize: 40,
-		fontWeight: "bold",
-		color: "#FFFFFF",
-		marginHorizontal: 16
-	},
-	quickTimeButtons: {
-		flexDirection: "row",
-		justifyContent: "space-around",
-		marginBottom: 20
-	},
-	quickTimeButton: {
-		backgroundColor: "#2A2A2A",
-		paddingVertical: 8,
-		paddingHorizontal: 12,
-		borderRadius: 8
-	},
-	quickTimeText: {
-		color: "#FFFFFF",
-		fontSize: 14
-	},
-	timePickerActions: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		gap: 12
-	},
-	timePickerCancelButton: {
-		flex: 1,
-		backgroundColor: "#2A2A2A",
 		paddingVertical: 14,
 		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: "rgba(255,255,255,0.1)",
 		alignItems: "center"
 	},
-	timePickerCancelText: {
-		color: "#FFFFFF",
-		fontSize: 16,
-		fontWeight: "600"
+	btnCancelText: {
+		color: "#4a6a8a",
+		fontSize: 15,
+		fontWeight: "500"
 	},
-	timePickerConfirmButton: {
+	btnConfirm: {
 		flex: 1,
-		backgroundColor: "#E50914",
 		paddingVertical: 14,
 		borderRadius: 10,
+		backgroundColor: "#1E90FF",
 		alignItems: "center"
 	},
-	timePickerConfirmText: {
-		color: "#FFFFFF",
-		fontSize: 16,
+	btnConfirmText: {
+		color: "#ffffff",
+		fontSize: 15,
 		fontWeight: "600"
 	}
 });

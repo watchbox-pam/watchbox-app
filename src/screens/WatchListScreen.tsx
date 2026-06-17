@@ -42,7 +42,7 @@ export default function Index() {
 	const [error, setError] = useState(false);
 	const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
 
-	const restrictedNames = ["Watchlist", "Historique", "Favoris"];
+	const restrictedNames = ["A Regarder", "Historique", "Favoris"];
 	const shouldShowEditButton = !restrictedNames.includes(playlistTitle);
 	const currentUser = useSessionStore((state: any) => state.user);
 
