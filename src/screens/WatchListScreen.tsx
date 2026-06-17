@@ -52,12 +52,12 @@ export default function Index() {
 	}, []);
 
 	useEffect(() => {
-  startScreenTracking('WatchList');
+		startScreenTracking("WatchList");
 
-  return () => {
-    endScreenTracking();
-  };
-}, []);
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	useEffect(() => {
 		if (error && !refreshing) return;

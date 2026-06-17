@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { testFirebaseAnalytics } from '@/src/services/firebase-test';
+import { testFirebaseAnalytics } from "@/src/services/firebase-test";
 import {
-  startScreenTracking,
-  endScreenTracking,
-} from '@/src/services/analytics';
+	startScreenTracking,
+	endScreenTracking
+} from "@/src/services/analytics";
 import CarouselPoster from "../components/CarouselPoster";
 import CarouselBigPoster from "../components/CarouselBigPoster";
 import CarouselEmotions from "../components/CarouselEmotions";
@@ -35,9 +35,9 @@ export default function HomeScreen() {
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
-		useEffect(() => {
+	useEffect(() => {
 		startScreenTracking("Home");
-	
+
 		return () => {
 			endScreenTracking();
 		};

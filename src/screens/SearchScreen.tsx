@@ -27,7 +27,11 @@ import MovieSearchResult from "@/src/components/search/MovieSearchResult";
 import PersonSearchResult from "@/src/components/search/PersonSearchResult";
 import UserSearchResultModel from "@/src/models/UserSearchResultModel";
 import UserSearchResult from "@/src/components/search/UserSearchResult";
-import { endScreenTracking, startScreenTracking, trackSearchPerformed } from "../services/analytics";
+import {
+	endScreenTracking,
+	startScreenTracking,
+	trackSearchPerformed
+} from "../services/analytics";
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -63,12 +67,12 @@ export default function SearchScreen() {
 	}, []);
 
 	useEffect(() => {
-  startScreenTracking('Search');
+		startScreenTracking("Search");
 
-  return () => {
-    endScreenTracking();
-  };
-}, []);
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -159,21 +163,17 @@ export default function SearchScreen() {
 
 	// Perform search based on current filter, search term, and selected providers
 	const search = async (termOverride?: string) => {
-	const term = termOverride ?? searchTerm;
-	hasInteracted.current = false;
+		const term = termOverride ?? searchTerm;
+		hasInteracted.current = false;
 
-	if (term.trim()) {
+		if (term.trim()) {
+			await trackSearchPerformed(term, selectedFilter);
 
-		await trackSearchPerformed(
-			term,
-			selectedFilter
-		);
+			setShowSuggestions(false);
+			Keyboard.dismiss();
+			setIsLoading(true);
 
-		setShowSuggestions(false);
-		Keyboard.dismiss();
-		setIsLoading(true);
-
-		try {
+			try {
 				switch (selectedFilter) {
 					case "films":
 						const movieResults = await searchService.searchMovies(
