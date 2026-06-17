@@ -119,12 +119,12 @@ export default function RecommendationScreen() {
 	const { emotionId } = useLocalSearchParams<{ emotionId?: string }>();
 
 	useEffect(() => {
-  startScreenTracking('Recommendation');
+		startScreenTracking("Recommendation");
 
-  return () => {
-    endScreenTracking();
-  };
-}, []);
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	const animateFade = useCallback(
 		(toValue: number, duration: number = 300) =>

@@ -86,12 +86,12 @@ export default function ProfileScreen() {
 	const currentUser = useSessionStore((state: any) => state.user);
 
 	useEffect(() => {
-  startScreenTracking('Profile');
+		startScreenTracking("Profile");
 
-  return () => {
-    endScreenTracking();
-  };
-}, []);
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	useEffect(() => {
 		setLoading(true);

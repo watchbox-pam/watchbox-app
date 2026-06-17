@@ -4,7 +4,11 @@ import { Image, ScrollView, View, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Provider, ActivityIndicator } from "react-native-paper";
-import { startScreenTracking, endScreenTracking, trackMovieOpened } from "@/src/services/analytics";
+import {
+	startScreenTracking,
+	endScreenTracking,
+	trackMovieOpened
+} from "@/src/services/analytics";
 
 import BackButton from "@/src/components/BackButton";
 import Tag from "@/src/components/Tag";
@@ -40,12 +44,12 @@ export default function MovieScreen() {
 	}, []);
 
 	useEffect(() => {
-	startScreenTracking("MovieDetail");
+		startScreenTracking("MovieDetail");
 
-	return () => {
-		endScreenTracking();
-	};
-}, []);
+		return () => {
+			endScreenTracking();
+		};
+	}, []);
 
 	const fetchData = async () => {
 		try {

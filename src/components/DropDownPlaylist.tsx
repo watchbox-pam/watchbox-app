@@ -102,7 +102,7 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 			);
 			if (response.success) {
 				await trackMovieAddedToWatchlist(movieId);
-				
+
 				Toast.show({
 					type: "success",
 					text1: "Succès",
