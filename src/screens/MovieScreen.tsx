@@ -23,6 +23,7 @@ import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 import useSessionStore from "../zustand/sessionStore";
 import DropDownPlaylist from "../components/DropDownPlaylist";
 import { ErrorMessage } from "../components/ErrorMessage";
+import BtnRow from "../components/BtnRow";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -212,6 +213,28 @@ export default function MovieScreen() {
 							: "Aucune description disponible pour ce film."}
 					</StyledText>
 				</View>
+
+				{/* Bouton */}
+				<BtnRow
+					items={[
+						{
+							label: "Aimé",
+							icon: "heart-outline"
+						},
+						{
+							label: "Pas pour moi",
+							icon: "thumbs-down"
+						},
+						{
+							label: "Ajouter à",
+							icon: "add"
+						},
+						{
+							label: "Partager",
+							icon: "share-social"
+						}
+					]}
+				/>
 
 				{media?.video_key ? (
 					<View style={styles.videoContainer} testID="movie-video">
