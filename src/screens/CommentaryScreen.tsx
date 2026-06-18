@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { View, Text } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import CommentSection from "../components/CommentSection";
 import styles from "@/src/styles/CommentaryStyle";
 import { Link } from "expo-router";
@@ -30,10 +31,12 @@ const CommentaryScreen = ({ mediaId }: { mediaId: string }) => {
 		}
 	};
 
-	useEffect(() => {
-		fetchReviews();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			fetchReviews();
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [mediaId])
+	);
 
 	return (
 		<View style={styles.container}>

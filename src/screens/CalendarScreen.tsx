@@ -66,7 +66,7 @@ function formatDate(date: Date): string {
 
 export default function CalendarScreen() {
 	const [currentDate, setCurrentDate] = useState(new Date());
-	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+	const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 	const [events, setEvents] = useState<Event[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [newEvent, setNewEvent] = useState({

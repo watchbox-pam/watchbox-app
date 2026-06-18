@@ -1,5 +1,6 @@
 import BackButton from "../components/BackButton";
 import { useLocalSearchParams, router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
 	View,
@@ -59,43 +60,42 @@ export default function Index() {
 		};
 	}, []);
 
-	useEffect(() => {
+	const fetchData = useCallback(async () => {
 		if (error && !refreshing) return;
+		try {
+			const [playlistResult, mediaResult] = await Promise.all([
+				getPlaylistById(stringifiedId),
+				getMediaInPlaylist(stringifiedId)
+			]);
 
-		setLoading(true);
-
-		const fetchData = async () => {
-			try {
-				const [playlistResult, mediaResult] = await Promise.all([
-					getPlaylistById(stringifiedId),
-					getMediaInPlaylist(stringifiedId)
-				]);
-
-				if (playlistResult.success) {
-					setPlaylistTitle(playlistResult.data.title);
-					if (playlistResult.data.user_id == currentUser.id) {
-						setIsCurrentUser(true);
-					}
-				} else {
-					setError(true);
-					return;
+			if (playlistResult.success) {
+				setPlaylistTitle(playlistResult.data.title);
+				if (playlistResult.data.user_id == currentUser.id) {
+					setIsCurrentUser(true);
 				}
-
-				if (mediaResult.success) {
-					setMovieList(mediaResult.data as MovieItem[]);
-				} else {
-					setError(true);
-				}
-			} catch {
+			} else {
 				setError(true);
-			} finally {
-				setLoading(false);
-				if (refreshing) setRefreshing(false);
+				return;
 			}
-		};
 
-		fetchData();
-	}, [stringifiedId, refreshing, error]);
+			if (mediaResult.success) {
+				setMovieList(mediaResult.data as MovieItem[]);
+			} else {
+				setError(true);
+			}
+		} catch {
+			setError(true);
+		} finally {
+			setLoading(false);
+			if (refreshing) setRefreshing(false);
+		}
+	}, [stringifiedId, refreshing, error, currentUser]);
+
+	useFocusEffect(
+		useCallback(() => {
+			fetchData();
+		}, [fetchData])
+	);
 
 	const handleDeleteMedia = async (movieId: number) => {
 		try {
