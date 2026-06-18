@@ -51,7 +51,11 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 		try {
 			const response = await getUserPlaylists(userId);
 			if (response.success) {
-				setUserPlaylists(response.data || []);
+				setUserPlaylists(
+					(response.data || []).filter(
+						(p: { title: string }) => p.title !== "Historique"
+					)
+				);
 			} else {
 				setUserPlaylists([]);
 			}
