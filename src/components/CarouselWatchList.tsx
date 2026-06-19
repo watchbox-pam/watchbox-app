@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, View, Image, Text } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { getMediaInPlaylist } from "../services/PlaylistService";
 import GradientDivider from "./TraitGradiant";
@@ -19,29 +20,33 @@ export default function CarouselWatchList({
 
 	const [movies, setMovies] = useState<Movie[]>([]);
 
-	useEffect(() => {
-		// Fetch movies for the given playlist (providers.id)
-		const fetchMoviesForPlaylist = async () => {
-			if (providers && providers.id) {
-				try {
-					const result = await getMediaInPlaylist(providers.id);
-					if (result.success && Array.isArray(result.data)) {
-						setMovies(result.data);
-					} else {
+	useFocusEffect(
+		useCallback(() => {
+			const fetchMoviesForPlaylist = async () => {
+				if (providers && providers.id) {
+					try {
+						const result = await getMediaInPlaylist(providers.id);
+						if (result.success && Array.isArray(result.data)) {
+							setMovies(result.data);
+						} else {
+							console.error(
+								"Error fetching movies for playlist or invalid data format:",
+								result.message
+							);
+							setMovies([]);
+						}
+					} catch (error) {
 						console.error(
-							"Error fetching movies for playlist or invalid data format:",
-							result.message
+							"Error in fetchMoviesForPlaylist:",
+							error
 						);
 						setMovies([]);
 					}
-				} catch (error) {
-					console.error("Error in fetchMoviesForPlaylist:", error);
-					setMovies([]);
 				}
-			}
-		};
-		fetchMoviesForPlaylist();
-	}, [providers]);
+			};
+			fetchMoviesForPlaylist();
+		}, [providers?.id])
+	);
 
 	// Filter out movies without images
 	const filteredMovies = movies.filter((movie) => movie && movie.image);

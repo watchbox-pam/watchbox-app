@@ -48,8 +48,10 @@ const styles = StyleSheet.create({
 	},
 	timerBarFill: {
 		height: 5,
+		width: "100%",
 		backgroundColor: "#AC2821",
-		borderRadius: 3
+		borderRadius: 3,
+		transformOrigin: "left"
 	},
 	timerText: {
 		color: "#FFFFFF",
@@ -150,6 +152,9 @@ const styles = StyleSheet.create({
 	},
 	progressDotDone: {
 		backgroundColor: "#AC2821"
+	},
+	progressDotCorrect: {
+		backgroundColor: "#4CAF50"
 	},
 	loadingContainer: {
 		flex: 1,

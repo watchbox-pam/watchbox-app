@@ -6,9 +6,18 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	ActivityIndicator,
-	Modal
+	Modal,
+	AppState,
+	type AppStateStatus
 } from "react-native";
 import Toast from "react-native-toast-message";
+import Animated, {
+	useSharedValue,
+	useAnimatedStyle,
+	withTiming,
+	cancelAnimation,
+	Easing
+} from "react-native-reanimated";
 import { useLocalSearchParams, router } from "expo-router";
 import { useNavigation, NavigationAction } from "@react-navigation/native";
 import BackButton from "../components/BackButton";
@@ -35,6 +44,8 @@ const GENRE_LABELS: Record<string, string> = {
 const TOTAL_QUESTIONS = 10;
 const TIMER_MAX = 30;
 
+const NO_HINT_IMAGE_TYPES = ["longest_film", "oldest_film", "biggest_budget"];
+
 const TMDB_IMAGE = "https://image.tmdb.org/t/p/w780";
 
 export default function QuizGameScreen() {
@@ -43,6 +54,7 @@ export default function QuizGameScreen() {
 
 	const [questions, setQuestions] = useState<ApiQuestion[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [correctness, setCorrectness] = useState<boolean[]>([]);
 	const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 	const [validated, setValidated] = useState(false);
 	const [timer, setTimer] = useState(TIMER_MAX);
@@ -55,6 +67,11 @@ export default function QuizGameScreen() {
 	const [submitError, setSubmitError] = useState(false);
 
 	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const timerValueRef = useRef(TIMER_MAX);
+	const barProgress = useSharedValue(1);
+	const timerBarStyle = useAnimatedStyle(() => ({
+		transform: [{ scaleX: barProgress.value }]
+	}));
 	const startTimeRef = useRef(Date.now());
 	const answersRef = useRef<AnswerPayload[]>([]);
 	const questionsRef = useRef<ApiQuestion[]>([]);
@@ -89,32 +106,50 @@ export default function QuizGameScreen() {
 			clearInterval(timerRef.current);
 			timerRef.current = null;
 		}
+		// Freeze the bar at its current position
+		cancelAnimation(barProgress);
 	};
 
-	const startTimer = useCallback(() => {
-		clearTimer();
-		validatedRef.current = false;
-		selectedAnswerRef.current = null;
-		startTimeRef.current = Date.now();
-		setTimer(TIMER_MAX);
-		setSelectedAnswer(null);
-		setValidated(false);
+	// fromSeconds < TIMER_MAX means we're resuming an in-progress question (e.g.
+	// after the app came back from background) — keep the current selection then.
+	const startTimer = useCallback(
+		(fromSeconds = TIMER_MAX, freshQuestion = true) => {
+			clearTimer();
+			if (freshQuestion) {
+				validatedRef.current = false;
+				selectedAnswerRef.current = null;
+				setSelectedAnswer(null);
+				setValidated(false);
+			}
+			startTimeRef.current =
+				Date.now() - (TIMER_MAX - fromSeconds) * 1000;
+			timerValueRef.current = fromSeconds;
+			setTimer(fromSeconds);
 
-		timerRef.current = setInterval(() => {
-			setTimer((prev) => {
-				const next = prev - 1;
-				if (next <= 0) {
-					clearTimer();
-					if (!validatedRef.current) {
-						doValidate(null);
-					}
-					return 0;
-				}
-				return next;
+			barProgress.value = fromSeconds / TIMER_MAX;
+			barProgress.value = withTiming(0, {
+				duration: fromSeconds * 1000,
+				easing: Easing.linear
 			});
-		}, 1000);
+
+			timerRef.current = setInterval(() => {
+				setTimer((prev) => {
+					const next = prev - 1;
+					timerValueRef.current = next;
+					if (next <= 0) {
+						clearTimer();
+						if (!validatedRef.current) {
+							doValidate(null);
+						}
+						return 0;
+					}
+					return next;
+				});
+			}, 1000);
+		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		[]
+	);
 
 	const doValidate = useCallback(
 		(answer: string | null) => {
@@ -128,6 +163,13 @@ export default function QuizGameScreen() {
 			);
 			const question = questionsRef.current[currentIndexRef.current];
 			if (!question) return;
+
+			const isCorrect = answer === question.correct_answer;
+			setCorrectness((prev) => {
+				const next = [...prev];
+				next[currentIndexRef.current] = isCorrect;
+				return next;
+			});
 
 			answersRef.current = [
 				...answersRef.current,
@@ -156,6 +198,26 @@ export default function QuizGameScreen() {
 		[startTimer]
 	);
 
+	useEffect(() => {
+		const sub = AppState.addEventListener(
+			"change",
+			(state: AppStateStatus) => {
+				if (state !== "active") {
+					// Background/inactive → freeze interval + bar.
+					clearTimer();
+					return;
+				}
+				// Back to foreground → resume the question if one is running.
+				if (loading || generating || quizDone) return;
+				if (validatedRef.current) return;
+				if (questionsRef.current.length === 0) return;
+				const remaining = timerValueRef.current;
+				if (remaining > 0) startTimer(remaining, false);
+			}
+		);
+		return () => sub.remove();
+	}, [loading, generating, quizDone, startTimer]);
+
 	const handleSubmit = async () => {
 		if (!mountedRef.current) return;
 		setSubmitError(false);
@@ -183,6 +245,7 @@ export default function QuizGameScreen() {
 		setGenerating(false);
 		setError(null);
 		setCurrentIndex(0);
+		setCorrectness([]);
 		setSelectedAnswer(null);
 		setValidated(false);
 		setQuizDone(false);
@@ -257,7 +320,6 @@ export default function QuizGameScreen() {
 	};
 
 	const currentQuestion = questions[currentIndex];
-	const timerProgress = timer / TIMER_MAX;
 
 	if (loading || generating) {
 		return (
@@ -372,9 +434,14 @@ export default function QuizGameScreen() {
 
 	const isPosterGuess = currentQuestion?.question_type === "poster_guess";
 
-	const imageUri = currentQuestion?.image_path
-		? `${TMDB_IMAGE}${currentQuestion.image_path}`
-		: null;
+	const hidesHintImage =
+		currentQuestion != null &&
+		NO_HINT_IMAGE_TYPES.includes(currentQuestion.question_type);
+
+	const imageUri =
+		currentQuestion?.image_path && !hidesHintImage
+			? `${TMDB_IMAGE}${currentQuestion.image_path}`
+			: null;
 	const imageBlur = isPosterGuess && !validated ? 18 : 0;
 
 	const getPosterAnswerStyle = (answer: string) => {
@@ -414,7 +481,11 @@ export default function QuizGameScreen() {
 				}).map((_, i) => {
 					const dotStyle = [
 						styles.progressDot,
-						i < currentIndex ? styles.progressDotDone : null,
+						i < currentIndex
+							? correctness[i]
+								? styles.progressDotCorrect
+								: styles.progressDotDone
+							: null,
 						i === currentIndex ? styles.progressDotActive : null
 					];
 					return <View key={i} style={dotStyle} />;
@@ -423,11 +494,8 @@ export default function QuizGameScreen() {
 
 			<View style={styles.timerRow}>
 				<View style={styles.timerBarBg}>
-					<View
-						style={[
-							styles.timerBarFill,
-							{ width: `${timerProgress * 100}%` }
-						]}
+					<Animated.View
+						style={[styles.timerBarFill, timerBarStyle]}
 					/>
 				</View>
 				<Text style={styles.timerText}>{timer}s</Text>

@@ -1,4 +1,4 @@
-// import analytics from '@react-native-firebase/analytics';
+import analytics from "@react-native-firebase/analytics";
 
 type AnalyticsParams = Record<string, string | number | boolean | null>;
 
@@ -29,10 +29,10 @@ export const startScreenTracking = async (screenName: string) => {
 	currentScreenStartTime = Date.now();
 
 	try {
-		// await analytics().logScreenView({
-		//   screen_name: screenName,
-		//   screen_class: screenName,
-		// });
+		await analytics().logScreenView({
+			screen_name: screenName,
+			screen_class: screenName
+		});
 
 		await trackEvent("screen_view_custom", {
 			screen_name: screenName
@@ -63,7 +63,7 @@ export const trackEvent = async (
 	params?: AnalyticsParams
 ) => {
 	try {
-		// await analytics().logEvent(eventName, params);
+		await analytics().logEvent(eventName, params);
 	} catch (error) {
 		console.error("Analytics event error:", error);
 	}
