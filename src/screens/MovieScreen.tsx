@@ -1,6 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Image, ScrollView, View, RefreshControl } from "react-native";
+import {
+	Image,
+	ScrollView,
+	View,
+	RefreshControl,
+	TouchableOpacity,
+	Button,
+	FlatList,
+	Modal
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Provider, ActivityIndicator } from "react-native-paper";
@@ -9,8 +18,10 @@ import {
 	endScreenTracking,
 	trackMovieOpened
 } from "@/src/services/analytics";
+import ddStyles from "@/src/styles/DropDownPlaylistStyle";
 
 import BackButton from "@/src/components/BackButton";
+import { usePlaylistActions } from "@/src/hooks/usePlaylistActions";
 import Tag from "@/src/components/Tag";
 import StyledText from "@/src/components/StyledText";
 import TagList from "@/src/components/TagList";
@@ -23,6 +34,7 @@ import { fetchMovieDetails } from "@/src/services/MovieDetailService";
 import useSessionStore from "../zustand/sessionStore";
 import DropDownPlaylist from "../components/DropDownPlaylist";
 import { ErrorMessage } from "../components/ErrorMessage";
+import BtnRow from "../components/BtnRow";
 
 export default function MovieScreen() {
 	const [loading, setLoading] = useState(true);
@@ -73,6 +85,8 @@ export default function MovieScreen() {
 		}
 	};
 
+	const playlistActions = usePlaylistActions(Number(id));
+
 	useEffect(() => {
 		const userId = currentUser && currentUser.id;
 
@@ -120,7 +134,6 @@ export default function MovieScreen() {
 				}>
 				<View style={styles.headers}>
 					<BackButton />
-					<DropDownPlaylist movieId={Number(id)} />
 				</View>
 
 				<View style={styles.imageBannerContainer}>
@@ -205,13 +218,48 @@ export default function MovieScreen() {
 					</View>
 				)}
 
-				<View testID="movie-overview">
+				<View testID="movie-overview" style={{ marginBottom: 20 }}>
 					<StyledText style={styles.description} ellipsizeMode="tail">
 						{media?.overview
 							? media.overview
 							: "Aucune description disponible pour ce film."}
 					</StyledText>
 				</View>
+
+				{/* Bouton */}
+
+				<BtnRow
+					items={[
+						{
+							label: "Aimé",
+							icon: "heart-outline",
+							iconActive: "heart",
+							toggle: true,
+							onPress: () => {
+								/* logique like */
+							}
+						},
+						{
+							label: "Pas pour moi",
+							icon: "ban-outline",
+							iconActive: "ban",
+							toggle: true,
+							onPress: () => {
+								/* logique dislike */
+							}
+						},
+						{
+							label: "Ajouter à",
+							icon: "add",
+							onPress: playlistActions.openModal
+						},
+						{
+							label: "Partager",
+							icon: "share-social",
+							onPress: playlistActions.onShare
+						}
+					]}
+				/>
 
 				{media?.video_key ? (
 					<View style={styles.videoContainer} testID="movie-video">
@@ -255,6 +303,88 @@ export default function MovieScreen() {
 				</View>
 				<CommentaryScreen mediaId={Array.isArray(id) ? id[0] : id} />
 			</ScrollView>
+
+			{/* Modal sélection playlist (déclenché par BtnRow "Ajouter à") */}
+			<Modal
+				visible={playlistActions.modalVisible}
+				transparent
+				animationType="fade"
+				onRequestClose={playlistActions.closeModal}>
+				<TouchableOpacity
+					style={ddStyles.modalContainer}
+					activeOpacity={1}
+					onPress={playlistActions.closeModal}>
+					<TouchableOpacity
+						style={ddStyles.modalContent}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}>
+						<StyledText style={styles.modalTitle}>
+							Choisissez une Watchlist
+						</StyledText>
+						{playlistActions.isFetchingPlaylists ? (
+							<ActivityIndicator
+								size="large"
+								color="#FFFFFF"
+								style={{ marginVertical: 20 }}
+							/>
+						) : (
+							<FlatList
+								data={playlistActions.userPlaylists}
+								keyExtractor={(item) => item.id}
+								style={ddStyles.selectContainer}
+								renderItem={({ item }) => (
+									<TouchableOpacity
+										style={[
+											ddStyles.playlistItem,
+											playlistActions.selectedPlaylistId ===
+												item.id && ddStyles.selectedItem
+										]}
+										onPress={() =>
+											playlistActions.setSelectedPlaylistId(
+												item.id
+											)
+										}>
+										<StyledText
+											style={[
+												ddStyles.playlistText,
+												playlistActions.selectedPlaylistId ===
+													item.id &&
+													ddStyles.selectedText
+											]}>
+											{item.title}
+										</StyledText>
+									</TouchableOpacity>
+								)}
+								ListEmptyComponent={
+									<StyledText style={{ color: "#FFFFFF" }}>
+										Aucune playlist trouvée
+									</StyledText>
+								}
+							/>
+						)}
+						<View style={ddStyles.modalButtons}>
+							<Button
+								title="Annuler"
+								onPress={playlistActions.closeModal}
+								disabled={playlistActions.isAdding}
+							/>
+							{playlistActions.isAdding ? (
+								<ActivityIndicator
+									size="small"
+									color="#FFFFFF"
+								/>
+							) : (
+								<Button
+									title="Ajouter"
+									onPress={
+										playlistActions.handleAddToPlaylist
+									}
+								/>
+							)}
+						</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
+			</Modal>
 		</Provider>
 	);
 }
