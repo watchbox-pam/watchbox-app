@@ -105,3 +105,183 @@ export const trackMovieRated = async (
 		rating
 	});
 };
+
+export const trackMovieShared = async (
+	movieId: string | number,
+	platform: string
+) => {
+	await trackEvent("movie_shared", {
+		movie_id: movieId,
+		platform
+	});
+};
+
+export const trackMovieTrailerWatched = async (
+	movieId: string | number,
+	trailerId: string | number
+) => {
+	await trackEvent("movie_trailer_watched", {
+		movie_id: movieId,
+		trailer_id: trailerId
+	});
+};
+
+export const trackMovieCommented = async (
+	movieId: string | number,
+	commentId: string | number
+) => {
+	await trackEvent("movie_commented", {
+		movie_id: movieId,
+		comment_id: commentId
+	});
+};
+
+export const trackMovieRatedWithComment = async (
+	movieId: string | number,
+	rating: number,
+	commentId: string | number
+) => {
+	await trackEvent("movie_rated_with_comment", {
+		movie_id: movieId,
+		rating,
+		comment_id: commentId
+	});
+};
+
+export const trackMovieAddedToPlaylist = async (
+	movieId: string | number,
+	playlistId: string | number
+) => {
+	await trackEvent("movie_added_to_playlist", {
+		movie_id: movieId,
+		playlist_id: playlistId
+	});
+};
+
+export const trackMovieRemovedFromPlaylist = async (
+	movieId: string | number,
+	playlistId: string | number
+) => {
+	await trackEvent("movie_removed_from_playlist", {
+		movie_id: movieId,
+		playlist_id: playlistId
+	});
+};
+
+export const trackPlaylistCreated = async (playlistId: string | number) => {
+	await trackEvent("playlist_created", {
+		playlist_id: playlistId
+	});
+};
+
+export const trackPlaylistDeleted = async (playlistId: string | number) => {
+	await trackEvent("playlist_deleted", {
+		playlist_id: playlistId
+	});
+};
+
+export const trackPlaylistRenamed = async (
+	playlistId: string | number,
+	newName: string
+) => {
+	await trackEvent("playlist_renamed", {
+		playlist_id: playlistId,
+		new_name: newName
+	});
+};
+
+export const trackPlaylistViewed = async (playlistId: string | number) => {
+	await trackEvent("playlist_viewed", {
+		playlist_id: playlistId
+	});
+};
+
+export const trackPlaylistShared = async (
+	playlistId: string | number,
+	platform: string
+) => {
+	await trackEvent("playlist_shared", {
+		playlist_id: playlistId,
+		platform
+	});
+};
+
+export const trackPlaylistMovieRemoved = async (
+	playlistId: string | number,
+	movieId: string | number
+) => {
+	await trackEvent("playlist_movie_removed", {
+		playlist_id: playlistId,
+		movie_id: movieId
+	});
+};
+
+export const trackPlaylistMovieAdded = async (
+	playlistId: string | number,
+	movieId: string | number
+) => {
+	await trackEvent("playlist_movie_added", {
+		playlist_id: playlistId,
+		movie_id: movieId
+	});
+};
+
+export const trackPlaylistMovieWatched = async (
+	playlistId: string | number,
+	movieId: string | number
+) => {
+	await trackEvent("playlist_movie_watched", {
+		playlist_id: playlistId,
+		movie_id: movieId
+	});
+};
+
+export const trackPlaylistMovieRated = async (
+	playlistId: string | number,
+	movieId: string | number,
+	rating: number
+) => {
+	await trackEvent("playlist_movie_rated", {
+		playlist_id: playlistId,
+		movie_id: movieId,
+		rating
+	});
+};
+
+export const trackPlaylistMovieCommented = async (
+	playlistId: string | number,
+	movieId: string | number,
+	commentId: string | number
+) => {
+	await trackEvent("playlist_movie_commented", {
+		playlist_id: playlistId,
+		movie_id: movieId,
+		comment_id: commentId
+	});
+};
+
+export const trackPlaylistMovieRatedWithComment = async (
+	playlistId: string | number,
+	movieId: string | number,
+	rating: number,
+	commentId: string | number
+) => {
+	await trackEvent("playlist_movie_rated_with_comment", {
+		playlist_id: playlistId,
+		movie_id: movieId,
+		rating,
+		comment_id: commentId
+	});
+};
+
+export const trackPlaylistMovieShared = async (
+	playlistId: string | number,
+	movieId: string | number,
+	platform: string
+) => {
+	await trackEvent("playlist_movie_shared", {
+		playlist_id: playlistId,
+		movie_id: movieId,
+		platform
+	});
+};
