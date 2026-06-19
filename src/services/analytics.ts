@@ -180,29 +180,9 @@ export const trackPlaylistDeleted = async (playlistId: string | number) => {
 	});
 };
 
-export const trackPlaylistRenamed = async (
-	playlistId: string | number,
-	newName: string
-) => {
-	await trackEvent("playlist_renamed", {
-		playlist_id: playlistId,
-		new_name: newName
-	});
-};
-
 export const trackPlaylistViewed = async (playlistId: string | number) => {
 	await trackEvent("playlist_viewed", {
 		playlist_id: playlistId
-	});
-};
-
-export const trackPlaylistShared = async (
-	playlistId: string | number,
-	platform: string
-) => {
-	await trackEvent("playlist_shared", {
-		playlist_id: playlistId,
-		platform
 	});
 };
 
@@ -271,17 +251,5 @@ export const trackPlaylistMovieRatedWithComment = async (
 		movie_id: movieId,
 		rating,
 		comment_id: commentId
-	});
-};
-
-export const trackPlaylistMovieShared = async (
-	playlistId: string | number,
-	movieId: string | number,
-	platform: string
-) => {
-	await trackEvent("playlist_movie_shared", {
-		playlist_id: playlistId,
-		movie_id: movieId,
-		platform
 	});
 };
