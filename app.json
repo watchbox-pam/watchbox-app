@@ -19,7 +19,7 @@
 			"associatedDomains": ["applinks:app.watchbox-app.fr"]
 		},
 		"android": {
-			"googleServicesFile": "$GOOGLE_SERVICES_JSON",
+			"googleServicesFile": "./google-services.json",
 			"adaptiveIcon": {
 				"foregroundImage": "./src/assets/images/watchbox-logo.png",
 				"backgroundColor": "#102A4C"
