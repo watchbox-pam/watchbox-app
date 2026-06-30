@@ -27,7 +27,7 @@ import styles from "../styles/SwipeStyle";
 import { Ionicons } from "@expo/vector-icons";
 import MovieLoader from "../components/MovieLoader";
 import useSessionStore from "../zustand/sessionStore";
-import { startScreenTracking, endScreenTracking } from "../services/analytics";
+//import { startScreenTracking, endScreenTracking } from "../services/analytics";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
@@ -61,13 +61,13 @@ export default function SwipeScreen() {
 	const isFetchingMoreRef = useRef(false);
 	const seenMovieIdsRef = useRef<Set<number>>(new Set());
 
-	useEffect(() => {
+	/*useEffect(() => {
 		startScreenTracking("Swipe");
 
 		return () => {
 			endScreenTracking();
 		};
-	}, []);
+	}, []);*/
 
 	useEffect(() => {
 		currentIndexRef.current = currentIndex;

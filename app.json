@@ -2,7 +2,7 @@
   "expo": {
     "name": "Watchbox",
     "slug": "watchbox-app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "backgroundColor": "#FFFFFF",
     "icon": "./src/assets/images/watchbox-logo.png",
@@ -53,8 +53,8 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app",
-      "@react-native-firebase/analytics",
+      //"@react-native-firebase/app",
+      //"@react-native-firebase/analytics",
       [
         "expo-splash-screen",
         {

@@ -4,7 +4,7 @@ import {
 	addMediaToPlaylist,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
-import { trackMovieAddedToPlaylist } from "@/src/services/analytics";
+//import { trackMovieAddedToPlaylist } from "@/src/services/analytics";
 import useSessionStore from "@/src/zustand/sessionStore";
 import Toast from "react-native-toast-message";
 
@@ -63,7 +63,7 @@ export function usePlaylistActions(mediaId: number) {
 				mediaId
 			);
 			if (response.success) {
-				await trackMovieAddedToPlaylist(mediaId, selectedPlaylistId);
+				//await trackMovieAddedToPlaylist(mediaId, selectedPlaylistId);
 				Toast.show({
 					type: "success",
 					text1: "Ajouté",

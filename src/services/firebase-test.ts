@@ -1,3 +1,4 @@
+/*
 import analytics from "@react-native-firebase/analytics";
 
 export async function testFirebaseAnalytics() {
@@ -12,3 +13,4 @@ export async function testFirebaseAnalytics() {
 		console.error("Firebase Analytics KO", error);
 	}
 }
+*/

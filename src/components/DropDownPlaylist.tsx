@@ -14,7 +14,7 @@ import {
 	addMediaToPlaylist,
 	getUserPlaylists
 } from "@/src/services/PlaylistService";
-import { trackMovieAddedToWatchlist } from "@/src/services/analytics";
+//import { trackMovieAddedToWatchlist } from "@/src/services/analytics";
 import useSessionStore from "@/src/zustand/sessionStore";
 import styles from "@/src/styles/DropDownPlaylistStyle";
 import Toast from "react-native-toast-message";
@@ -105,7 +105,7 @@ const DropDownPlaylist = ({ movieId }: { movieId: number }) => {
 				movieId
 			);
 			if (response.success) {
-				await trackMovieAddedToWatchlist(movieId);
+				//await trackMovieAddedToWatchlist(movieId);
 
 				Toast.show({
 					type: "success",

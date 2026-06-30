@@ -1,3 +1,4 @@
+/*
 import analytics from "@react-native-firebase/analytics";
 
 type AnalyticsParams = Record<string, string | number | boolean | null>;
@@ -253,3 +254,4 @@ export const trackPlaylistMovieRatedWithComment = async (
 		comment_id: commentId
 	});
 };
+*/

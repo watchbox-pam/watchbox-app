@@ -13,11 +13,11 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Provider, ActivityIndicator } from "react-native-paper";
-import {
+/*import {
 	startScreenTracking,
 	endScreenTracking,
 	trackMovieOpened
-} from "@/src/services/analytics";
+} from "@/src/services/analytics";*/
 import ddStyles from "@/src/styles/DropDownPlaylistStyle";
 
 import BackButton from "@/src/components/BackButton";
@@ -55,13 +55,13 @@ export default function MovieScreen() {
 		setRefreshing(true);
 	}, []);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		startScreenTracking("MovieDetail");
 
 		return () => {
 			endScreenTracking();
 		};
-	}, []);
+	}, []);*/
 
 	const fetchData = async () => {
 		try {
@@ -70,10 +70,10 @@ export default function MovieScreen() {
 			const response = await fetchMovieDetails(+id);
 			if (response.success && response.data) {
 				setMedia(response.data);
-				await trackMovieOpened(
+				/*await trackMovieOpened(
 					response.data.id ?? id,
 					response.data.title
-				);
+				);*/
 			} else {
 				setError(true);
 			}

@@ -27,11 +27,11 @@ import MovieSearchResult from "@/src/components/search/MovieSearchResult";
 import PersonSearchResult from "@/src/components/search/PersonSearchResult";
 import UserSearchResultModel from "@/src/models/UserSearchResultModel";
 import UserSearchResult from "@/src/components/search/UserSearchResult";
-import {
+/*import {
 	endScreenTracking,
 	startScreenTracking,
 	trackSearchPerformed
-} from "../services/analytics";
+} from "../services/analytics";*/
 
 export default function SearchScreen() {
 	// State variables for search input, loading state, results and filter
@@ -66,13 +66,13 @@ export default function SearchScreen() {
 		setRefreshing(true);
 	}, []);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		startScreenTracking("Search");
 
 		return () => {
 			endScreenTracking();
 		};
-	}, []);
+	}, []);*/
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -167,7 +167,7 @@ export default function SearchScreen() {
 		hasInteracted.current = false;
 
 		if (term.trim()) {
-			await trackSearchPerformed(term, selectedFilter);
+			//await trackSearchPerformed(term, selectedFilter);
 
 			setShowSuggestions(false);
 			Keyboard.dismiss();

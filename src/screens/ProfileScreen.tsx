@@ -30,7 +30,7 @@ import {
 } from "@/src/services/PlaylistService";
 import useSessionStore from "../zustand/sessionStore";
 import Playlist from "../models/Playlist";
-import { endScreenTracking, startScreenTracking } from "../services/analytics";
+//import { endScreenTracking, startScreenTracking } from "../services/analytics";
 
 // Adapté depuis l'ancien composant Stats
 function formatRuntime(totalMinutes: number): string {
@@ -85,13 +85,13 @@ export default function ProfileScreen() {
 
 	const currentUser = useSessionStore((state: any) => state.user);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		startScreenTracking("Profile");
 
 		return () => {
 			endScreenTracking();
 		};
-	}, []);
+	}, []);*/
 
 	useEffect(() => {
 		setLoading(true);
