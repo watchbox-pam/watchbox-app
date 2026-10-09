@@ -8,10 +8,8 @@ import {
 	Text,
 	FlatList,
 	TouchableOpacity,
-	RefreshControl,
-	ScrollView
+	RefreshControl
 } from "react-native";
-import StyledText from "../components/StyledText";
 import {
 	deleteMediaFromPlaylist,
 	getMediaInPlaylist,
@@ -116,6 +114,47 @@ export default function Index() {
 		setTimeout(() => setRefreshing(true), 500);
 	};
 
+	const renderMovie = ({ item }: { item: MovieItem }) => (
+		<View style={styles.viewResult}>
+			<TouchableOpacity
+				onPress={() => router.push(`/(app)/(tabs)/movie/${item.id}`)}
+				style={styles.resultatInfo}
+				activeOpacity={0.7}>
+				{item.image != null ? (
+					<Image
+						source={{
+							uri: `https://image.tmdb.org/t/p/w500${item.image}`
+						}}
+						style={styles.image}
+						resizeMode="cover"
+					/>
+				) : (
+					<View style={styles.image} />
+				)}
+				<View style={styles.resultInfo}>
+					<Text style={styles.resultTitle} numberOfLines={3}>
+						{item.title}
+					</Text>
+					<Text style={styles.resultYear}>
+						{item.release_date?.toString().split("-")[0] ??
+							"Date inconnue"}
+					</Text>
+				</View>
+				{isCurrentUser && (
+					<TouchableOpacity
+						onPress={() => handleDeleteMedia(item.id)}
+						style={styles.deleteIconContainer}>
+						<MaterialIcons
+							name="delete"
+							size={20}
+							color="#e05a5a"
+						/>
+					</TouchableOpacity>
+				)}
+			</TouchableOpacity>
+		</View>
+	);
+
 	if (error) {
 		return (
 			<ErrorMessage
@@ -134,18 +173,31 @@ export default function Index() {
 	}
 
 	return (
-		<ScrollView
-			style={styles.container}
-			contentContainerStyle={styles.contentContainer}
-			overScrollMode="never"
-			refreshControl={
-				<RefreshControl
-					refreshing={refreshing}
-					onRefresh={onRefresh}
-					tintColor="#1E90FF"
-				/>
-			}>
-			{/* Header */}
+		<View style={styles.container}>
+			<FlatList
+				data={movieList}
+				keyExtractor={(item) => String(item.id)}
+				renderItem={renderMovie}
+				contentContainerStyle={styles.contentContainer}
+				overScrollMode="never"
+				initialNumToRender={8}
+				maxToRenderPerBatch={10}
+				windowSize={7}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+						tintColor="#1E90FF"
+					/>
+				}
+				ListEmptyComponent={
+					<Text style={styles.NoResult}>
+						Aucun film dans cette playlist
+					</Text>
+				}
+			/>
+
+			{/* Header en overlay absolu (hors FlatList) */}
 			<View style={styles.headers}>
 				<BackButton />
 				<Text style={styles.playlistName} numberOfLines={1}>
@@ -165,56 +217,6 @@ export default function Index() {
 					<View style={{ width: 44 }} /> // spacer pour centrer le titre
 				)}
 			</View>
-
-			{movieList?.length > 0 ? (
-				movieList.map((movie) => (
-					<View key={movie.id} style={styles.viewResult}>
-						<TouchableOpacity
-							onPress={() =>
-								router.push(`/(app)/(tabs)/movie/${movie.id}`)
-							}
-							style={styles.resultatInfo}
-							activeOpacity={0.7}>
-							<Image
-								source={{
-									uri: movie.image
-										? `https://image.tmdb.org/t/p/w500${movie.image}`
-										: ""
-								}}
-								style={styles.image}
-								resizeMode="cover"
-							/>
-							<View style={styles.resultInfo}>
-								<Text
-									style={styles.resultTitle}
-									numberOfLines={3}>
-									{movie.title}
-								</Text>
-								<Text style={styles.resultYear}>
-									{movie.release_date
-										?.toString()
-										.split("-")[0] ?? "Date inconnue"}
-								</Text>
-							</View>
-							{isCurrentUser && (
-								<TouchableOpacity
-									onPress={() => handleDeleteMedia(movie.id)}
-									style={styles.deleteIconContainer}>
-									<MaterialIcons
-										name="delete"
-										size={20}
-										color="#e05a5a"
-									/>
-								</TouchableOpacity>
-							)}
-						</TouchableOpacity>
-					</View>
-				))
-			) : (
-				<Text style={styles.NoResult}>
-					Aucun film dans cette playlist
-				</Text>
-			)}
-		</ScrollView>
+		</View>
 	);
 }
