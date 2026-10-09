@@ -18,7 +18,11 @@ export const createReview = async (review: Review) => {
 		if (response.success) return { success: true, message: response.data };
 		return { success: false, message: response.data };
 	} catch (error: any) {
-		return { success: false, message: error.detail };
+		return {
+			success: false,
+			message:
+				error.response?.data?.detail ?? error.message ?? "Unknown error"
+		};
 	}
 };
 
