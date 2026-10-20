@@ -10,7 +10,7 @@ import PersonMediaList from "../components/PersonMediaList";
 import { fetchPerson } from "@/src/services/PersonService";
 import { ErrorMessage } from "../components/ErrorMessage";
 import DropDownSharePeople from "../components/DropDownSharePeople";
-import countries from "i18n-iso-countries";
+import countries from "i18n-iso-countries/index";
 import fr from "i18n-iso-countries/langs/fr.json";
 import en from "i18n-iso-countries/langs/en.json";
 import es from "i18n-iso-countries/langs/es.json";
