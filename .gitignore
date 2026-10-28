@@ -33,8 +33,6 @@ yarn-error.*
 .env*.local
 .env
 
-GoogleService-Info.plist
-
 # typescript
 *.tsbuildinfo
 
