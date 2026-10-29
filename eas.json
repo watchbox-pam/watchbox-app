@@ -17,6 +17,11 @@
 		}
 	},
 	"submit": {
-		"production": {}
+		"production": {
+			"ios": {
+				"ascAppId": "6755971888", 
+				"appleId": "teamwatchbox@gmail.com" 
+			}
+		}
 	}
 }
