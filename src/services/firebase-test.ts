@@ -1,8 +1,8 @@
-import analytics from "@react-native-firebase/analytics";
+import { trackEvent } from "@/src/services/analytics";
 
 export async function testFirebaseAnalytics() {
 	try {
-		await analytics().logEvent("watchbox_test_event", {
+		await trackEvent("watchbox_test_event", {
 			source: "home_screen",
 			timestamp: Date.now()
 		});

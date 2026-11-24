@@ -1,4 +1,15 @@
-import analytics from "@react-native-firebase/analytics";
+import Constants, { ExecutionEnvironment } from "expo-constants";
+
+const isExpoGo =
+	Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const analyticsEnabled = !__DEV__ && !isExpoGo;
+
+let analytics: any = null;
+
+if (analyticsEnabled) {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	analytics = require("@react-native-firebase/analytics").default;
+}
 
 type AnalyticsParams = Record<string, string | number | boolean | null>;
 
@@ -29,6 +40,8 @@ export const startScreenTracking = async (screenName: string) => {
 	currentScreenStartTime = Date.now();
 
 	try {
+		if (!analytics) return;
+
 		await analytics().logScreenView({
 			screen_name: screenName,
 			screen_class: screenName
@@ -63,6 +76,11 @@ export const trackEvent = async (
 	params?: AnalyticsParams
 ) => {
 	try {
+		if (!analytics) {
+			if (__DEV__) console.log("[analytics:disabled]", eventName, params);
+			return;
+		}
+
 		await analytics().logEvent(eventName, params);
 	} catch (error) {
 		console.error("Analytics event error:", error);
