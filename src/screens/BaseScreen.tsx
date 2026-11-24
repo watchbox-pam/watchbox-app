@@ -1,11 +1,23 @@
-import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+	ActivityIndicator,
+	Image,
+	Platform,
+	Text,
+	TouchableOpacity,
+	View
+} from "react-native";
 import styles from "@/src/styles/BasePageStyle";
 import StyledText from "@/src/components/StyledText";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkLogin } from "@/src/services/LandingService";
 import useSessionStore from "@/src/zustand/sessionStore";
 import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
+import {
+	isGoogleSignInAvailable,
+	signInWithGoogle
+} from "@/src/services/GoogleAuthService";
 
 export default function BaseScreen() {
 	// Retrieve the signIn function from the session store
@@ -41,6 +53,52 @@ export default function BaseScreen() {
 		}
 	};
 
+	const [googleLoading, setGoogleLoading] = useState<boolean>(false);
+
+	// Connexion ou inscription avec un compte Google
+	const handleGoogleSignIn = async () => {
+		if (googleLoading) return;
+		setGoogleLoading(true);
+		try {
+			const result = await signInWithGoogle();
+
+			switch (result.status) {
+				case "logged_in":
+					// Session déjà enregistrée par le service : même chemin que la connexion classique
+					signIn(
+						result.session.id,
+						result.session.username,
+						result.session.token
+					);
+					router.replace("/");
+					return;
+
+				case "registration_required":
+					// TODO étape 4.4 : ouvrir l'écran "Finaliser l'inscription"
+					Toast.show({
+						type: "info",
+						text1: "Nouveau compte Google",
+						text2: "L'écran de fin d'inscription arrive à l'étape suivante"
+					});
+					return;
+
+				case "error":
+					Toast.show({
+						type: "error",
+						text1: "Connexion avec Google",
+						text2: result.message
+					});
+					return;
+
+				case "cancelled":
+					// L'utilisateur a fermé la fenêtre Google : rien à afficher
+					return;
+			}
+		} finally {
+			setGoogleLoading(false);
+		}
+	};
+
 	useEffect(() => {
 		checkUserLogin();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +125,37 @@ export default function BaseScreen() {
 					onPress={() => router.push("/signup")}>
 					<Text style={styles.buttonText}>Créez votre compte</Text>
 				</TouchableOpacity>
+
+				{isGoogleSignInAvailable && (
+					<>
+						<View style={styles.separator}>
+							<View style={styles.separatorLine} />
+							<Text style={styles.separatorText}>ou</Text>
+							<View style={styles.separatorLine} />
+						</View>
+						<TouchableOpacity
+							style={styles.googleButton}
+							onPress={handleGoogleSignIn}
+							disabled={googleLoading}
+							accessibilityRole="button"
+							accessibilityLabel="Continuer avec Google">
+							{googleLoading ? (
+								<ActivityIndicator color="#757575" />
+							) : (
+								<>
+									<Image
+										style={styles.googleLogo}
+										source={require("@/src/assets/images/google-g.png")}
+										accessibilityIgnoresInvertColors
+									/>
+									<Text style={styles.googleButtonText}>
+										Continuer avec Google
+									</Text>
+								</>
+							)}
+						</TouchableOpacity>
+					</>
+				)}
 			</View>
 		</View>
 	);
