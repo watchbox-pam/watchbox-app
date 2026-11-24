@@ -15,8 +15,15 @@ import { ApiHelper } from "@/src/utils/axios";
  */
 const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
-// Android uniquement pour l'instant : iOS sera configuré dans la branche Apple
-export const isGoogleSignInAvailable = Platform.OS === "android";
+/**
+ * Client ID OAuth Google de type "iOS" (bundle com.watchbox.watchbox).
+ * Sur iPhone, c'est lui qui ouvre la fenêtre Google ; le jeton reste adressé au Client ID Web.
+ * Son "URL scheme" (ID inversé) est déclaré dans app.json (plugin google-signin).
+ */
+const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+
+export const isGoogleSignInAvailable =
+	Platform.OS === "android" || Platform.OS === "ios";
 
 export type GoogleSession = {
 	id: string;
@@ -42,7 +49,7 @@ let isConfigured = false;
 
 function configureGoogleSignIn() {
 	if (isConfigured) return;
-	GoogleSignin.configure({ webClientId });
+	GoogleSignin.configure({ webClientId, iosClientId });
 	isConfigured = true;
 }
 
@@ -91,9 +98,9 @@ export async function signInWithGoogle(): Promise<GoogleSignInResult> {
 		};
 	}
 
-	if (!webClientId) {
+	if (!webClientId || (Platform.OS === "ios" && !iosClientId)) {
 		console.error(
-			"[GOOGLE AUTH] EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID manquant dans le .env"
+			"[GOOGLE AUTH] EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID (et EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID sur iOS) manquant dans le .env"
 		);
 		return {
 			status: "error",
@@ -103,9 +110,12 @@ export async function signInWithGoogle(): Promise<GoogleSignInResult> {
 
 	try {
 		configureGoogleSignIn();
-		await GoogleSignin.hasPlayServices({
-			showPlayServicesUpdateDialog: true
-		});
+		// Google Play Services n'existe que sur Android
+		if (Platform.OS === "android") {
+			await GoogleSignin.hasPlayServices({
+				showPlayServicesUpdateDialog: true
+			});
+		}
 
 		const response = await GoogleSignin.signIn();
 		if (!isSuccessResponse(response)) {

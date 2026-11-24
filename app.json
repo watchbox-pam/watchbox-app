@@ -64,7 +64,13 @@
 			"expo-secure-store",
 			"expo-font",
 			"expo-web-browser",
-			"@react-native-community/datetimepicker"
+			"@react-native-community/datetimepicker",
+			[
+				"@react-native-google-signin/google-signin",
+				{
+					"iosUrlScheme": "com.googleusercontent.apps.856131105122-q5fr99bamiksue1vek9tcqgnl3kqeodd"
+				}
+			]
 		],
 		"experiments": {
 			"typedRoutes": true
