@@ -1,10 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { ScrollView, View, Text, Image, RefreshControl } from "react-native";
+import {
+	ScrollView,
+	View,
+	Text,
+	Image,
+	RefreshControl,
+	TouchableOpacity
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator } from "react-native-paper";
 
-import styles from "../styles/ProfileScreenStyle";
+import styles from "../styles/UserScreenStyle";
 import CarouselWatchList from "../components/CarouselWatchList";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { getUserProfile } from "../services/ProfileService";
@@ -15,6 +22,8 @@ import {
 
 import Playlist from "../models/Playlist";
 import { useLocalSearchParams } from "expo-router";
+import { followUser } from "@/src/services/UserService";
+import Toast from "react-native-toast-message";
 
 // Adapté depuis l'ancien composant Stats
 function formatRuntime(totalMinutes: number): string {
@@ -45,6 +54,7 @@ export default function UserScreen() {
 	const [error, setError] = useState(false);
 	const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
+	const [userFollowed, setUserFollowed] = useState(false);
 
 	const { id }: { id: string } = useLocalSearchParams();
 
@@ -89,6 +99,25 @@ export default function UserScreen() {
 			if (playlistRes.status === "fulfilled" && playlistRes.value.success)
 				setUserPlaylists(playlistRes.value.data ?? []);
 			else setUserPlaylists([]);
+		} catch {
+			setError(true);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleFollowUser = async () => {
+		try {
+			const result = await followUser(id);
+			if (result.success) {
+				setUserFollowed(!userFollowed);
+			} else {
+				Toast.show({
+					type: "error",
+					text1: "Erreur lors du follow",
+					text2: result.message
+				});
+			}
 		} catch {
 			setError(true);
 		} finally {
@@ -145,6 +174,24 @@ export default function UserScreen() {
 							source={require("../assets/images/default-user.png")}
 							style={styles.avatar}
 						/>
+						<View style={styles.avatarActions}>
+							<TouchableOpacity
+								style={
+									userFollowed
+										? styles.btnFollowActive
+										: styles.btnFollowInactive
+								}
+								onPress={handleFollowUser}>
+								<Text
+									style={
+										userFollowed
+											? styles.btnFollowTextActive
+											: styles.btnFollowTextInactive
+									}>
+									{userFollowed ? "Suivi" : "Suivre"}
+								</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 
 					<Text style={styles.username}>
