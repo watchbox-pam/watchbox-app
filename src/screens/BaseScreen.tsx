@@ -12,6 +12,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { checkLogin } from "@/src/services/LandingService";
 import useSessionStore from "@/src/zustand/sessionStore";
+import useGoogleRegistrationStore from "@/src/zustand/googleRegistrationStore";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 import {
@@ -54,6 +55,9 @@ export default function BaseScreen() {
 	};
 
 	const [googleLoading, setGoogleLoading] = useState<boolean>(false);
+	const setPendingGoogleRegistration = useGoogleRegistrationStore(
+		(state) => state.setPending
+	);
 
 	// Connexion ou inscription avec un compte Google
 	const handleGoogleSignIn = async () => {
@@ -74,12 +78,13 @@ export default function BaseScreen() {
 					return;
 
 				case "registration_required":
-					// TODO étape 4.4 : ouvrir l'écran "Finaliser l'inscription"
-					Toast.show({
-						type: "info",
-						text1: "Nouveau compte Google",
-						text2: "L'écran de fin d'inscription arrive à l'étape suivante"
+					// Nouveau compte : on demande le pseudo et la date de naissance
+					setPendingGoogleRegistration({
+						registrationToken: result.registrationToken,
+						email: result.email,
+						suggestedUsername: result.suggestedUsername
 					});
+					router.push("/googleRegistration");
 					return;
 
 				case "error":

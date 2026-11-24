@@ -1,6 +1,7 @@
 import { create } from "zustand/react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { signOutFromGoogle } from "@/src/services/GoogleAuthService";
 
 type SessionStore = {
 	isLoggedIn: boolean;
@@ -32,6 +33,9 @@ const useSessionStore = create<SessionStore>((set) => ({
 			localStorage.removeItem("identifier");
 			localStorage.removeItem("token");
 		}
+		// Si l'utilisateur s'était connecté avec Google, on déconnecte aussi le compte Google
+		// de l'appareil : la prochaine fois, il pourra choisir un autre compte
+		await signOutFromGoogle();
 		set({ isLoggedIn: false, user: { id: "", identifier: "", token: "" } });
 	}
 }));
