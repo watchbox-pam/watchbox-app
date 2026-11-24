@@ -82,10 +82,18 @@ export async function registerUser(user: UserSignup) {
 					"verification_code_token",
 					result.data.verification_code_token
 				);
+				await SecureStore.setItemAsync(
+					"first_login_import_username",
+					user.username.toLowerCase()
+				);
 			} else {
 				localStorage.setItem(
 					"verification_code_token",
 					result.data.verification_code_token
+				);
+				localStorage.setItem(
+					"first_login_import_username",
+					user.username.toLowerCase()
 				);
 			}
 
@@ -111,6 +119,30 @@ export async function registerUser(user: UserSignup) {
 			message: error.detail
 		};
 	}
+}
+
+export async function consumeFirstLoginImportPrompt(
+	username: string
+): Promise<boolean> {
+	let registeredUsername: string | null;
+	if (Platform.OS === "ios" || Platform.OS === "android") {
+		registeredUsername = await SecureStore.getItemAsync(
+			"first_login_import_username"
+		);
+	} else {
+		registeredUsername = localStorage.getItem(
+			"first_login_import_username"
+		);
+	}
+
+	if (registeredUsername !== username.toLowerCase()) return false;
+
+	if (Platform.OS === "ios" || Platform.OS === "android") {
+		await SecureStore.deleteItemAsync("first_login_import_username");
+	} else {
+		localStorage.removeItem("first_login_import_username");
+	}
+	return true;
 }
 
 /**

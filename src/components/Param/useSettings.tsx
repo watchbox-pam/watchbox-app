@@ -8,7 +8,7 @@ import getPasswordResetToken, {
 	getUserProfile,
 	updateSettings
 } from "@/src/services/ProfileService";
-import { providerService } from "@/src/services/ProviderService";
+import { fetchMovieImportOptions, providerService } from "@/src/services/ProviderService";
 import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 
@@ -33,6 +33,7 @@ export const useSettings = () => {
 	// Data
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [providers, setProviders] = useState<Provider[]>([]);
+	const [movieImports, setMovieImports] = useState<any[]>([]);
 
 	// Loading
 	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -46,6 +47,7 @@ export const useSettings = () => {
 	useEffect(() => {
 		fetchUserProfile();
 		fetchProviders();
+		fetchMovieImports();
 		if (!isLoaded) loadProviders();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -133,6 +135,15 @@ export const useSettings = () => {
 			if (response.success) setProviders(response.data);
 		} finally {
 			setIsLoadingProviders(false);
+		}
+	};
+
+	const fetchMovieImports = async () => {
+		try {
+			const response = await fetchMovieImportOptions();
+			if (response.success) setMovieImports(response.data);
+		} catch (error) {
+			console.error(error);
 		}
 	};
 
@@ -238,6 +249,7 @@ export const useSettings = () => {
 		isAdult,
 		userProfile,
 		providers,
+		movieImports,
 		selectedProviders,
 		cacheSize,
 

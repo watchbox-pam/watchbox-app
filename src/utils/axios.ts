@@ -99,6 +99,39 @@ export abstract class ApiHelper {
 		}
 	}
 
+	public static async uploadFile(
+		url: string,
+		formData: FormData,
+		options?: AxiosRequestConfig
+	) {
+		try {
+			let userToken: string | null;
+			if (Platform.OS === "ios" || Platform.OS === "android") {
+				userToken = await SecureStore.getItemAsync("token");
+			} else {
+				userToken = localStorage.getItem("token");
+			}
+
+			const response = await this.instance.post(url, formData, {
+				...options,
+				headers: {
+					...(options?.headers ?? {}),
+					Authorization: `Bearer ${userToken}`
+				}
+			});
+
+			return {
+				success: true,
+				data: response.data
+			};
+		} catch (error: any) {
+			return {
+				success: false,
+				data: error.response?.data?.detail ?? error.message
+			};
+		}
+	}
+
 	public static async put(
 		url: string,
 		data: any,

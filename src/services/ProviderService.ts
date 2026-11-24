@@ -40,3 +40,20 @@ export const providerService = {
 		}
 	}
 };
+
+/**
+ * Fetchs available import options for a specific service
+ * @returns list of import options
+ */
+export const fetchMovieImportOptions = async () => {
+	try {
+		const data: { success: boolean; data: any } =
+			await ApiHelper.get(`/providers/imports`);
+		return data;
+	} catch (error: any) {
+		return {
+			success: false,
+			data: "Impossible de récupérer les options d'importation"
+		};
+	}
+};

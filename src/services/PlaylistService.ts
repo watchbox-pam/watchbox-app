@@ -387,3 +387,54 @@ export async function getMovieRuntime(playlistId: string) {
 		};
 	}
 }
+
+export async function UploadFileToPlaylist(
+	fileUri: string,
+	type: string,
+	name: string,
+	id: string
+) {
+	try {
+		const formData = new FormData();
+		formData.append("file", {
+			uri: fileUri,
+			type: type,
+			name: name
+		} as any);
+
+		const options = {
+			headers: {
+				"Content-Type": "multipart/form-data"
+			}
+		};
+
+		const result = await ApiHelper.uploadFile(
+			`/playlists/import/${id}`,
+			formData,
+			options
+		);
+		if (result.success) {
+			return {
+				success: true,
+				message: "Fichier importé avec succès"
+			};
+		} else {
+			return {
+				success: false,
+				message:
+					result.data || "Erreur lors de l'importation du fichier"
+			};
+		}
+	} catch (error) {
+		console.error(
+			"Error in UploadFileToPlaylist:",
+			(error as any).response?.data || (error as any).message
+		);
+		return {
+			success: false,
+			message:
+				(error as any).message ||
+				"Erreur lors de l'importation du fichier"
+		};
+	}
+}

@@ -10,6 +10,9 @@ import DeleteAccountModal from "../components/Param/DeleteAccountModal";
 import ClearCacheModal from "../components/Param/ClearCacheModal";
 import { useSettings } from "@/src/components/Param/useSettings";
 import Toast from "react-native-toast-message";
+import ImportMovies, { ImportProvider } from "../components/Param/ImportMovies";
+import { pickDocument } from "@/src/utils/pickDocument";
+import { UploadFileToPlaylist } from "../services/PlaylistService";
 
 const ParamScreen: React.FC = () => {
 	const {
@@ -20,6 +23,7 @@ const ParamScreen: React.FC = () => {
 		isAdult,
 		userProfile,
 		providers,
+		movieImports,
 		selectedProviders,
 		cacheSize,
 		isLoadingProfile,
@@ -38,6 +42,53 @@ const ParamScreen: React.FC = () => {
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showClearCacheModal, setShowClearCacheModal] = useState(false);
+
+	const handleImportProvider = async (provider: ImportProvider) => {
+		
+		let importOption: any = null;
+		let importId: string = "";
+		switch (provider) {
+			case ImportProvider.Netflix:
+				importId = ImportProvider.Netflix.toString();
+				importOption = "text/comma-separated-values";
+				break;
+
+			case ImportProvider.Letterboxd:
+				importId = ImportProvider.Letterboxd.toString();
+				importOption = "application/zip";
+				break;
+			default:
+				console.warn("Unknown import provider:", provider);
+				return;
+		}
+
+		const file = await pickDocument(importOption);
+
+		if (!file) {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Aucun fichier sélectionné"
+			});
+			return;
+		}
+
+		if (!file.uri || !file.mimeType || !file.name) {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Fichier invalide"
+			});
+			return;
+		}
+
+		await UploadFileToPlaylist(
+			file.uri,
+			file.mimeType,
+			file.name,
+			importId
+		);
+	};
 
 	return (
 		<ScrollView style={styles.container}>
@@ -71,6 +122,11 @@ const ParamScreen: React.FC = () => {
 				selectedProviders={selectedProviders}
 				isLoading={isLoadingProviders}
 				onToggleProvider={toggleProvider}
+			/>
+
+			<ImportMovies
+				movieImports={movieImports}
+				onImportProvider={handleImportProvider}
 			/>
 
 			<SettingCheckboxItem

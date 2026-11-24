@@ -8,6 +8,7 @@ import { loginUser } from "@/src/services/LoginService";
 import { router, Link } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
 import Toast from "react-native-toast-message";
+import { consumeFirstLoginImportPrompt } from "@/src/services/SignupService";
 
 export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
@@ -20,13 +21,15 @@ export default function LoginScreen() {
 	const handleSubmit = async () => {
 		const result = await loginUser({ identifier, password });
 		if (result.success) {
-			// Save session and redirect to home
+			const showImportPrompt = await consumeFirstLoginImportPrompt(
+				result.message.username
+			);
 			signIn(
 				result.message.id,
 				result.message.username,
 				result.message.token
 			);
-			router.replace("/");
+			router.replace(showImportPrompt ? "/importMovies" : "/");
 			return;
 		} else {
 			Toast.show({
