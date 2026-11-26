@@ -56,7 +56,10 @@ export async function loginUser({
 				message: {
 					id: result.data.user_id,
 					token: result.data.token,
-					username: result.data.username
+					username: result.data.username,
+					onboardingCompleted: result.data.onboarding_completed as
+						| boolean
+						| undefined
 				}
 			};
 		} else {

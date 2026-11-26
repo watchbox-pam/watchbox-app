@@ -103,6 +103,23 @@ describe("GoogleRegistrationScreen", () => {
 		expect(useGoogleRegistrationStore.getState().pending).toBeNull();
 	});
 
+	it("ouvre l'onboarding quand le backend l'indique", async () => {
+		mockedComplete.mockResolvedValue({
+			status: "logged_in",
+			session: { id: "u1", username: "Arno", token: "jwt" },
+			onboardingCompleted: false
+		});
+		render(<GoogleRegistrationScreen />);
+
+		fireEvent.press(screen.getByText("Date de naissance"));
+		fireEvent.press(screen.getByTestId("dateTimePicker"));
+		fireEvent.press(screen.getByText("Créer mon compte"));
+
+		await waitFor(() =>
+			expect(router.replace).toHaveBeenCalledWith("/onboarding/providers")
+		);
+	});
+
 	it("affiche l'erreur du backend (pseudo pris) sans quitter l'écran", async () => {
 		mockedComplete.mockResolvedValue({
 			status: "error",

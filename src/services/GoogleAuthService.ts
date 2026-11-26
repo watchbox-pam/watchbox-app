@@ -33,7 +33,12 @@ export type GoogleSession = {
 
 export type GoogleSignInResult =
 	// Compte connu : l'utilisateur est connecté, la session est enregistrée
-	| { status: "logged_in"; session: GoogleSession }
+	| {
+			status: "logged_in";
+			session: GoogleSession;
+			/** Absent si le backend ne gère pas encore l'onboarding */
+			onboardingCompleted?: boolean;
+	  }
 	// Nouveau compte : il faut afficher l'écran "Finaliser l'inscription"
 	| {
 			status: "registration_required";
@@ -83,7 +88,11 @@ async function saveLoggedInResponse(data: any): Promise<GoogleSignInResult> {
 		token: data.token
 	};
 	await storeSession(session);
-	return { status: "logged_in", session };
+	return {
+		status: "logged_in",
+		session,
+		onboardingCompleted: data.onboarding_completed
+	};
 }
 
 /**

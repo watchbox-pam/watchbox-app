@@ -15,6 +15,7 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
+import { routeAfterLogin } from "@/src/utils/onboarding";
 import useSessionStore from "@/src/zustand/sessionStore";
 import useGoogleRegistrationStore from "@/src/zustand/googleRegistrationStore";
 import {
@@ -103,7 +104,8 @@ export default function GoogleRegistrationScreen() {
 					text1: "Bienvenue sur Watchbox !",
 					text2: "Votre compte a été créé"
 				});
-				router.replace("/");
+				// Nouveau compte : parcours d'onboarding avant l'accueil
+				router.replace(routeAfterLogin(result.onboardingCompleted));
 				return;
 			}
 

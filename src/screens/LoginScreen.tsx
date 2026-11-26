@@ -8,6 +8,7 @@ import { loginUser } from "@/src/services/LoginService";
 import { router, Link } from "expo-router";
 import useSessionStore from "@/src/zustand/sessionStore";
 import Toast from "react-native-toast-message";
+import { routeAfterLogin } from "@/src/utils/onboarding";
 
 export default function LoginScreen() {
 	const [identifier, setIdentifier] = useState<string>("");
@@ -26,7 +27,8 @@ export default function LoginScreen() {
 				result.message.username,
 				result.message.token
 			);
-			router.replace("/");
+			// Premier passage : parcours d'onboarding avant l'accueil
+			router.replace(routeAfterLogin(result.message.onboardingCompleted));
 			return;
 		} else {
 			Toast.show({

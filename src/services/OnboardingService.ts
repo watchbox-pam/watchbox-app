@@ -26,3 +26,14 @@ export async function completeOnboarding(): Promise<boolean> {
 	const response = await ApiHelper.post("/users/me/onboarding/complete", {});
 	return response.success;
 }
+
+/**
+ * Statut de l'onboarding de l'utilisateur connecté.
+ * null si le serveur ne répond pas (ou ne connaît pas encore cette route).
+ */
+export async function getOnboardingStatus(): Promise<boolean | null> {
+	const response = await ApiHelper.get("/users/me/onboarding");
+	if (!response.success || typeof response.data !== "object") return null;
+	const completed = response.data?.onboarding_completed;
+	return typeof completed === "boolean" ? completed : null;
+}

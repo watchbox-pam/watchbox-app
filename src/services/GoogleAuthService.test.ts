@@ -185,4 +185,25 @@ describe("GoogleAuthService", () => {
 		expect(result.status).toBe("error");
 		expect(result.message).toContain("Google Play");
 	});
+
+	it("transmet le statut d'onboarding renvoyé par le backend", async () => {
+		mockedSignIn.mockResolvedValue({
+			type: "success",
+			data: { idToken: "google-token" }
+		});
+		mockedPost.mockResolvedValue({
+			success: true,
+			data: {
+				status: "logged_in",
+				user_id: "u1",
+				username: "Arno",
+				token: "jwt",
+				onboarding_completed: false
+			}
+		});
+
+		const result = await service.signInWithGoogle();
+
+		expect(result.onboardingCompleted).toBe(false);
+	});
 });

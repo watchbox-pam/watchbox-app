@@ -11,6 +11,8 @@ import StyledText from "@/src/components/StyledText";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { checkLogin } from "@/src/services/LandingService";
+import { getOnboardingStatus } from "@/src/services/OnboardingService";
+import { routeAfterLogin } from "@/src/utils/onboarding";
 import useSessionStore from "@/src/zustand/sessionStore";
 import useGoogleRegistrationStore from "@/src/zustand/googleRegistrationStore";
 import * as SecureStore from "expo-secure-store";
@@ -49,7 +51,9 @@ export default function BaseScreen() {
 				result.identifier ?? "",
 				result.token ?? ""
 			);
-			router.replace("/"); // Redirect to home if logged in
+			// Onboarding interrompu (app fermée en cours de route) : on le reprend
+			const onboardingCompleted = await getOnboardingStatus();
+			router.replace(routeAfterLogin(onboardingCompleted));
 			return;
 		}
 	};
@@ -74,7 +78,7 @@ export default function BaseScreen() {
 						result.session.username,
 						result.session.token
 					);
-					router.replace("/");
+					router.replace(routeAfterLogin(result.onboardingCompleted));
 					return;
 
 				case "registration_required":
