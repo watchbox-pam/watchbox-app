@@ -68,7 +68,9 @@ describe("OnboardingProvidersScreen", () => {
 
 		fireEvent.press(screen.getByTestId("onboarding-providers-continue"));
 
-		await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/"));
+		await waitFor(() =>
+			expect(router.replace).toHaveBeenCalledWith("/onboarding/swipe")
+		);
 		expect(saveProviders).toHaveBeenCalledWith([337, 8]);
 	});
 

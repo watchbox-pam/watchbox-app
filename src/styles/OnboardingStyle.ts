@@ -118,3 +118,74 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+
+export const swipeStyles = StyleSheet.create({
+	header: {
+		width: "100%",
+		paddingHorizontal: 16,
+		paddingTop: 16,
+		paddingBottom: 8
+	},
+	topRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center"
+	},
+	skip: {
+		paddingVertical: 6,
+		paddingHorizontal: 12
+	},
+	skipText: {
+		color: "#C9D1DB",
+		fontSize: 15,
+		fontWeight: "600"
+	},
+	title: {
+		color: "#fff",
+		fontSize: 26,
+		fontWeight: "bold",
+		marginTop: 2
+	},
+	hint: {
+		color: "#9AA4B2",
+		fontSize: 13,
+		marginTop: 4
+	},
+	progressRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
+		marginTop: 12
+	},
+	progressTrack: {
+		flex: 1,
+		height: 6,
+		borderRadius: 3,
+		backgroundColor: "#1E3A5F",
+		overflow: "hidden"
+	},
+	progressFill: {
+		height: "100%",
+		borderRadius: 3,
+		backgroundColor: "#AC2128"
+	},
+	progressText: {
+		color: "#C9D1DB",
+		fontSize: 13,
+		minWidth: 44,
+		textAlign: "right"
+	},
+	finishButton: {
+		backgroundColor: "#AC2128",
+		borderRadius: 12,
+		paddingVertical: 14,
+		paddingHorizontal: 32,
+		alignItems: "center",
+		minWidth: 240
+	},
+	finishText: {
+		color: "#fff",
+		fontWeight: "bold",
+		fontSize: 17
+	}
+});

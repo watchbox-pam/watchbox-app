@@ -20,7 +20,7 @@ import useSessionStore from "@/src/zustand/sessionStore";
 const COLUMNS = 3;
 
 // Écran suivant de l'onboarding
-const NEXT_ROUTE = "/";
+const NEXT_ROUTE = "/onboarding/swipe";
 
 export default function OnboardingProvidersScreen() {
 	const isLoggedIn = useSessionStore((state) => state.isLoggedIn);

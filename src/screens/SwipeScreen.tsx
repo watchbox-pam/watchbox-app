@@ -36,7 +36,34 @@ const PREFETCH_THRESHOLD = 10;
 
 type SwipeDirection = "left" | "right" | "up";
 
-export default function SwipeScreen() {
+export type SwipeProgress = { current: number; total: number };
+
+type SwipeScreenProps = {
+	/** Source des films (par défaut : films aléatoires) */
+	loadMovies?: () => Promise<Movie[]>;
+	/** Recharge des films quand on arrive au bout (onglet Swipe) */
+	loadMore?: boolean;
+	/** Un appui sur l'affiche ouvre la fiche du film */
+	openDetailsOnTap?: boolean;
+	/** Nom de l'écran dans les statistiques */
+	screenName?: string;
+	/** Affiché au-dessus des cartes */
+	renderHeader?: (progress: SwipeProgress) => React.ReactNode;
+	/** Affiché sous le récapitulatif de fin */
+	endAction?: React.ReactNode;
+	/** Affiché quand il n'y a aucun film */
+	emptyAction?: React.ReactNode;
+};
+
+export default function SwipeScreen({
+	loadMovies = fetchMovies,
+	loadMore = true,
+	openDetailsOnTap = true,
+	screenName = "Swipe",
+	renderHeader,
+	endAction,
+	emptyAction
+}: SwipeScreenProps = {}) {
 	const [movies, setMovies] = useState<Movie[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
@@ -62,12 +89,12 @@ export default function SwipeScreen() {
 	const seenMovieIdsRef = useRef<Set<number>>(new Set());
 
 	useEffect(() => {
-		startScreenTracking("Swipe");
+		startScreenTracking(screenName);
 
 		return () => {
 			endScreenTracking();
 		};
-	}, []);
+	}, [screenName]);
 
 	useEffect(() => {
 		currentIndexRef.current = currentIndex;
@@ -78,6 +105,7 @@ export default function SwipeScreen() {
 	}, [movies]);
 
 	useEffect(() => {
+		if (!loadMore) return;
 		const remaining = movies.length - currentIndex;
 		if (
 			remaining > PREFETCH_THRESHOLD ||
@@ -101,12 +129,12 @@ export default function SwipeScreen() {
 			.catch(() => {
 				isFetchingMoreRef.current = false;
 			});
-	}, [currentIndex, movies.length]);
+	}, [currentIndex, movies.length, loadMore]);
 
 	useEffect(() => {
 		const load = async () => {
 			try {
-				const res = await fetchMovies();
+				const res = await loadMovies();
 				res.forEach((m) => seenMovieIdsRef.current.add(m.id));
 				setMovies(res);
 			} catch (err) {
@@ -117,6 +145,7 @@ export default function SwipeScreen() {
 		};
 
 		load();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useLayoutEffect(() => {
@@ -223,6 +252,11 @@ export default function SwipeScreen() {
 
 				if (isTab) {
 					const movie = moviesRef.current[currentIndexRef.current];
+					if (!openDetailsOnTap) {
+						translateX.value = 0;
+						translateY.value = 0;
+						return;
+					}
 					if (movie) {
 						translateX.value = 0;
 						translateY.value = 0;
@@ -270,16 +304,26 @@ export default function SwipeScreen() {
 		return <MovieLoader />;
 	}
 
+	const header = renderHeader?.({
+		current: Math.min(currentIndex, movies.length),
+		total: movies.length
+	});
+
 	if (movies.length === 0) {
 		return (
-			<View style={styles.centered}>
-				<Text style={styles.endText}>Aucun film disponible</Text>
+			<View style={styles.container}>
+				{header}
+				<View style={styles.centered}>
+					<Text style={styles.endText}>Aucun film disponible</Text>
+					{emptyAction}
+				</View>
 			</View>
 		);
 	}
 
 	return (
 		<View style={styles.container}>
+			{header}
 			<View style={styles.cardContainer}>
 				{hasEnded ? (
 					<View style={styles.centered}>
@@ -356,6 +400,7 @@ export default function SwipeScreen() {
 								</Text>
 							</View>
 						</View>
+						{endAction}
 					</View>
 				) : (
 					[...visibleMovies].reverse().map((movie, ReverseIndex) => {
