@@ -126,6 +126,18 @@ export const useSettings = () => {
 
 	/* ---------- PROVIDERS ---------- */
 
+	// Enregistré sur le serveur ; en cas d'échec, la sélection précédente est remise
+	const handleToggleProvider = async (providerId: number) => {
+		const saved = await toggleProvider(providerId);
+		if (!saved) {
+			Toast.show({
+				type: "error",
+				text1: "Erreur",
+				text2: "Impossible d'enregistrer vos plateformes"
+			});
+		}
+	};
+
 	const fetchProviders = async () => {
 		setIsLoadingProviders(true);
 		try {
@@ -251,7 +263,7 @@ export const useSettings = () => {
 		setHistory: handleToggleHistory,
 		setAdultContent: handleToggleAdultContent,
 
-		toggleProvider,
+		toggleProvider: handleToggleProvider,
 		calculateCacheSize,
 		clearCache,
 		redirectToPasswordReset,

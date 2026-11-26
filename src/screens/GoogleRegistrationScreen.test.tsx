@@ -40,6 +40,10 @@ jest.mock("@react-native-community/datetimepicker", () => {
 	);
 	return MockDatePicker;
 });
+jest.mock("@/src/services/UserProviderService", () => ({
+	getMyProviders: jest.fn(),
+	updateMyProviders: jest.fn()
+}));
 jest.mock("@/src/services/GoogleAuthService", () => ({
 	completeGoogleRegistration: jest.fn(),
 	signOutFromGoogle: jest.fn()

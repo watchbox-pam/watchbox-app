@@ -53,11 +53,15 @@ export default function SearchScreen() {
 		useState<boolean>(false);
 	const {
 		selectedProviders,
+		searchFilter,
 		isLoaded,
 		loadProviders,
-		toggleProvider,
-		clearProviders
+		toggleSearchFilter,
+		clearSearchFilter
 	} = useFiltersStore();
+	// Par défaut, la recherche est filtrée sur les plateformes de l'utilisateur.
+	// Modifier le filtre ici ne change pas les plateformes enregistrées.
+	const activeFilter = searchFilter ?? selectedProviders;
 
 	const hasInteracted = useRef(false);
 
@@ -125,7 +129,7 @@ export default function SearchScreen() {
 		try {
 			const results = await searchService.getSuggestions(
 				searchTerm,
-				selectedProviders.length > 0 ? selectedProviders : undefined
+				activeFilter.length > 0 ? activeFilter : undefined
 			);
 			if (results.success) {
 				const seenTitles = new Set<string>();
@@ -178,9 +182,7 @@ export default function SearchScreen() {
 					case "films":
 						const movieResults = await searchService.searchMovies(
 							term,
-							selectedProviders.length > 0
-								? selectedProviders
-								: undefined
+							activeFilter.length > 0 ? activeFilter : undefined
 						);
 						if (movieResults.success) {
 							setMovies(movieResults.data);
@@ -217,9 +219,7 @@ export default function SearchScreen() {
 					default:
 						const allResults = await searchService.searchAll(
 							term,
-							selectedProviders.length > 0
-								? selectedProviders
-								: undefined
+							activeFilter.length > 0 ? activeFilter : undefined
 						);
 						if (allResults.success) {
 							setMovies(allResults.data.movies || []);
@@ -377,13 +377,13 @@ export default function SearchScreen() {
 				<TouchableOpacity
 					style={[
 						styles.providerFilterButton,
-						selectedProviders.length > 0 &&
+						activeFilter.length > 0 &&
 							styles.activeProviderFilterButton
 					]}
 					onPress={() => setShowProviderFilter(!showProviderFilter)}>
 					<Text style={styles.providerFilterText}>
-						{selectedProviders.length > 0
-							? `Filtres (${selectedProviders.length})`
+						{activeFilter.length > 0
+							? `Filtres (${activeFilter.length})`
 							: "Filtres"}
 					</Text>
 				</TouchableOpacity>
@@ -396,7 +396,7 @@ export default function SearchScreen() {
 						<Text style={styles.providerFilterTitle}>
 							Plateformes
 						</Text>
-						<TouchableOpacity onPress={clearProviders}>
+						<TouchableOpacity onPress={clearSearchFilter}>
 							<Text style={styles.clearText}>Effacer tout</Text>
 						</TouchableOpacity>
 					</View>
@@ -410,10 +410,10 @@ export default function SearchScreen() {
 								key={provider.id}
 								style={[
 									styles.providerItem,
-									selectedProviders.includes(provider.id) &&
+									activeFilter.includes(provider.id) &&
 										styles.selectedProviderItem
 								]}
-								onPress={() => toggleProvider(provider.id)}>
+								onPress={() => toggleSearchFilter(provider.id)}>
 								{provider.logo_path ? (
 									<Image
 										source={{
